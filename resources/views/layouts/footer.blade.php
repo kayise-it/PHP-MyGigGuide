@@ -63,7 +63,7 @@
                     &copy; {{ date('Y') }} My Gig Guide. All rights reserved.
                 </p>
                 <p class="text-gray-400 text-sm mt-2 md:mt-0">
-                    Created by <a href="https://kayiseit.co.za" class="text-purple-400 hover:text-white font-semibold" target="_blank" rel="noopener">KAYISE IT</a> — promoting KAYISE IT
+                    Created by <a href="https://kayiseit.co.za" class="text-purple-400 hover:text-white font-semibold" target="_blank" rel="noopener">KAYISE IT</a> — promoting My Gig Guide
                 </p>
             </div>
         </div>

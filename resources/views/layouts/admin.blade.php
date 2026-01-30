@@ -12,7 +12,7 @@
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=inter:400,500,600,700,800&display=swap" rel="stylesheet" />
     
-    <!-- Scripts -->
+    <!-- Styles / Scripts -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     
     @stack('head')
@@ -22,6 +22,10 @@
         .btn:hover{background:#f3f4f6}
         .btn-primary{background:#7c3aed;color:#fff;border-color:#7c3aed}
         .btn-primary:hover{background:#6d28d9;border-color:#6d28d9}
+        .btn-secondary{background:#e5e7eb;color:#111827;border-color:#e5e7eb}
+        .btn-secondary:hover{background:#d1d5db;border-color:#d1d5db}
+        .btn-danger{background:#dc2626;color:#fff;border-color:#dc2626}
+        .btn-danger:hover{background:#b91c1c;border-color:#b91c1c}
         .btn-sm{padding:.25rem .6rem;font-size:.875rem}
         .input{width:100%;padding:.5rem .75rem;border:1px solid #e5e7eb;border-radius:.5rem}
         .alert{padding:.5rem .75rem;border-radius:.5rem}
@@ -100,13 +104,15 @@
                         Organisers
                     </a>
 
-                    <a href="{{ route('admin.paid-features.index') }}" 
-                       class="nav-item {{ request()->routeIs('admin.paid-features.*') ? 'nav-item-active' : '' }}">
-                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 1.343-3 3s1.343 3 3 3 3-1.343 3-3-1.343-3-3-3zm0-6a9 9 0 100 18 9 9 0 000-18z" />
-                        </svg>
-                        Paid Features
-                    </a>
+                    @if(\App\Models\SiteSetting::isPaidFeaturesEnabled())
+                        <a href="{{ route('admin.paid-features.index') }}" 
+                           class="nav-item {{ request()->routeIs('admin.paid-features.*') ? 'nav-item-active' : '' }}">
+                            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 1.343-3 3s1.343 3 3 3 3-1.343 3-3-1.343-3-3-3zm0-6a9 9 0 100 18 9 9 0 000-18z" />
+                            </svg>
+                            Paid Features
+                        </a>
+                    @endif
                     <!-- Add genre management -->
                     <a href="{{ route('admin.genres.index') }}" 
                        class="nav-item {{ request()->routeIs('admin.genres.*') ? 'nav-item-active' : '' }}">
@@ -123,13 +129,22 @@
                         </svg>
                         Categories
                     </a>
-                    <!-- Unclaimed Artists -->
-                    <a href="{{ route('admin.unclaimed-artists.index') }}" 
-                       class="nav-item {{ request()->routeIs('admin.unclaimed-artists.*') ? 'nav-item-active' : '' }}">
+                    <!-- Unclaimed Items -->
+                    @php
+                        $unclaimedCount = \App\Models\Artist::whereNull('user_id')->count()
+                            + \App\Models\Venue::whereNull('user_id')->whereNull('owner_id')->count()
+                            + \App\Models\Event::whereNull('owner_id')->count()
+                            + \App\Models\Organiser::whereNull('user_id')->count();
+                    @endphp
+                    <a href="{{ route('admin.unclaimed.index') }}" 
+                       class="nav-item {{ request()->routeIs('admin.unclaimed.*') ? 'nav-item-active' : '' }}">
                         <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
                         </svg>
-                        Unclaimed Artists
+                        Unclaimed
+                        @if($unclaimedCount > 0)
+                            <span class="ml-auto px-2 py-0.5 text-xs font-semibold rounded-full bg-purple-100 text-purple-800">{{ $unclaimedCount }}</span>
+                        @endif
                     </a>
                     <!-- Artist Claim Disputes -->
                     @php
@@ -148,6 +163,60 @@
                         @if($disputeCount > 0)
                             <span class="ml-2 px-2 py-0.5 text-xs font-semibold rounded-full bg-red-100 text-red-800">{{ $disputeCount }}</span>
                         @endif
+                    </a>
+
+                    <!-- Duplicate Names -->
+                    @php
+                        $duplicateService = app(\App\Services\DuplicateNameService::class);
+                        $duplicateSummary = $duplicateService->getDuplicateSummary();
+                        $totalDuplicateGroups = collect($duplicateSummary)->sum('duplicate_groups');
+                    @endphp
+                    <a href="{{ route('admin.duplicates.index') }}" 
+                       class="nav-item {{ request()->routeIs('admin.duplicates.*') ? 'nav-item-active' : '' }}">
+                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                        </svg>
+                        Duplicates
+                        @if($totalDuplicateGroups > 0)
+                            <span class="ml-auto px-2 py-0.5 text-xs font-semibold rounded-full bg-amber-100 text-amber-800">{{ $totalDuplicateGroups }}</span>
+                        @endif
+                    </a>
+
+                    <!-- Divider -->
+                    <div class="border-t border-gray-200 my-4"></div>
+
+                    <!-- Settings -->
+                    <a href="{{ route('admin.settings.index') }}" 
+                       class="nav-item {{ request()->routeIs('admin.settings.*') ? 'nav-item-active' : '' }}">
+                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                        </svg>
+                        Settings
+                    </a>
+
+                    <a href="{{ route('admin.email-templates.index') }}"
+                       class="nav-item {{ request()->routeIs('admin.email-templates.*') ? 'nav-item-active' : '' }}">
+                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h6m5 8H6a2 2 0 01-2-2V6a2 2 0 012-2h8l6 6v8a2 2 0 01-2 2z" />
+                        </svg>
+                        Email Templates
+                    </a>
+                    <!-- Mail Accounts -->
+                    <a href="{{ route('admin.mail-accounts.index') }}"
+                       class="nav-item {{ request()->routeIs('admin.mail-accounts.*') ? 'nav-item-active' : '' }}">
+                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                        </svg>
+                        Mail Accounts
+                    </a>
+
+                    <a href="{{ route('admin.capabilities.index') }}"
+                       class="nav-item {{ request()->routeIs('admin.capabilities.*') ? 'nav-item-active' : '' }}">
+                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h10M4 18h6" />
+                        </svg>
+                        Capabilities
                     </a>
                 </div>
             </nav>
@@ -263,6 +332,30 @@
             </main>
         </div>
 
+        <!-- Global admin modal -->
+        <div id="admin-modal-backdrop"
+             class="fixed inset-0 z-40 hidden transition-opacity bg-gray-900/20"
+             style="backdrop-filter: blur(8px);"></div>
+        <div id="admin-modal"
+             class="fixed inset-0 z-50 flex items-center justify-center p-4 hidden">
+            <div class="bg-white rounded-2xl shadow-xl max-w-4xl w-full relative overflow-hidden">
+                <button type="button"
+                        id="admin-modal-close"
+                        class="absolute top-3 right-3 inline-flex items-center justify-center rounded-full p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 focus:outline-none">
+                    <span class="sr-only">Close</span>
+                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+                <div id="admin-modal-body" class="max-h-[80vh] overflow-y-auto p-6">
+                    <!-- Content injected dynamically -->
+                    <div class="flex items-center justify-center py-12 text-gray-400 text-sm">
+                        Loading...
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- Mobile sidebar overlay -->
         <div x-show="sidebarOpen" 
              x-transition:enter="transition-opacity ease-linear duration-300"
@@ -275,6 +368,99 @@
              @click="sidebarOpen = false">
         </div>
     </div>
+
+    <script>
+        /**
+         * Global Admin Modal helper.
+         * Usage:
+         * - AdminModal.openFromElement('#selector')
+         * - AdminModal.openWithHtml('<p>Content</p>')
+         * - AdminModal.openFromUrl('/admin/users/1')
+         * - AdminModal.close()
+         */
+        window.AdminModal = (function () {
+            const modal = document.getElementById('admin-modal');
+            const backdrop = document.getElementById('admin-modal-backdrop');
+            const body = document.getElementById('admin-modal-body');
+            const closeBtn = document.getElementById('admin-modal-close');
+
+            if (!modal || !backdrop || !body || !closeBtn) {
+                return {
+                    openWithHtml: function () {},
+                    openFromElement: function () {},
+                    openFromUrl: function () {},
+                    close: function () {},
+                };
+            }
+
+            function open() {
+                modal.classList.remove('hidden');
+                backdrop.classList.remove('hidden');
+            }
+
+            function close() {
+                modal.classList.add('hidden');
+                backdrop.classList.add('hidden');
+            }
+
+            closeBtn.addEventListener('click', close);
+            backdrop.addEventListener('click', close);
+            document.addEventListener('keydown', function (e) {
+                if (e.key === 'Escape') {
+                    close();
+                }
+            });
+
+            function setBodyHtml(html) {
+                body.innerHTML = html;
+            }
+
+            function openWithHtml(html) {
+                setBodyHtml(html);
+                open();
+            }
+
+            function openFromElement(selector) {
+                const el = document.querySelector(selector);
+                if (!el) return;
+                setBodyHtml(el.innerHTML);
+                open();
+            }
+
+            function openFromUrl(url, options = {}) {
+                const loadingText = options.loadingText || 'Loading...';
+                setBodyHtml(
+                    '<div class="flex items-center justify-center py-12 text-gray-400 text-sm">' +
+                        loadingText +
+                        '</div>'
+                );
+                open();
+
+                fetch(url, {
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Accept': 'text/html',
+                    },
+                })
+                    .then((r) => r.text())
+                    .then((html) => {
+                        setBodyHtml(html);
+                    })
+                    .catch(() => {
+                        setBodyHtml(
+                            '<div class="flex items-center justify-center py-12 text-red-500 text-sm">Failed to load content.</div>'
+                        );
+                    });
+            }
+
+            return {
+                openWithHtml,
+                openFromElement,
+                openFromUrl,
+                close,
+            };
+        })();
+    </script>
 
     @stack('scripts')
 </body>

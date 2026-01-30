@@ -2,6 +2,83 @@
 
 @section('title', $event->name . ' - My Gig Guide')
 
+@push('head')
+@php
+    $description = \Illuminate\Support\Str::limit(strip_tags($event->description ?? 'Discover live events on My Gig Guide.'), 160);
+    $imageUrl = null;
+    
+    // Try event poster first
+    if ($event->poster && \Illuminate\Support\Facades\Storage::disk('public')->exists($event->poster)) {
+        $storageUrl = \Illuminate\Support\Facades\Storage::disk('public')->url($event->poster);
+        // Ensure absolute URL - Storage::url() may return relative if APP_URL not set
+        $imageUrl = (str_starts_with($storageUrl, 'http://') || str_starts_with($storageUrl, 'https://')) 
+            ? $storageUrl 
+            : url($storageUrl);
+    } 
+    // Try event gallery images
+    elseif ($event->gallery) {
+        $galleryImages = [];
+        try {
+            $galleryImages = is_string($event->gallery) ? json_decode($event->gallery, true) : $event->gallery;
+            if (!is_array($galleryImages)) {
+                $galleryImages = [];
+            }
+            // Filter out invalid temp paths
+            $galleryImages = array_filter($galleryImages, function($path) {
+                return $path && !str_contains($path, '/tmp/php') && !str_contains($path, 'tmp.php');
+            });
+        } catch (Exception $e) {
+            $galleryImages = [];
+        }
+        
+        // Try first gallery image
+        if (count($galleryImages) > 0) {
+            $firstImage = $galleryImages[0];
+            if (\Illuminate\Support\Facades\Storage::disk('public')->exists($firstImage)) {
+                $storageUrl = \Illuminate\Support\Facades\Storage::disk('public')->url($firstImage);
+                $imageUrl = (str_starts_with($storageUrl, 'http://') || str_starts_with($storageUrl, 'https://')) 
+                    ? $storageUrl 
+                    : url($storageUrl);
+            }
+        }
+    }
+    // Try venue main picture
+    if (!$imageUrl && $event->venue && $event->venue->main_picture && \Illuminate\Support\Facades\Storage::disk('public')->exists($event->venue->main_picture)) {
+        $storageUrl = \Illuminate\Support\Facades\Storage::disk('public')->url($event->venue->main_picture);
+        $imageUrl = (str_starts_with($storageUrl, 'http://') || str_starts_with($storageUrl, 'https://')) 
+            ? $storageUrl 
+            : url($storageUrl);
+    }
+    // Fallback to logo
+    if (!$imageUrl) {
+        $fallbackUrl = asset('logos/logo1.jpeg');
+        $imageUrl = url($fallbackUrl);
+    }
+@endphp
+<!-- Open Graph / Facebook -->
+<meta property="og:type" content="article">
+<meta property="og:url" content="{{ route('events.show', $event) }}">
+<meta property="og:title" content="{{ $event->name }} - My Gig Guide">
+<meta property="og:description" content="{{ $description }}">
+@if($imageUrl)
+<meta property="og:image" content="{{ $imageUrl }}">
+<meta property="og:image:secure_url" content="{{ str_replace('http://', 'https://', $imageUrl) }}">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:type" content="image/jpeg">
+@endif
+<meta property="og:site_name" content="My Gig Guide">
+
+<!-- Twitter -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:url" content="{{ route('events.show', $event) }}">
+<meta name="twitter:title" content="{{ $event->name }} - My Gig Guide">
+<meta name="twitter:description" content="{{ $description }}">
+@if($imageUrl)
+<meta name="twitter:image" content="{{ $imageUrl }}">
+@endif
+@endpush
+
 @push('styles')
 <style>
     /* Heart icon styling for favorited/unfavorited states */
@@ -50,9 +127,9 @@
         }
         }
         $mainImage = $event->poster ?: ($galleryImages[0] ?? null);
-        // Also check if mainImage is a valid path
-        if ($mainImage && (str_contains($mainImage, '/tmp/php') || str_contains($mainImage, 'tmp.php'))) {
-        $mainImage = null;
+        // Also check if mainImage is a valid path and the file exists
+        if ($mainImage && (str_contains($mainImage, '/tmp/php') || str_contains($mainImage, 'tmp.php') || !\Illuminate\Support\Facades\Storage::disk('public')->exists($mainImage))) {
+            $mainImage = null;
         }
         @endphp
 
@@ -60,8 +137,14 @@
         <!-- Owl Carousel for multiple gallery images -->
         <div class="owl-carousel owl-theme event-hero-carousel w-full h-full">
             @foreach($galleryImages as $index => $image)
+                @php
+                    $imageExists = \Illuminate\Support\Facades\Storage::disk('public')->exists($image);
+                @endphp
+                @if(! $imageExists)
+                    @continue
+                @endif
             <div class="item relative w-full h-full">
-                <img src="{{ Storage::url($image) }}" alt="{{ $event->name }} - Image {{ $index + 1 }}"
+                <img src="{{ Storage::disk('public')->url($image) }}" alt="{{ $event->name }} - Image {{ $index + 1 }}"
                     class="w-full h-full object-cover">
                 <div class="absolute inset-0 bg-black/40"></div>
             </div>
@@ -70,7 +153,7 @@
         @elseif($mainImage)
         <!-- Single image background -->
         <div class="relative w-full h-full">
-            <img src="{{ Storage::url($mainImage) }}" alt="{{ $event->name }}" class="w-full h-full object-cover">
+            <img src="{{ Storage::disk('public')->url($mainImage) }}" alt="{{ $event->name }}" class="w-full h-full object-cover">
             <div class="absolute inset-0 bg-black/40"></div>
         </div>
         @else
@@ -262,7 +345,7 @@
                         ?: (optional($artist->user)->profile_picture ?? null);
                         $avatarValid = $avatarPath && !str_contains($avatarPath, '/tmp/php') &&
                         !str_contains($avatarPath, 'tmp.php');
-                        $avatarUrl = $avatarValid ? Storage::url($avatarPath) : null;
+                        $avatarUrl = $avatarValid && Storage::disk('public')->exists($avatarPath) ? Storage::disk('public')->url($avatarPath) : null;
                         @endphp
                         <a href="{{ route('artists.show', $artist) }}" class="flex items-center p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
                             @if($avatarUrl)
@@ -287,13 +370,30 @@
                 @endif
                 <!-- Event Gallery -->
                 @if(count($galleryImages) > 0)
+                @php
+                    // Filter valid gallery images and create mapping
+                    $validGalleryImages = [];
+                    $galleryIndexMap = [];
+                    $validIndex = 0;
+                    foreach ($galleryImages as $originalIndex => $image) {
+                        if ($image && !str_contains($image, '/tmp/php') && !str_contains($image, 'tmp.php') && \Illuminate\Support\Facades\Storage::disk('public')->exists($image)) {
+                            $validGalleryImages[] = $image;
+                            $galleryIndexMap[$originalIndex] = $validIndex;
+                            $validIndex++;
+                        }
+                    }
+                @endphp
                 <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
                     <h2 class="text-2xl font-bold text-gray-900 mb-4">Event Gallery</h2>
                     <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
                         @foreach($galleryImages as $index => $image)
-                        <div class="relative group cursor-pointer" data-gallery-index="{{ $index }}" role="button" tabindex="0" aria-label="Open image {{ $index + 1 }} in gallery">
-                            <img src="{{ Storage::url($image) }}" alt="{{ $event->name }} - Image {{ $index + 1 }}"
-                                class="w-full h-32 object-cover rounded-lg shadow-sm group-hover:shadow-md transition-shadow">
+                            @php
+                                $imageExists = \Illuminate\Support\Facades\Storage::disk('public')->exists($image);
+                            @endphp
+                            @if($imageExists && !str_contains($image, '/tmp/php') && !str_contains($image, 'tmp.php'))
+                            <div class="relative group cursor-pointer" data-gallery-index="{{ $galleryIndexMap[$index] ?? $index }}" role="button" tabindex="0" aria-label="Open image {{ ($galleryIndexMap[$index] ?? $index) + 1 }} in gallery">
+                                <img src="{{ Storage::disk('public')->url($image) }}" alt="{{ $event->name }} - Image {{ ($galleryIndexMap[$index] ?? $index) + 1 }}"
+                                    class="w-full h-32 object-cover rounded-lg shadow-sm group-hover:shadow-md transition-shadow">
                             <div
                                 class="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all rounded-lg flex items-center justify-center">
                                 <svg class="h-6 w-6 text-white opacity-0 group-hover:opacity-100 transition-opacity"
@@ -305,21 +405,82 @@
                                     </path>
                                 </svg>
                             </div>
-                        </div>
+                            </div>
+                            @endif
+                        @endforeach
+                    </div>
+                </div>
+                @endif
+
+                <!-- YouTube Videos -->
+                @php
+                    try {
+                        $youtubeVideos = $event->youtubeVideos ?? collect();
+                        if (!$youtubeVideos || !is_object($youtubeVideos)) {
+                            $youtubeVideos = $event->youtubeVideos()->get();
+                        }
+                        // #region agent log
+                        $logData = [
+                            'sessionId' => 'debug-session',
+                            'runId' => 'run1',
+                            'hypothesisId' => 'D',
+                            'location' => 'events/show.blade.php:youtube_videos',
+                            'message' => 'YouTube videos in view',
+                            'data' => [
+                                'event_id' => $event->id,
+                                'videos_count' => $youtubeVideos->count(),
+                                'videos_data' => $youtubeVideos->map(function($v) {
+                                    return ['id' => $v->id, 'youtube_video_id' => $v->youtube_video_id];
+                                })->toArray(),
+                            ],
+                            'timestamp' => now()->timestamp * 1000,
+                        ];
+                        @file_put_contents('/var/www/mygigguide/.cursor/debug.log', json_encode($logData) . "\n", FILE_APPEND | LOCK_EX);
+                        // #endregion
+                    } catch (\Exception $e) {
+                        $youtubeVideos = collect();
+                        \Log::error('Error loading youtube videos: ' . $e->getMessage());
+                    }
+                @endphp
+                @if($youtubeVideos && $youtubeVideos->count() > 0)
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                    <h2 class="text-2xl font-bold text-gray-900 mb-4">Videos</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        @foreach($youtubeVideos as $video)
+                        @php
+                            // #region agent log
+                            $logData = [
+                                'sessionId' => 'debug-session',
+                                'runId' => 'run1',
+                                'hypothesisId' => 'D',
+                                'location' => 'events/show.blade.php:video_loop',
+                                'message' => 'Rendering video component',
+                                'data' => [
+                                    'video_id' => $video->id,
+                                    'youtube_video_id' => $video->youtube_video_id,
+                                    'embed_url' => $video->embed_url,
+                                    'has_video_id' => !empty($video->youtube_video_id),
+                                ],
+                                'timestamp' => now()->timestamp * 1000,
+                            ];
+                            @file_put_contents('/var/www/mygigguide/.cursor/debug.log', json_encode($logData) . "\n", FILE_APPEND | LOCK_EX);
+                            // #endregion
+                        @endphp
+                        <x-youtube-video :video="$video" />
                         @endforeach
                     </div>
                 </div>
                 @endif
 
                 <!-- Lightbox Modal for Event Gallery -->
-                <div id="event-gallery-modal" class="fixed inset-0 bg-black/90 hidden items-center justify-center z-[100]">
-                    <button type="button" id="event-gallery-close" class="absolute top-4 right-4 p-2 text-white bg-white/10 hover:bg-white/20 rounded-full" aria-label="Close gallery">
+                <div id="event-gallery-modal" class="fixed inset-0 bg-black/90 z-[100]" style="display: none; align-items: center; justify-content: center;">
+                    <button type="button" id="event-gallery-close" class="absolute top-4 right-4 p-2 text-white bg-white/10 hover:bg-white/20 rounded-full z-10" aria-label="Close gallery">
                         <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
                     </button>
-                    <button type="button" id="event-gallery-prev" class="absolute left-4 md:left-8 p-3 text-white bg-white/10 hover:bg-white/20 rounded-full" aria-label="Previous image">
+                    <button type="button" id="event-gallery-prev" class="absolute left-4 md:left-8 p-3 text-white bg-white/10 hover:bg-white/20 rounded-full z-10" aria-label="Previous image">
                         <svg class="h-7 w-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
                     </button>
-                    <button type="button" id="event-gallery-next" class="absolute right-4 md:right-8 p-3 text-white bg-white/10 hover:bg-white/20 rounded-full" aria-label="Next image">
+                    <button type="button" id="event-gallery-next" class="absolute right-4 md:right-8 p-3 text-white bg-white/10 hover:bg-white/20 rounded-full z-10" aria-label="Next image">
                         <svg class="h-7 w-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
                     </button>
                     <div class="max-w-5xl w-full px-4">
@@ -493,66 +654,11 @@
                     </div>
 
                     <!-- Social Sharing -->
-                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-                    <h3 class="text-lg font-semibold text-gray-900 mb-4">Share this event</h3>
-                    <div class="flex flex-wrap gap-3">
-                        <!-- Facebook -->
-                        <a href="https://www.facebook.com/sharer/sharer.php?u={{ urlencode(request()->url()) }}&quote={{ urlencode($event->name . ' - ' . $event->description) }}" 
-                           target="_blank" 
-                           rel="noopener noreferrer"
-                           class="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
-                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
-                            </svg>
-                            Facebook
-                        </a>
-
-                        <!-- Twitter -->
-                        <a href="https://twitter.com/intent/tweet?url={{ urlencode(request()->url()) }}&text={{ urlencode($event->name . ' - ' . $event->date->format('M j, Y') . ' at ' . $event->venue->name) }}" 
-                           target="_blank" 
-                           rel="noopener noreferrer"
-                           class="flex items-center gap-2 px-4 py-2 bg-sky-500 text-white rounded-lg hover:bg-sky-600 transition-colors">
-                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"/>
-                            </svg>
-                            Twitter
-                        </a>
-
-                        <!-- WhatsApp -->
-                        <a href="https://wa.me/?text={{ urlencode($event->name . ' - ' . $event->date->format('M j, Y') . ' at ' . $event->venue->name . ' - ' . request()->url()) }}" 
-                           target="_blank" 
-                           rel="noopener noreferrer"
-                           class="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors">
-                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893A11.821 11.821 0 0020.885 3.488"/>
-                            </svg>
-                            WhatsApp
-                        </a>
-
-                        <!-- LinkedIn -->
-                        <a href="https://www.linkedin.com/sharing/share-offsite/?url={{ urlencode(request()->url()) }}" 
-                           target="_blank" 
-                           rel="noopener noreferrer"
-                           class="flex items-center gap-2 px-4 py-2 bg-blue-700 text-white rounded-lg hover:bg-blue-800 transition-colors">
-                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
-                            </svg>
-                            LinkedIn
-                        </a>
-
-                        <!-- Copy Link -->
-                        <button onclick="copyEventLink()" 
-                                class="flex items-center gap-2 px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
-                            </svg>
-                            Copy Link
-                        </button>
+                    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                        <h3 class="text-lg font-semibold text-gray-900 mb-4">Share this event</h3>
+                        <x-social-share-icons :event="$event" />
                     </div>
                 </div>
-                </div>
-
-                
 
                 <!-- Event Tips -->
                 <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
@@ -808,6 +914,102 @@
                 jQuery('.owl-next').click(function () {
                     jQuery('.event-hero-carousel').trigger('next.owl.carousel');
                 });
+            }
+
+            // Initialize Event Gallery Lightbox
+            @php
+                $galleryUrls = [];
+                foreach ($galleryImages as $image) {
+                    if ($image && !str_contains($image, '/tmp/php') && !str_contains($image, 'tmp.php') && \Illuminate\Support\Facades\Storage::disk('public')->exists($image)) {
+                        $galleryUrls[] = \Illuminate\Support\Facades\Storage::disk('public')->url($image);
+                    }
+                }
+            @endphp
+            const galleryImages = @json($galleryUrls ?? []);
+            
+            if (galleryImages && galleryImages.length > 0) {
+                const modal = document.getElementById('event-gallery-modal');
+                const modalImage = document.getElementById('event-gallery-image');
+                const modalCounter = document.getElementById('event-gallery-counter');
+                const closeBtn = document.getElementById('event-gallery-close');
+                const prevBtn = document.getElementById('event-gallery-prev');
+                const nextBtn = document.getElementById('event-gallery-next');
+                let currentIndex = 0;
+
+                // Open modal when clicking gallery images
+                document.querySelectorAll('[data-gallery-index]').forEach(function(item) {
+                    item.addEventListener('click', function() {
+                        currentIndex = parseInt(this.getAttribute('data-gallery-index'));
+                        openGallery(currentIndex);
+                    });
+                    
+                    // Also handle Enter key for accessibility
+                    item.addEventListener('keydown', function(e) {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                            e.preventDefault();
+                            currentIndex = parseInt(this.getAttribute('data-gallery-index'));
+                            openGallery(currentIndex);
+                        }
+                    });
+                });
+
+                function openGallery(index) {
+                    if (index < 0 || index >= galleryImages.length) return;
+                    currentIndex = index;
+                    modalImage.src = galleryImages[currentIndex];
+                    modalImage.alt = 'Event image ' + (currentIndex + 1);
+                    modalCounter.textContent = (currentIndex + 1) + ' / ' + galleryImages.length;
+                    modal.style.display = 'flex';
+                    modal.classList.remove('hidden');
+                    document.body.style.overflow = 'hidden'; // Prevent background scrolling
+                }
+
+                function closeGallery() {
+                    modal.style.display = 'none';
+                    modal.classList.add('hidden');
+                    document.body.style.overflow = ''; // Restore scrolling
+                }
+
+                function showNext() {
+                    currentIndex = (currentIndex + 1) % galleryImages.length;
+                    openGallery(currentIndex);
+                }
+
+                function showPrev() {
+                    currentIndex = (currentIndex - 1 + galleryImages.length) % galleryImages.length;
+                    openGallery(currentIndex);
+                }
+
+                // Event listeners
+                closeBtn.addEventListener('click', closeGallery);
+                nextBtn.addEventListener('click', showNext);
+                prevBtn.addEventListener('click', showPrev);
+
+                // Close on background click
+                modal.addEventListener('click', function(e) {
+                    if (e.target === modal) {
+                        closeGallery();
+                    }
+                });
+
+                // Keyboard navigation
+                document.addEventListener('keydown', function(e) {
+                    if (!modal.classList.contains('hidden')) {
+                        if (e.key === 'Escape') {
+                            closeGallery();
+                        } else if (e.key === 'ArrowRight') {
+                            showNext();
+                        } else if (e.key === 'ArrowLeft') {
+                            showPrev();
+                        }
+                    }
+                });
+
+                // Hide prev/next buttons if only one image
+                if (galleryImages.length <= 1) {
+                    prevBtn.style.display = 'none';
+                    nextBtn.style.display = 'none';
+                }
             }
         }
 

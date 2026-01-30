@@ -6,6 +6,8 @@ use App\Models\Artist;
 use App\Models\Category;
 use App\Models\Event;
 use App\Models\Venue;
+use App\Models\YoutubeVideo;
+use App\Rules\YoutubeUrl;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -113,6 +115,23 @@ class EventController extends Controller
      */
     public function store(Request $request)
     {
+        // #region agent log
+        $logData = [
+            'sessionId' => 'debug-session',
+            'runId' => 'run1',
+            'hypothesisId' => 'A',
+            'location' => 'EventController.php:store',
+            'message' => 'EventController store method entry',
+            'data' => [
+                'has_youtube_videos' => $request->has('youtube_videos'),
+                'youtube_videos_input' => $request->input('youtube_videos'),
+                'table_exists' => \Illuminate\Support\Facades\Schema::hasTable('youtube_videos'),
+            ],
+            'timestamp' => now()->timestamp * 1000,
+        ];
+        @file_put_contents('/var/www/mygigguide/.cursor/debug.log', json_encode($logData) . "\n", FILE_APPEND | LOCK_EX);
+        // #endregion
+        
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
@@ -130,6 +149,8 @@ class EventController extends Controller
             'artists.*' => 'exists:artists,id',
             'categories' => 'nullable|array',
             'categories.*' => 'exists:categories,id',
+            'youtube_videos' => 'nullable|array',
+            'youtube_videos.*' => ['nullable', new YoutubeUrl()],
         ]);
 
         // Get user's folder path
@@ -161,7 +182,37 @@ class EventController extends Controller
         $validated['owner_type'] = auth()->user()->hasRole('artist') ? 'artist' : 'organiser';
         $validated['status'] = 'upcoming';
 
+        // #region agent log
+        $logData = [
+            'sessionId' => 'debug-session',
+            'runId' => 'run1',
+            'hypothesisId' => 'A',
+            'location' => 'EventController.php:168',
+            'message' => 'Before creating Event',
+            'data' => [
+                'table_exists' => \Illuminate\Support\Facades\Schema::hasTable('youtube_videos'),
+            ],
+            'timestamp' => now()->timestamp * 1000,
+        ];
+        @file_put_contents('/var/www/mygigguide/.cursor/debug.log', json_encode($logData) . "\n", FILE_APPEND | LOCK_EX);
+        // #endregion
+
         $event = Event::create($validated);
+        
+        // #region agent log
+        $logData = [
+            'sessionId' => 'debug-session',
+            'runId' => 'run1',
+            'hypothesisId' => 'A',
+            'location' => 'EventController.php:175',
+            'message' => 'Event created successfully',
+            'data' => [
+                'event_id' => $event->id,
+            ],
+            'timestamp' => now()->timestamp * 1000,
+        ];
+        @file_put_contents('/var/www/mygigguide/.cursor/debug.log', json_encode($logData) . "\n", FILE_APPEND | LOCK_EX);
+        // #endregion
 
         // Attach artists
         if ($request->has('artists')) {
@@ -173,6 +224,94 @@ class EventController extends Controller
             $event->categories()->attach($request->categories);
         }
 
+        // Handle YouTube videos
+        if ($request->has('youtube_videos') && is_array($request->youtube_videos)) {
+            // #region agent log
+            $logData = [
+                'sessionId' => 'debug-session',
+                'runId' => 'run1',
+                'hypothesisId' => 'A',
+                'location' => 'EventController.php:181',
+                'message' => 'Checking if youtube_videos table exists before creating records',
+                'data' => [
+                    'has_youtube_videos' => $request->has('youtube_videos'),
+                    'youtube_videos_count' => is_array($request->youtube_videos) ? count($request->youtube_videos) : 0,
+                    'table_exists' => \Illuminate\Support\Facades\Schema::hasTable('youtube_videos'),
+                    'database_name' => \DB::connection()->getDatabaseName(),
+                ],
+                'timestamp' => now()->timestamp * 1000,
+            ];
+            @file_put_contents('/var/www/mygigguide/.cursor/debug.log', json_encode($logData) . "\n", FILE_APPEND | LOCK_EX);
+            // #endregion
+            
+            foreach ($request->youtube_videos as $index => $url) {
+                if (!empty($url)) {
+                    $videoId = YoutubeVideo::extractVideoId($url);
+                    // #region agent log
+                    $logData = [
+                        'sessionId' => 'debug-session',
+                        'runId' => 'run1',
+                        'hypothesisId' => 'C',
+                        'location' => 'EventController.php:195',
+                        'message' => 'Before creating YoutubeVideo record',
+                        'data' => [
+                            'url' => $url,
+                            'video_id' => $videoId,
+                            'event_id' => $event->id,
+                            'index' => $index,
+                        ],
+                        'timestamp' => now()->timestamp * 1000,
+                    ];
+                    @file_put_contents('/var/www/mygigguide/.cursor/debug.log', json_encode($logData) . "\n", FILE_APPEND | LOCK_EX);
+                    // #endregion
+                    
+                    if ($videoId) {
+                        try {
+                            YoutubeVideo::create([
+                                'videoable_type' => Event::class,
+                                'videoable_id' => $event->id,
+                                'youtube_url' => $url,
+                                'youtube_video_id' => $videoId,
+                                'order' => $index,
+                            ]);
+                            // #region agent log
+                            $logData = [
+                                'sessionId' => 'debug-session',
+                                'runId' => 'run1',
+                                'hypothesisId' => 'C',
+                                'location' => 'EventController.php:210',
+                                'message' => 'YoutubeVideo record created successfully',
+                                'data' => [
+                                    'video_id' => $videoId,
+                                ],
+                                'timestamp' => now()->timestamp * 1000,
+                            ];
+                            @file_put_contents('/var/www/mygigguide/.cursor/debug.log', json_encode($logData) . "\n", FILE_APPEND | LOCK_EX);
+                            // #endregion
+                        } catch (\Exception $e) {
+                            // #region agent log
+                            $logData = [
+                                'sessionId' => 'debug-session',
+                                'runId' => 'run1',
+                                'hypothesisId' => 'C',
+                                'location' => 'EventController.php:220',
+                                'message' => 'Exception when creating YoutubeVideo',
+                                'data' => [
+                                    'exception_message' => $e->getMessage(),
+                                    'exception_code' => $e->getCode(),
+                                    'table_exists_check' => \Illuminate\Support\Facades\Schema::hasTable('youtube_videos'),
+                                ],
+                                'timestamp' => now()->timestamp * 1000,
+                            ];
+                            @file_put_contents('/var/www/mygigguide/.cursor/debug.log', json_encode($logData) . "\n", FILE_APPEND | LOCK_EX);
+                            // #endregion
+                            throw $e;
+                        }
+                    }
+                }
+            }
+        }
+
         return redirect()->route('events.show', $event)
             ->with('success', 'Event created successfully!');
     }
@@ -182,8 +321,50 @@ class EventController extends Controller
      */
     public function show(Request $request, Event $event)
     {
-        $event->load(['venue', 'artists', 'owner', 'ratings.user']);
+        // #region agent log
+        $logData = [
+            'sessionId' => 'debug-session',
+            'runId' => 'run1',
+            'hypothesisId' => 'D',
+            'location' => 'EventController.php:show',
+            'message' => 'EventController show method entry',
+            'data' => [
+                'event_id' => $event->id,
+                'youtube_videos_count_before_load' => $event->youtubeVideos()->count(),
+            ],
+            'timestamp' => now()->timestamp * 1000,
+        ];
+        @file_put_contents('/var/www/mygigguide/.cursor/debug.log', json_encode($logData) . "\n", FILE_APPEND | LOCK_EX);
+        // #endregion
+        
+        $event->load(['venue', 'artists', 'owner', 'ratings.user', 'youtubeVideos']);
+        
+        // Ensure youtubeVideos relationship is loaded even if not eager loaded
+        if (!$event->relationLoaded('youtubeVideos')) {
+            $event->load('youtubeVideos');
+        }
+        
+        // #region agent log
+        $logData = [
+            'sessionId' => 'debug-session',
+            'runId' => 'run1',
+            'hypothesisId' => 'D',
+            'location' => 'EventController.php:show',
+            'message' => 'After loading relationships',
+            'data' => [
+                'event_id' => $event->id,
+                'youtube_videos_count_after_load' => $event->youtubeVideos->count(),
+                'relation_loaded' => $event->relationLoaded('youtubeVideos'),
+                'youtube_videos_data' => $event->youtubeVideos->map(function($v) {
+                    return ['id' => $v->id, 'youtube_video_id' => $v->youtube_video_id, 'youtube_url' => $v->youtube_url];
+                })->toArray(),
+            ],
+            'timestamp' => now()->timestamp * 1000,
+        ];
+        @file_put_contents('/var/www/mygigguide/.cursor/debug.log', json_encode($logData) . "\n", FILE_APPEND | LOCK_EX);
+        // #endregion
 
+        // Check for social media crawlers FIRST, before auth check
         if ($this->isSocialPreviewRequest($request)) {
             $shareData = $this->buildSocialPreviewData($event);
 
@@ -193,6 +374,7 @@ class EventController extends Controller
                 ->header('X-Robots-Tag', 'noindex, nofollow');
         }
 
+        // Only require auth for regular users, not crawlers
         if (! $request->user()) {
             return redirect()->route('login', ['continue' => $request->fullUrl()]);
         }
@@ -229,56 +411,92 @@ class EventController extends Controller
             'category' => 'nullable|string|max:255',
             'capacity' => 'nullable|integer|min:1',
             'venue_id' => 'nullable|exists:venues,id',
-            'artist_ids' => 'nullable|array',
-            'artist_ids.*' => 'exists:artists,id',
+            'artists' => 'nullable|array',
+            'artists.*' => 'exists:artists,id',
             'categories' => 'nullable|array',
             'categories.*' => 'exists:categories,id',
+            'youtube_videos' => 'nullable|array',
+            'youtube_videos.*' => ['nullable', new YoutubeUrl()],
+            'youtube_video_ids' => 'nullable|array',
+            'youtube_video_ids.*' => 'nullable|integer|exists:youtube_videos,id',
         ]);
 
         // Prepare event storage folder for any uploads
         $userFolder = auth()->user()->getFolderPath();
         $eventFolder = $this->createEventFolder($userFolder, $validated['name'], $validated['date']);
 
-        // Handle poster upload
+        // Handle poster upload - preserve existing if no new file uploaded
+        $posterPath = $event->poster; // Keep existing poster
         if ($request->hasFile('poster')) {
             // Delete old poster if exists
             if ($event->poster) {
                 Storage::disk('public')->delete($event->poster);
             }
-            $validated['poster'] = $request->file('poster')->store($eventFolder.'/poster', 'public');
+            $posterPath = $request->file('poster')->store($eventFolder.'/poster', 'public');
+        }
+        $validated['poster'] = $posterPath;
+
+        // Handle gallery - preserve existing and merge with new uploads
+        // Normalize existing gallery to array
+        $existingGallery = is_array($event->gallery)
+            ? $event->gallery
+            : (is_string($event->gallery) ? json_decode($event->gallery, true) : []);
+        if (!is_array($existingGallery)) {
+            $existingGallery = [];
         }
 
-        // Merge new gallery images with existing ones
+        // Add new gallery images if uploaded
         if ($request->hasFile('gallery')) {
-            // Normalize existing gallery to array
-            $existingGallery = is_array($event->gallery)
-                ? $event->gallery
-                : (is_string($event->gallery) ? json_decode($event->gallery, true) : []);
-            if (!is_array($existingGallery)) {
-                $existingGallery = [];
-            }
-
             foreach ($request->file('gallery') as $image) {
                 $existingGallery[] = $image->store($eventFolder.'/gallery', 'public');
             }
-
-            $validated['gallery'] = json_encode(array_values($existingGallery));
         }
+
+        // Preserve existing gallery (even if empty, don't overwrite with null)
+        $validated['gallery'] = json_encode(array_values($existingGallery));
 
         $event->update($validated);
 
-        // Sync artists
-        if ($request->has('artist_ids')) {
-            $event->artists()->sync($request->artist_ids);
-        } else {
-            $event->artists()->detach();
+        // Sync artists - preserve existing if not provided or empty
+        if ($request->has('artists') && !empty($request->artists)) {
+            $event->artists()->sync($request->artists);
         }
+        // If artists not provided or empty, keep existing associations (don't detach)
 
-        // Sync categories
+        // Sync categories - preserve existing if not provided
         if ($request->has('categories')) {
             $event->categories()->sync($request->categories);
+        }
+        // If categories not provided, keep existing associations (don't detach)
+
+        // Handle YouTube videos - delete removed videos and add new ones
+        if ($request->has('youtube_video_ids')) {
+            // Delete videos that are not in the list
+            $event->youtubeVideos()->whereNotIn('id', array_filter($request->youtube_video_ids))->delete();
         } else {
-            $event->categories()->detach();
+            // If no video IDs provided, delete all existing videos
+            $event->youtubeVideos()->delete();
+        }
+
+        // Add new YouTube videos
+        if ($request->has('youtube_videos') && is_array($request->youtube_videos)) {
+            $existingVideoIds = $request->youtube_video_ids ?? [];
+            $orderOffset = $event->youtubeVideos()->whereIn('id', array_filter($existingVideoIds))->count();
+            
+            foreach ($request->youtube_videos as $index => $url) {
+                if (!empty($url)) {
+                    $videoId = YoutubeVideo::extractVideoId($url);
+                    if ($videoId) {
+                        YoutubeVideo::create([
+                            'videoable_type' => Event::class,
+                            'videoable_id' => $event->id,
+                            'youtube_url' => $url,
+                            'youtube_video_id' => $videoId,
+                            'order' => $orderOffset + $index,
+                        ]);
+                    }
+                }
+            }
         }
 
         return redirect()->route('events.show', $event)
@@ -329,6 +547,7 @@ class EventController extends Controller
         $previewAgents = [
             'facebookexternalhit',
             'facebot',
+            'facebook',
             'twitterbot',
             'pinterest',
             'linkedinbot',
@@ -338,6 +557,8 @@ class EventController extends Controller
             'telegrambot',
             'vkshare',
             'skypeuripreview',
+            'googlebot',
+            'bingbot',
         ];
 
         foreach ($previewAgents as $agent) {
@@ -346,6 +567,7 @@ class EventController extends Controller
             }
         }
 
+        // Also check for share_preview parameter
         return $request->boolean('share_preview');
     }
 
@@ -355,12 +577,52 @@ class EventController extends Controller
 
         $imageUrl = null;
 
-        if ($event->poster) {
-            $imageUrl = url(Storage::url($event->poster));
-        } elseif ($event->venue && $event->venue->main_picture) {
-            $imageUrl = url(Storage::url($event->venue->main_picture));
-        } else {
-            $imageUrl = asset('logos/logo1.jpeg');
+        // Try event poster first
+        if ($event->poster && Storage::disk('public')->exists($event->poster)) {
+            $storageUrl = Storage::disk('public')->url($event->poster);
+            // Ensure absolute URL - Storage::url() may return relative if APP_URL not set
+            $imageUrl = (str_starts_with($storageUrl, 'http://') || str_starts_with($storageUrl, 'https://')) 
+                ? $storageUrl 
+                : url($storageUrl);
+        } 
+        // Try event gallery images
+        elseif ($event->gallery) {
+            $galleryImages = [];
+            try {
+                $galleryImages = is_string($event->gallery) ? json_decode($event->gallery, true) : $event->gallery;
+                if (!is_array($galleryImages)) {
+                    $galleryImages = [];
+                }
+                // Filter out invalid temp paths
+                $galleryImages = array_filter($galleryImages, function($path) {
+                    return $path && !str_contains($path, '/tmp/php') && !str_contains($path, 'tmp.php');
+                });
+            } catch (\Exception $e) {
+                $galleryImages = [];
+            }
+            
+            // Try first gallery image
+            if (count($galleryImages) > 0) {
+                $firstImage = $galleryImages[0];
+                if (Storage::disk('public')->exists($firstImage)) {
+                    $storageUrl = Storage::disk('public')->url($firstImage);
+                    $imageUrl = (str_starts_with($storageUrl, 'http://') || str_starts_with($storageUrl, 'https://')) 
+                        ? $storageUrl 
+                        : url($storageUrl);
+                }
+            }
+        }
+        // Try venue main picture
+        if (!$imageUrl && $event->venue && $event->venue->main_picture && Storage::disk('public')->exists($event->venue->main_picture)) {
+            $storageUrl = Storage::disk('public')->url($event->venue->main_picture);
+            $imageUrl = (str_starts_with($storageUrl, 'http://') || str_starts_with($storageUrl, 'https://')) 
+                ? $storageUrl 
+                : url($storageUrl);
+        }
+        // Fallback to logo
+        if (!$imageUrl) {
+            $fallbackUrl = asset('logos/logo1.jpeg');
+            $imageUrl = url($fallbackUrl);
         }
 
         return [
@@ -420,6 +682,7 @@ class EventController extends Controller
         $eventFolder = $userFolder.'/events/'.$folderName;
 
         // Create the folder structure
+        \Storage::disk('public')->makeDirectory($eventFolder.'/poster');
         \Storage::disk('public')->makeDirectory($eventFolder.'/gallery');
         \Storage::disk('public')->makeDirectory($eventFolder.'/documents');
 

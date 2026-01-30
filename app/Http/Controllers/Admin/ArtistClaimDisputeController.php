@@ -34,11 +34,15 @@ class ArtistClaimDisputeController extends Controller
 
             $query = Artist::with(['pendingClaimUser'])
                 ->where(function($q) {
-                    $q->where('claim_status', 'pending')
+                    // Show all items that are disputed OR have pending claims
+                    $q->where('dispute_raised', true)
                       ->orWhere('claim_status', 'disputed')
-                      ->orWhere('dispute_raised', true);
-                })
-                ->whereNotNull('pending_claim_user_id');
+                      ->orWhere(function($pendingQ) {
+                          // Items with pending claims
+                          $pendingQ->whereNotNull('pending_claim_user_id')
+                                   ->where('claim_status', 'pending');
+                      });
+                });
 
             // Filter by status
             if ($request->filled('status')) {
@@ -62,7 +66,10 @@ class ArtistClaimDisputeController extends Controller
                 });
             }
 
-            $disputes = $query->orderByDesc('pending_claim_at')->paginate(20)->withQueryString();
+            $disputes = $query->orderByDesc('dispute_raised_at')
+                              ->orderByDesc('pending_claim_at')
+                              ->orderByDesc('created_at')
+                              ->paginate(20)->withQueryString();
 
             return view('admin.artist-disputes.index', compact('disputes'));
         } catch (\Exception $e) {
@@ -82,9 +89,11 @@ class ArtistClaimDisputeController extends Controller
     {
         $artist->load('pendingClaimUser');
         
-        if (!$artist->pending_claim_user_id) {
+        // Allow viewing disputes even without pending claims
+        // Just verify it's actually disputed
+        if (!$artist->dispute_raised && $artist->claim_status !== 'disputed') {
             return redirect()->route('admin.artist-disputes.index')
-                ->with('error', 'No pending claim found for this artist.');
+                ->with('error', 'This artist is not in a disputed state.');
         }
 
         return view('admin.artist-disputes.show', compact('artist'));
@@ -105,6 +114,14 @@ class ArtistClaimDisputeController extends Controller
         }
 
         $user = User::findOrFail($artist->pending_claim_user_id);
+
+        // Check if user already has an artist profile - if so, unlink it first (make it unclaimed)
+        $existingArtist = $user->artist;
+        if ($existingArtist && $existingArtist->id !== $artist->id) {
+            // Unlink the existing artist (set user_id to null, making it unclaimed)
+            $existingArtist->update(['user_id' => null]);
+            $existingArtist->clearClaimData();
+        }
 
         // Link the artist to the user
         $artist->update([
@@ -204,6 +221,14 @@ class ArtistClaimDisputeController extends Controller
         if (!$gracePeriodEnabled || ($artist->grace_period_ends_at && Carbon::now()->gte($artist->grace_period_ends_at))) {
             if ($artist->pending_claim_user_id) {
                 $user = User::findOrFail($artist->pending_claim_user_id);
+                
+                // Check if user already has an artist profile - if so, unlink it first (make it unclaimed)
+                $existingArtist = $user->artist;
+                if ($existingArtist && $existingArtist->id !== $artist->id) {
+                    // Unlink the existing artist (set user_id to null, making it unclaimed)
+                    $existingArtist->update(['user_id' => null]);
+                    $existingArtist->clearClaimData();
+                }
                 
                 $artist->update([
                     'user_id' => $user->id,

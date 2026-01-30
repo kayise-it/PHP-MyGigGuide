@@ -121,6 +121,9 @@
                         <p class="text-gray-500">No upcoming events at this venue</p>
                     @endif
                 </div>
+
+                <!-- Venue Management (Superuser Only) -->
+                <x-venue-owner-management :venue="$venue" />
             </div>
 
             <!-- Sidebar -->

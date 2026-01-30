@@ -25,9 +25,17 @@
 <!-- Venues Grid -->
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
     @if($venues->count() > 0)
+        @php
+            $ownedIds = $ownedVenueIds ?? [];
+        @endphp
+
+        @if(!empty($ownedIds))
+            <h2 class="text-lg font-semibold text-gray-900 mb-3">Your Venues</h2>
+        @endif
+
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             @foreach($venues as $venue)
-                <x-venue-card :venue="$venue" />
+                <x-venue-card :venue="$venue" :isOwned="in_array($venue->id, $ownedIds)" />
             @endforeach
         </div>
 

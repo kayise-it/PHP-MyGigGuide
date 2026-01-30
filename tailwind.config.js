@@ -1,4 +1,5 @@
 import { defineConfig } from '@tailwindcss/vite'
+import colors from 'tailwindcss/colors'
 
 export default defineConfig({
   content: [
@@ -9,6 +10,8 @@ export default defineConfig({
   theme: {
     extend: {
       colors: {
+        // Ensure full amber palette is available for bg-amber-*, border-amber-*, text-amber-* utilities
+        amber: colors.amber,
         // Primary Brand Colors
         primary: {
           50: '#faf5ff',

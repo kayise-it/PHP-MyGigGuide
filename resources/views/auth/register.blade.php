@@ -25,6 +25,29 @@
 
         <!-- Registration Form -->
         <div class="bg-white rounded-2xl shadow-sm border border-purple-100 p-8">
+            @if(\App\Models\SiteSetting::isFacebookLoginEnabled())
+            <!-- Facebook Login Button -->
+            <div class="mb-6">
+                <a href="{{ route('facebook.login', ['role' => request('role')]) }}" 
+                   class="w-full flex items-center justify-center gap-3 py-3 px-4 border border-gray-300 rounded-xl shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-300">
+                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                        <path fill-rule="evenodd" d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z" clip-rule="evenodd" />
+                    </svg>
+                    Continue with Facebook
+                </a>
+            </div>
+
+            <!-- Divider -->
+            <div class="relative mb-6">
+                <div class="absolute inset-0 flex items-center">
+                    <div class="w-full border-t border-gray-300"></div>
+                </div>
+                <div class="relative flex justify-center text-sm">
+                    <span class="px-2 bg-white text-gray-500">Or continue with email</span>
+                </div>
+            </div>
+            @endif
+
             <form method="POST" action="{{ route('register') }}" class="space-y-6">
                 @csrf
                 

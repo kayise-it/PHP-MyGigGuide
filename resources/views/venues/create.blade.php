@@ -200,6 +200,35 @@
                     @enderror
                 </div>
 
+                <!-- YouTube Videos -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        YouTube Videos
+                    </label>
+                    <div id="youtube-videos-container" class="space-y-4">
+                        <div class="youtube-video-input flex gap-2">
+                            <input
+                                type="url"
+                                name="youtube_videos[]"
+                                placeholder="https://www.youtube.com/watch?v=..."
+                                class="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent @error('youtube_videos.*') border-red-300 @enderror"
+                            />
+                            <button type="button" onclick="removeYoutubeVideoInput(this)" class="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 hidden remove-video-btn">
+                                Remove
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <button type="button" onclick="addYoutubeVideoInput()" class="mt-4 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700">
+                        + Add Another Video
+                    </button>
+                    
+                    @error('youtube_videos.*')
+                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                    @enderror
+                    <p class="mt-2 text-sm text-gray-500">Add YouTube video URLs to showcase your venue</p>
+                </div>
+
                 <!-- Submit Buttons -->
                 <div class="flex items-center justify-end space-x-4 pt-6">
                     <a href="{{ route('dashboard') }}" class="btn-secondary">
@@ -270,6 +299,49 @@ function loadGoogleMaps() {
 // Initialize when page loads
 document.addEventListener('DOMContentLoaded', function() {
     loadGoogleMaps();
+});
+
+// YouTube Videos Management
+function addYoutubeVideoInput() {
+    const container = document.getElementById('youtube-videos-container');
+    const newInput = document.createElement('div');
+    newInput.className = 'youtube-video-input flex gap-2';
+    newInput.innerHTML = `
+        <input
+            type="url"
+            name="youtube_videos[]"
+            placeholder="https://www.youtube.com/watch?v=..."
+            class="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+        />
+        <button type="button" onclick="removeYoutubeVideoInput(this)" class="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 remove-video-btn">
+            Remove
+        </button>
+    `;
+    container.appendChild(newInput);
+    updateRemoveButtons();
+}
+
+function removeYoutubeVideoInput(button) {
+    button.closest('.youtube-video-input').remove();
+    updateRemoveButtons();
+}
+
+function updateRemoveButtons() {
+    const inputs = document.querySelectorAll('.youtube-video-input');
+    inputs.forEach((input) => {
+        const removeBtn = input.querySelector('.remove-video-btn');
+        if (removeBtn) {
+            if (inputs.length > 1) {
+                removeBtn.classList.remove('hidden');
+            } else {
+                removeBtn.classList.add('hidden');
+            }
+        }
+    });
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    updateRemoveButtons();
 });
 </script>
 @endpush

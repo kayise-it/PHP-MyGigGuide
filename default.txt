@@ -1,0 +1,3 @@
+default._domainkey	IN	TXT	( "v=DKIM1; h=sha256; k=rsa; "
+	  "p=MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAw7XevEFQ0wiw3LnafQdHp7/Yfy9cmMDik2ztzGHXdS6LMaiORV//XHCbsPeG4rxOkyWCnNU0asXVUUxVYy07M16J4Q4aBm4vWa+ldy4IhTz4/41RkGifiMeXCOst4Ckiw794bwlo0jLcIu8leqEPSlOSV5HGi6jGrIDEu7XsXIs8r77Zk3xCwqSWRFMbpJ7Ska1+sVjK6hIr0x"
+	  "zM1YGqowOHYSBL7VIV2wvmgkA6h4rpF2rWYvnKCe5+EbPOgtxHLD66LXguNXMxQ4zEVtRu5hXCh8lgTvazaUA2/5d7XtV2udOze/3GuHuPViXn7dfgtHTZYKAxC9AQZAM1cNcPtQIDAQAB" )  ; ----- DKIM key default for mygigguide.co.za

@@ -12,9 +12,15 @@ class AjaxSearch {
         this.debounceTimer = null;
         this.loadingClass = config.loadingClass || 'ajax-loading';
         
-        if (!this.form || !this.resultsContainer) {
-            console.warn('AjaxSearch: Form or results container not found');
+        if (!this.form) {
+            console.warn('AjaxSearch: Form not found');
             return;
+        }
+        
+        if (!this.resultsContainer) {
+            console.warn('AjaxSearch: Results container not found, will search for it on first search');
+            // Try to find it later when needed
+            this.resultsContainer = null;
         }
 
         this.init();
@@ -66,6 +72,16 @@ class AjaxSearch {
     }
 
     performSearch() {
+        // Find results container if not already set
+        if (!this.resultsContainer) {
+            this.resultsContainer = document.getElementById('ajax-results');
+            if (!this.resultsContainer) {
+                console.error('AjaxSearch: Results container not found');
+                this.showError('Results container not found. Please refresh the page.');
+                return;
+            }
+        }
+        
         const formData = new FormData(this.form);
         const params = new URLSearchParams(formData);
         
@@ -86,7 +102,7 @@ class AjaxSearch {
         })
         .then(response => {
             if (!response.ok) {
-                throw new Error('Network response was not ok');
+                throw new Error(`HTTP error! status: ${response.status}`);
             }
             return response.text();
         })
@@ -95,20 +111,48 @@ class AjaxSearch {
             const parser = new DOMParser();
             const doc = parser.parseFromString(html, 'text/html');
             
-            // Extract the results
-            const newResults = doc.getElementById('ajax-results');
+            // Extract the results - try multiple selectors
+            let newResults = doc.getElementById('ajax-results');
+            if (!newResults) {
+                // Try to find the table wrapper
+                newResults = doc.querySelector('.bg-white.rounded-xl.border');
+            }
+            if (!newResults) {
+                // Try to find any table
+                newResults = doc.querySelector('table');
+            }
             
             if (newResults) {
-                this.resultsContainer.innerHTML = newResults.innerHTML;
+                // If we found the ajax-results div, use its innerHTML
+                // Otherwise, wrap the content
+                if (newResults.id === 'ajax-results') {
+                    this.resultsContainer.innerHTML = newResults.innerHTML;
+                } else {
+                    // Wrap the found element in the ajax-results div structure
+                    this.resultsContainer.innerHTML = `<div class="bg-white rounded-xl border border-gray-200 overflow-hidden">${newResults.outerHTML}</div>`;
+                }
                 
                 // Reattach pagination listeners
                 this.attachPaginationListeners();
+                
+                // Reinitialize checkbox functionality if available
+                if (typeof window.initCheckboxFunctionality === 'function') {
+                    window.initCheckboxFunctionality();
+                }
+                
+                // Dispatch custom event for other components that need to reinitialize
+                window.dispatchEvent(new CustomEvent('ajax-results-updated', {
+                    detail: { container: this.resultsContainer }
+                }));
                 
                 // Update URL without page reload
                 window.history.pushState({}, '', fullUrl);
                 
                 // Scroll to top of results smoothly
                 this.resultsContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            } else {
+                console.error('AjaxSearch: Could not find results in response');
+                throw new Error('No results found in response');
             }
             
             this.hideLoading();
@@ -171,6 +215,17 @@ class AjaxSearch {
             if (newResults) {
                 this.resultsContainer.innerHTML = newResults.innerHTML;
                 this.attachPaginationListeners();
+                
+                // Reinitialize checkbox functionality if available
+                if (typeof window.initCheckboxFunctionality === 'function') {
+                    window.initCheckboxFunctionality();
+                }
+                
+                // Dispatch custom event for other components that need to reinitialize
+                window.dispatchEvent(new CustomEvent('ajax-results-updated', {
+                    detail: { container: this.resultsContainer }
+                }));
+                
                 window.history.pushState({}, '', url);
                 this.resultsContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
             }

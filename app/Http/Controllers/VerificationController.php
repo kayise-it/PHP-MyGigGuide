@@ -10,10 +10,20 @@ use Illuminate\Support\Facades\Log;
 use App\Mail\EmailVerificationMail;
 use App\Models\User;
 use App\Models\Artist;
+use App\Models\Venue;
+use App\Models\Organiser;
+use App\Services\ClaimService;
 use Carbon\Carbon;
 
 class VerificationController extends Controller
 {
+    protected ClaimService $claimService;
+
+    public function __construct(ClaimService $claimService)
+    {
+        $this->claimService = $claimService;
+    }
+
     /**
      * Show the email verification notice.
      */
@@ -27,6 +37,10 @@ class VerificationController extends Controller
      */
     public function verify(Request $request, $id, $hash)
     {
+        // #region agent log
+        @file_put_contents('/var/www/mygigguide/.cursor/debug.log', json_encode(['location'=>'VerificationController.php:verify:entry','message'=>'Email verification entry','data'=>['user_id'=>$id],'timestamp'=>now()->timestamp*1000,'sessionId'=>'debug-session','runId'=>'run1','hypothesisId'=>'H'])."\n", FILE_APPEND | LOCK_EX);
+        // #endregion
+
         $user = User::findOrFail($id);
 
         if (!hash_equals((string) $hash, sha1($user->getEmailForVerification()))) {
@@ -45,60 +59,39 @@ class VerificationController extends Controller
             event(new Verified($user));
         }
 
-        // Check for unclaimed artist with matching email (case-insensitive)
-        $unclaimedArtist = Artist::whereNull('user_id')
-            ->whereRaw('LOWER(contact_email) = ?', [strtolower($user->email)])
-            ->first();
+        // Check for unclaimed entities with matching email (artists, venues, organisers)
+        $claimResults = $this->claimService->autoClaimOnVerification($user);
+        
+        $hasApproved = !empty($claimResults['approved']);
+        $hasPending = !empty($claimResults['pending']);
+        $hasDisputed = !empty($claimResults['disputed']);
 
-        if ($unclaimedArtist) {
-            $gracePeriodEnabled = config('artist_claims.enable_grace_period', false);
-            $canAutoClaim = true;
+        if ($hasApproved || $hasPending || $hasDisputed) {
             $claimMessage = "Email verified successfully! ";
-
-            // Check if this user has a pending claim
-            $hasPendingClaim = $unclaimedArtist->pending_claim_user_id === $user->id;
             
-            // Check for disputes
-            if ($unclaimedArtist->dispute_raised) {
-                $canAutoClaim = false;
-                $claimMessage .= "Your artist profile '{$unclaimedArtist->stage_name}' claim is under review due to a dispute. An admin will verify your claim. ";
+            // Build message about approved claims
+            if ($hasApproved) {
+                $approvedNames = collect($claimResults['approved'])->pluck('name')->join(', ');
+                $claimMessage .= "Your profile(s) ({$approvedNames}) have been claimed. ";
             }
             
-            // Check grace period if enabled
-            if ($gracePeriodEnabled && $unclaimedArtist->grace_period_ends_at) {
-                if (Carbon::now()->lt($unclaimedArtist->grace_period_ends_at)) {
-                    $canAutoClaim = false;
-                    $remainingTime = $unclaimedArtist->grace_period_ends_at->diffForHumans();
-                    $claimMessage .= "Your artist profile '{$unclaimedArtist->stage_name}' is pending. The claim will be processed {$remainingTime}. ";
-                }
+            // Build message about pending claims
+            if ($hasPending) {
+                $pendingNames = collect($claimResults['pending'])->pluck('name')->join(', ');
+                $firstPending = $claimResults['pending'][0];
+                $remainingTime = isset($firstPending['grace_period_ends']) 
+                    ? Carbon::parse($firstPending['grace_period_ends'])->diffForHumans()
+                    : 'soon';
+                $claimMessage .= "Your profile(s) ({$pendingNames}) are pending. Claims will be processed {$remainingTime}. ";
             }
-
-            // Only auto-claim if no dispute and grace period passed (or disabled)
-            if ($canAutoClaim) {
-                // Link the artist to this user
-                $unclaimedArtist->update([
-                    'user_id' => $user->id,
-                    'claim_status' => 'approved',
-                    'pending_claim_user_id' => null,
-                    'pending_claim_at' => null,
-                ]);
-
-                // Assign artist role if not already assigned
-                if (!$user->hasRole('artist')) {
-                    $user->addRole('artist');
-                }
-
-                $claimMessage .= "Your artist profile '{$unclaimedArtist->stage_name}' has been claimed. Welcome to My Gig Guide!";
-            } else {
-                // User verified email but claim is pending - update status
-                if ($hasPendingClaim) {
-                    $unclaimedArtist->update([
-                        'claim_status' => 'pending',
-                    ]);
-                }
-                
-                $claimMessage .= "Please wait for claim processing or admin approval.";
+            
+            // Build message about disputed claims
+            if ($hasDisputed) {
+                $disputedNames = collect($claimResults['disputed'])->pluck('name')->join(', ');
+                $claimMessage .= "Your profile(s) ({$disputedNames}) have disputes under review by admin. ";
             }
+            
+            $claimMessage .= "Welcome to My Gig Guide!";
 
             // Login the user
             Auth::login($user);
@@ -152,10 +145,9 @@ class VerificationController extends Controller
         // Persist the email so subsequent resends still work for logged-out users
         session(['pending_verification_email' => $user->email]);
 
-        // Check for unclaimed artist
-        $unclaimedArtist = Artist::whereNull('user_id')
-            ->whereRaw('LOWER(contact_email) = ?', [strtolower($user->email)])
-            ->first();
+        // Check for unclaimed entities
+        $unclaimedEntities = $this->claimService->findUnclaimedByEmail($user->email);
+        $unclaimedArtist = $unclaimedEntities->first(fn($e) => $e instanceof Artist);
 
         Mail::to($user->email)->send(new EmailVerificationMail($user, $unclaimedArtist));
 

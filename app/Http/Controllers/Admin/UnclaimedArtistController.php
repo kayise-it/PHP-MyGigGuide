@@ -39,6 +39,10 @@ class UnclaimedArtistController extends Controller
 
     public function update(Request $request, Artist $artist)
     {
+        // #region agent log
+        @file_put_contents('/var/www/mygigguide/.cursor/debug.log', json_encode(['location'=>'UnclaimedArtistController.php:update:entry','message'=>'Unclaimed artist update entry','data'=>['artist_id'=>$artist->id,'artist_name'=>$artist->stage_name,'current_contact_email'=>$artist->contact_email,'request_contact_email'=>$request->input('contact_email')],'timestamp'=>now()->timestamp*1000,'sessionId'=>'debug-session','runId'=>'run1','hypothesisId'=>'I'])."\n", FILE_APPEND | LOCK_EX);
+        // #endregion
+
         // Ensure this is an unclaimed artist
         if ($artist->user_id !== null) {
             abort(404);

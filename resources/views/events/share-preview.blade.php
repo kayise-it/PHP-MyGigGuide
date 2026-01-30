@@ -15,6 +15,10 @@
     <meta property="og:site_name" content="My Gig Guide">
     @if(!empty($shareData['image']))
         <meta property="og:image" content="{{ $shareData['image'] }}">
+        <meta property="og:image:secure_url" content="{{ str_replace('http://', 'https://', $shareData['image']) }}">
+        <meta property="og:image:width" content="1200">
+        <meta property="og:image:height" content="630">
+        <meta property="og:image:type" content="image/jpeg">
     @endif
 
     <meta name="twitter:card" content="summary_large_image">
@@ -23,15 +27,16 @@
     @if(!empty($shareData['image']))
         <meta name="twitter:image" content="{{ $shareData['image'] }}">
     @endif
-
-    @php($loginUrl = route('login', ['continue' => $shareData['url']]))
-    <meta http-equiv="refresh" content="0;url={{ $loginUrl }}">
 </head>
 <body>
-    <p>Redirecting you to the secure event page…</p>
-    <noscript>
-        <p><a href="{{ $loginUrl }}">Click here to continue</a></p>
-    </noscript>
+    <div style="text-align: center; padding: 50px; font-family: Arial, sans-serif;">
+        <h1>{{ $event->name }}</h1>
+        <p>{{ $shareData['description'] }}</p>
+        @if(!empty($shareData['image']))
+            <img src="{{ $shareData['image'] }}" alt="{{ $event->name }}" style="max-width: 100%; height: auto;">
+        @endif
+        <p><a href="{{ $shareData['url'] }}">View Event</a></p>
+    </div>
 </body>
 </html>
 

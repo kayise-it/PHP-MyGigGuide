@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
+use App\Mail\ContactFormMail;
 
 class ContactController extends Controller
 {
@@ -36,43 +37,44 @@ class ContactController extends Controller
         }
 
         try {
-            // For now, we'll store a basic success message
-            // In a production environment, you might want to send an email to the owner
             $contactData = $request->only(['name', 'email', 'subject', 'message', 'newsletter']);
-            $contactData['newsletter'] = $request->has('newsletter');
-            $contactData['submitted_at'] = now();
+            $newsletter = $request->has('newsletter');
 
-            // Log the contact form submission (in production, you might want to store in database)
-            \Log::info('Contact form submitted', $contactData);
+            // Log the contact form submission
+            \Log::info('Contact form submitted', array_merge($contactData, ['newsletter' => $newsletter]));
 
-            // Send email to Dave
+            // Send email to admin using Mailable class
             try {
-                $subject = '[Contact] '.($contactData['subject'] ?? 'New message');
-                $body = "Contact form submission\n\n".
-                        "Name: {$contactData['name']}\n".
-                        "Email: {$contactData['email']}\n".
-                        "Newsletter: ".($contactData['newsletter'] ? 'Yes' : 'No')."\n".
-                        "Submitted: {$contactData['submitted_at']}\n\n".
-                        "Message:\n{$contactData['message']}\n";
-
-                Mail::send([], [], function ($message) use ($contactData, $subject, $body) {
-                    $message->to('dave@mygigguide.co.za')
-                            ->from($contactData['email'], $contactData['name'])
-                            ->subject($subject)
-                            ->setBody($body, 'text/plain');
-                });
+                Mail::to('admin@mygigguide.co.za')
+                    ->send(new ContactFormMail(
+                        $contactData['name'],
+                        $contactData['email'],
+                        $contactData['subject'],
+                        $contactData['message'],
+                        $newsletter
+                    ));
             } catch (\Throwable $mailErr) {
-                \Log::error('Failed to send contact email', ['error' => $mailErr->getMessage()]);
+                \Log::error('Failed to send contact email', [
+                    'error' => $mailErr->getMessage(),
+                    'trace' => $mailErr->getTraceAsString()
+                ]);
+                
+                return redirect()->back()
+                    ->with('error', 'Sorry, there was an error sending your message. Please try again or contact us directly at admin@mygigguide.co.za.')
+                    ->withInput();
             }
 
             return redirect()->route('contact.index')
                 ->with('success', 'Thank you for contacting us! We will get back to you within 24 hours.');
 
         } catch (\Exception $e) {
-            \Log::error('Contact form submission failed', ['error' => $e->getMessage()]);
+            \Log::error('Contact form submission failed', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
 
             return redirect()->back()
-                ->with('error', 'Sorry, there was an error sending your message. Please try again or contact us directly at dave@mygigguide.co.za.')
+                ->with('error', 'Sorry, there was an error sending your message. Please try again or contact us directly at admin@mygigguide.co.za.')
                 ->withInput();
         }
     }

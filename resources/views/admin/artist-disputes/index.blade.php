@@ -13,8 +13,14 @@
         <div class="flex gap-2">
             @php
                 try {
-                    $disputedCount = \App\Models\Artist::where('dispute_raised', true)->whereNotNull('pending_claim_user_id')->count();
-                    $pendingCount = \App\Models\Artist::where('claim_status', 'pending')->whereNotNull('pending_claim_user_id')->count();
+                    // Count all disputed items (with or without pending claims)
+                    $disputedCount = \App\Models\Artist::where(function($q) {
+                        $q->where('dispute_raised', true)
+                          ->orWhere('claim_status', 'disputed');
+                    })->count();
+                    // Count pending items (must have pending_claim_user_id)
+                    $pendingCount = \App\Models\Artist::where('claim_status', 'pending')
+                        ->whereNotNull('pending_claim_user_id')->count();
                 } catch (\Exception $e) {
                     $disputedCount = 0;
                     $pendingCount = 0;
@@ -34,23 +40,6 @@
             </a>
         </div>
     </div>
-
-    <!-- Messages -->
-    @if(session('success'))
-        <div class="mb-4 p-4 bg-green-100 border border-green-400 text-green-700 rounded-lg">
-            {{ session('success') }}
-        </div>
-    @endif
-    @if(session('error'))
-        <div class="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded-lg">
-            {{ session('error') }}
-        </div>
-    @endif
-    @if(session('info'))
-        <div class="mb-4 p-4 bg-blue-100 border border-blue-400 text-blue-700 rounded-lg">
-            {{ session('info') }}
-        </div>
-    @endif
 
     <!-- Search -->
     <form method="GET" class="mb-4">

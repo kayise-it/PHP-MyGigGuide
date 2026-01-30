@@ -2,6 +2,139 @@
 
 @section('title', $venue->name . ' - My Gig Guide')
 
+@push('head')
+@php
+    // #region agent log
+    $logData = [
+        'sessionId' => 'debug-session',
+        'runId' => 'run1',
+        'hypothesisId' => 'C',
+        'location' => 'venues/show.blade.php:8',
+        'message' => 'OG image URL generation start',
+        'data' => [
+            'venue_id' => $venue->id,
+            'main_picture' => $venue->main_picture,
+            'gallery_count' => isset($gallery) ? count($gallery) : 0,
+        ],
+        'timestamp' => now()->timestamp * 1000,
+    ];
+    @file_put_contents('/var/www/mygigguide/.cursor/debug.log', json_encode($logData) . "\n", FILE_APPEND | LOCK_EX);
+    // #endregion
+
+    $description = \Illuminate\Support\Str::limit(strip_tags($venue->description ?? 'Discover this amazing venue on My Gig Guide.'), 160);
+    $imageUrl = null;
+    
+    if ($venue->main_picture && \Illuminate\Support\Facades\Storage::disk('public')->exists($venue->main_picture)) {
+        $storageUrl = \Illuminate\Support\Facades\Storage::disk('public')->url($venue->main_picture);
+        // Ensure absolute URL - Storage::url() may return relative if APP_URL not set
+        $imageUrl = (str_starts_with($storageUrl, 'http://') || str_starts_with($storageUrl, 'https://')) 
+            ? $storageUrl 
+            : url($storageUrl);
+        
+        // #region agent log
+        $logData = [
+            'sessionId' => 'debug-session',
+            'runId' => 'run1',
+            'hypothesisId' => 'A',
+            'location' => 'venues/show.blade.php:20',
+            'message' => 'Main picture URL generated',
+            'data' => [
+                'storage_url' => $storageUrl,
+                'final_url' => $imageUrl,
+                'is_absolute' => str_starts_with($imageUrl, 'http'),
+                'url_length' => strlen($imageUrl),
+            ],
+            'timestamp' => now()->timestamp * 1000,
+        ];
+        @file_put_contents('/var/www/mygigguide/.cursor/debug.log', json_encode($logData) . "\n", FILE_APPEND | LOCK_EX);
+        // #endregion
+    } elseif (isset($gallery) && is_array($gallery) && count($gallery) > 0) {
+        $firstImage = $gallery[0];
+        if (\Illuminate\Support\Facades\Storage::disk('public')->exists($firstImage)) {
+            $storageUrl = \Illuminate\Support\Facades\Storage::disk('public')->url($firstImage);
+            // Ensure absolute URL - Storage::url() may return relative if APP_URL not set
+            $imageUrl = (str_starts_with($storageUrl, 'http://') || str_starts_with($storageUrl, 'https://')) 
+                ? $storageUrl 
+                : url($storageUrl);
+            
+            // #region agent log
+            $logData = [
+                'sessionId' => 'debug-session',
+                'runId' => 'run1',
+                'hypothesisId' => 'A',
+                'location' => 'venues/show.blade.php:32',
+                'message' => 'Gallery image URL generated',
+                'data' => [
+                    'storage_url' => $storageUrl,
+                    'final_url' => $imageUrl,
+                    'is_absolute' => str_starts_with($imageUrl, 'http'),
+                ],
+                'timestamp' => now()->timestamp * 1000,
+            ];
+            @file_put_contents('/var/www/mygigguide/.cursor/debug.log', json_encode($logData) . "\n", FILE_APPEND | LOCK_EX);
+            // #endregion
+        }
+    }
+    if (!$imageUrl) {
+        $fallbackUrl = asset('logos/logo1.jpeg');
+        $imageUrl = url($fallbackUrl);
+        
+        // #region agent log
+        $logData = [
+            'sessionId' => 'debug-session',
+            'runId' => 'run1',
+            'hypothesisId' => 'D',
+            'location' => 'venues/show.blade.php:45',
+            'message' => 'Using fallback logo',
+            'data' => [
+                'fallback_url' => $fallbackUrl,
+                'final_url' => $imageUrl,
+            ],
+            'timestamp' => now()->timestamp * 1000,
+        ];
+        @file_put_contents('/var/www/mygigguide/.cursor/debug.log', json_encode($logData) . "\n", FILE_APPEND | LOCK_EX);
+        // #endregion
+    }
+    
+    // #region agent log
+    $logData = [
+        'sessionId' => 'debug-session',
+        'runId' => 'run1',
+        'hypothesisId' => 'E',
+        'location' => 'venues/show.blade.php:55',
+        'message' => 'Final OG image URL before meta tag',
+        'data' => [
+            'final_image_url' => $imageUrl,
+            'is_absolute' => str_starts_with($imageUrl, 'http'),
+            'has_protocol' => str_starts_with($imageUrl, 'http://') || str_starts_with($imageUrl, 'https://'),
+        ],
+        'timestamp' => now()->timestamp * 1000,
+    ];
+    @file_put_contents('/var/www/mygigguide/.cursor/debug.log', json_encode($logData) . "\n", FILE_APPEND | LOCK_EX);
+    // #endregion
+@endphp
+<!-- Open Graph / Facebook -->
+<meta property="og:type" content="website">
+<meta property="og:url" content="{{ route('venues.show', $venue) }}">
+<meta property="og:title" content="{{ $venue->name }} - My Gig Guide">
+<meta property="og:description" content="{{ $description }}">
+@if($imageUrl)
+<meta property="og:image" content="{{ $imageUrl }}">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+@endif
+<meta property="og:site_name" content="My Gig Guide">
+
+<!-- Twitter -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:url" content="{{ route('venues.show', $venue) }}">
+<meta name="twitter:title" content="{{ $venue->name }} - My Gig Guide">
+<meta name="twitter:description" content="{{ $description }}">
+@if($imageUrl)
+<meta name="twitter:image" content="{{ $imageUrl }}">
+@endif
+@endpush
+
 @section('content')
 <div class="min-h-screen bg-gray-50">
     <!-- Hero Section -->
@@ -205,6 +338,18 @@
                 </div>
                 @endif
 
+                <!-- YouTube Videos -->
+                @if($venue->youtubeVideos->count() > 0)
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-8">
+                    <h2 class="text-2xl font-bold text-gray-900 mb-4">Videos</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        @foreach($venue->youtubeVideos as $video)
+                        <x-youtube-video :video="$video" />
+                        @endforeach
+                    </div>
+                </div>
+                @endif
+
                 <!-- Upcoming Events -->
                 @if(count($upcomingEvents) > 0)
                 <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
@@ -336,6 +481,191 @@
                     </div>
                 </div>
 
+                <!-- Show venue ownership management section -->
+                @auth
+                @if(isset($isOwner) && $isOwner)
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                        <svg class="w-5 h-5 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z" />
+                        </svg>
+                        Venue Ownership Management
+                    </h3>
+                    
+                    <!-- Add New Owner (Primary Owner only) -->
+                    @if(isset($isPrimaryOwner) && $isPrimaryOwner)
+                    <div class="mb-6 pb-6 border-b border-gray-200">
+                        <button 
+                            onclick="document.getElementById('add-owner-modal').classList.remove('hidden')"
+                            class="w-full px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors flex items-center justify-center gap-2"
+                        >
+                            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                            </svg>
+                            Add Owner
+                        </button>
+                    </div>
+                    @endif
+                    
+                    <!-- Current Owners List (Read) -->
+                    @if(isset($venueOwners) && $venueOwners && $venueOwners->count() > 0)
+                    <div class="space-y-3 mb-4">
+                        @foreach($venueOwners as $owner)
+                        <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+                            <div class="flex items-center gap-3 flex-1">
+                                <div class="h-10 w-10 bg-gradient-to-r from-purple-500 to-blue-500 rounded-full flex items-center justify-center">
+                                    <span class="text-white text-sm font-semibold">{{ substr($owner->name ?? $owner->email, 0, 1) }}</span>
+                                </div>
+                                <div class="flex-1">
+                                    <p class="text-sm font-medium text-gray-900">{{ $owner->name ?? 'Unknown' }}</p>
+                                    <p class="text-xs text-gray-500">{{ $owner->email }}</p>
+                                    @php
+                                        $ownerRole = null;
+                                        if (isset($owner->pivot)) {
+                                            $ownerRole = is_object($owner->pivot) ? ($owner->pivot->role ?? null) : (is_array($owner->pivot) ? ($owner->pivot['role'] ?? null) : null);
+                                        }
+                                    @endphp
+                                    @if($ownerRole === 'primary')
+                                        <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-purple-100 text-purple-800 mt-1">Primary Owner</span>
+                                    @elseif($ownerRole === 'co_owner')
+                                        <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800 mt-1">Co-Owner</span>
+                                    @elseif($ownerRole === 'manager')
+                                        <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-800 mt-1">Manager</span>
+                                    @endif
+                                </div>
+                            </div>
+                            @if(isset($isPrimaryOwner) && $isPrimaryOwner && $owner->id !== auth()->id())
+                            <div class="flex items-center gap-2">
+                                <!-- Update Role (Primary Owner only) -->
+                                <form action="{{ route('venues.update-owner-role', $venue) }}" method="POST" class="inline">
+                                    @csrf
+                                    @method('PUT')
+                                    <input type="hidden" name="user_id" value="{{ $owner->id }}">
+                                    <select name="role" onchange="this.form.submit()" class="text-xs border border-gray-300 rounded px-2 py-1">
+                                        <option value="co_owner" {{ $ownerRole === 'co_owner' ? 'selected' : '' }}>Co-Owner</option>
+                                        <option value="manager" {{ $ownerRole === 'manager' ? 'selected' : '' }}>Manager</option>
+                                    </select>
+                                </form>
+                                <!-- Delete Owner (Primary Owner only) -->
+                                <form action="{{ route('venues.remove-owner', $venue) }}" method="POST" class="inline" onsubmit="return confirm('Are you sure you want to remove this owner?');">
+                                    @csrf
+                                    @method('DELETE')
+                                    <input type="hidden" name="user_id" value="{{ $owner->id }}">
+                                    <button type="submit" class="text-red-600 hover:text-red-800 text-sm font-medium px-2">
+                                        Remove
+                                    </button>
+                                </form>
+                            </div>
+                            @endif
+                        </div>
+                        @endforeach
+                    </div>
+                    @else
+                    <p class="text-sm text-gray-500 mb-4">No owners listed.</p>
+                    @endif
+                    
+                    <!-- Pending Ownership Requests (Primary Owner only) -->
+                    @if(isset($isPrimaryOwner) && $isPrimaryOwner)
+                    <div class="mt-6 pt-6 border-t border-gray-200">
+                        <h4 class="text-sm font-semibold text-gray-900 mb-3">
+                            Pending Ownership Requests
+                            @if(isset($pendingRequests) && $pendingRequests)
+                                <span class="text-xs text-gray-500">({{ $pendingRequests->count() }})</span>
+                            @endif
+                        </h4>
+                        @if(isset($pendingRequests) && $pendingRequests && $pendingRequests->count() > 0)
+                        <div class="space-y-3">
+                            @foreach($pendingRequests as $request)
+                            <div class="p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+                                <div class="flex items-start justify-between">
+                                    <div class="flex-1">
+                                        <p class="text-sm font-medium text-gray-900">{{ $request->requester->name ?? 'Unknown' }}</p>
+                                        <p class="text-xs text-gray-600">{{ $request->requester->email ?? '' }}</p>
+                                        @if($request->reason)
+                                        <p class="text-xs text-gray-500 mt-1">{{ Str::limit($request->reason, 100) }}</p>
+                                        @endif
+                                        <p class="text-xs text-gray-400 mt-1">Requested: {{ $request->requested_at->diffForHumans() }}</p>
+                                    </div>
+                                    <div class="flex gap-2 ml-4">
+                                        <form action="{{ route('venues.approve-request', [$venue, $request]) }}" method="POST" class="inline">
+                                            @csrf
+                                            <button type="submit" class="px-3 py-1 text-xs bg-green-600 text-white rounded hover:bg-green-700">
+                                                Approve
+                                            </button>
+                                        </form>
+                                        <form action="{{ route('venues.reject-request', [$venue, $request]) }}" method="POST" class="inline">
+                                            @csrf
+                                            <button type="submit" class="px-3 py-1 text-xs bg-red-600 text-white rounded hover:bg-red-700">
+                                                Reject
+                                            </button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                            @endforeach
+                        </div>
+                        @else
+                        <p class="text-sm text-gray-500">No pending ownership requests.</p>
+                        @endif
+                    </div>
+                    @endif
+                </div>
+                
+                <!-- Add Owner Modal (Primary Owner only) -->
+                @if(isset($isPrimaryOwner) && $isPrimaryOwner)
+                <div id="add-owner-modal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center z-50" onclick="if(event.target === this) this.classList.add('hidden')">
+                    <div class="bg-white rounded-xl shadow-xl max-w-md w-full mx-4 p-6" onclick="event.stopPropagation()">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-lg font-semibold text-gray-900">Add New Owner</h3>
+                            <button onclick="document.getElementById('add-owner-modal').classList.add('hidden')" class="text-gray-400 hover:text-gray-600">
+                                <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                            </button>
+                        </div>
+                        <form action="{{ route('venues.add-owner', $venue) }}" method="POST">
+                            @csrf
+                            <div class="space-y-4">
+                                <div>
+                                    <label for="user_email" class="block text-sm font-medium text-gray-700 mb-2">User Email</label>
+                                    <input 
+                                        type="email" 
+                                        id="user_email" 
+                                        name="user_email" 
+                                        required
+                                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                                        placeholder="user@example.com"
+                                    >
+                                    <p class="mt-1 text-xs text-gray-500">Enter the email of the user to add as owner</p>
+                                </div>
+                                <div>
+                                    <label for="role" class="block text-sm font-medium text-gray-700 mb-2">Role</label>
+                                    <select 
+                                        id="role" 
+                                        name="role" 
+                                        required
+                                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                                    >
+                                        <option value="co_owner">Co-Owner</option>
+                                        <option value="manager">Manager</option>
+                                    </select>
+                                </div>
+                                <div class="flex gap-3 pt-2">
+                                    <button type="submit" class="flex-1 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700">
+                                        Add Owner
+                                    </button>
+                                    <button type="button" onclick="document.getElementById('add-owner-modal').classList.add('hidden')" class="flex-1 px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300">
+                                        Cancel
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                @endif
+                @endif
+                @endauth
+
                 <!-- Social Sharing -->
                 <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
                     <h3 class="text-lg font-semibold text-gray-900 mb-4">Share this venue</h3>
@@ -398,11 +728,108 @@
                 <!-- Rating Form -->
                 <x-rating-form :model="$venue" type="venue" />
 
+                <!-- Owners Management Section (Only visible to venue owners) -->
+                @auth
+                @if(isset($isOwner) && $isOwner)
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                        <svg class="w-5 h-5 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z" />
+                        </svg>
+                        Venue Owners
+                    </h3>
+                    
+                    <!-- Current Owners List -->
+                    @if(isset($venueOwners) && $venueOwners->count() > 0)
+                    <div class="space-y-3 mb-4">
+                        @foreach($venueOwners as $owner)
+                        <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                            <div class="flex items-center gap-3">
+                                <div class="h-10 w-10 bg-gradient-to-r from-purple-500 to-blue-500 rounded-full flex items-center justify-center">
+                                    <span class="text-white text-sm font-semibold">{{ substr($owner->name ?? $owner->email, 0, 1) }}</span>
+                                </div>
+                                <div>
+                                    <p class="text-sm font-medium text-gray-900">{{ $owner->name ?? 'Unknown' }}</p>
+                                    <p class="text-xs text-gray-500">{{ $owner->email }}</p>
+                                    @if($owner->pivot && $owner->pivot->role === 'primary')
+                                        <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-purple-100 text-purple-800 mt-1">Primary Owner</span>
+                                    @elseif($owner->pivot && $owner->pivot->role === 'co_owner')
+                                        <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800 mt-1">Co-Owner</span>
+                                    @elseif($owner->pivot && $owner->pivot->role === 'manager')
+                                        <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-800 mt-1">Manager</span>
+                                    @endif
+                                </div>
+                            </div>
+                            @if(isset($isPrimaryOwner) && $isPrimaryOwner && $owner->id !== auth()->id())
+                            <form action="{{ route('venues.remove-owner', $venue) }}" method="POST" class="inline" onsubmit="return confirm('Are you sure you want to remove this owner?');">
+                                @csrf
+                                @method('DELETE')
+                                <input type="hidden" name="user_id" value="{{ $owner->id }}">
+                                <button type="submit" class="text-red-600 hover:text-red-800 text-sm font-medium">
+                                    Remove
+                                </button>
+                            </form>
+                            @endif
+                        </div>
+                        @endforeach
+                    </div>
+                    @else
+                    <p class="text-sm text-gray-500 mb-4">No owners listed.</p>
+                    @endif
+                    
+                    <!-- Pending Ownership Requests (Only visible to primary owner) -->
+                    @if(isset($isPrimaryOwner) && $isPrimaryOwner && isset($pendingRequests) && $pendingRequests->count() > 0)
+                    <div class="mt-6 pt-6 border-t border-gray-200">
+                        <h4 class="text-sm font-semibold text-gray-900 mb-3">Pending Requests</h4>
+                        <div class="space-y-3">
+                            @foreach($pendingRequests as $request)
+                            <div class="p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+                                <div class="flex items-start justify-between">
+                                    <div class="flex-1">
+                                        <p class="text-sm font-medium text-gray-900">{{ $request->requester->name ?? 'Unknown' }}</p>
+                                        <p class="text-xs text-gray-600">{{ $request->requester->email ?? '' }}</p>
+                                        @if($request->reason)
+                                        <p class="text-xs text-gray-500 mt-1">{{ Str::limit($request->reason, 100) }}</p>
+                                        @endif
+                                    </div>
+                                    <div class="flex gap-2 ml-4">
+                                        <form action="{{ route('venues.approve-request', [$venue, $request]) }}" method="POST" class="inline">
+                                            @csrf
+                                            <button type="submit" class="px-3 py-1 text-xs bg-green-600 text-white rounded hover:bg-green-700">
+                                                Approve
+                                            </button>
+                                        </form>
+                                        <form action="{{ route('venues.reject-request', [$venue, $request]) }}" method="POST" class="inline">
+                                            @csrf
+                                            <button type="submit" class="px-3 py-1 text-xs bg-red-600 text-white rounded hover:bg-red-700">
+                                                Reject
+                                            </button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                            @endforeach
+                        </div>
+                    </div>
+                    @endif
+                </div>
+                @endif
+                @endauth
+
                 <!-- Action Buttons -->
                 <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
                     <div class="space-y-3">
                         @auth
-                            @if($venue->owner_id === auth()->id())
+                            @if(isset($isOwner) && $isOwner)
+                            <a href="{{ route('venues.edit', $venue) }}" class="btn-secondary w-full">
+                                <div class="btn-content">
+                                    <svg class="btn-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                                    </svg>
+                                    Edit Venue
+                                </div>
+                            </a>
+                            @elseif($venue->owner_id === auth()->id())
                             <a href="{{ route('venues.edit', $venue) }}" class="btn-secondary w-full">
                                 <div class="btn-content">
                                     <svg class="btn-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">

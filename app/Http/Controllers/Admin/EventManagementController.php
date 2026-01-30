@@ -182,6 +182,8 @@ class EventManagementController extends Controller
             'gallery.*' => 'image|mimes:jpeg,png,jpg,gif|max:10240',
             'categories' => 'nullable|array',
             'categories.*' => 'exists:categories,id',
+            'artists' => 'nullable|array',
+            'artists.*' => 'exists:artists,id',
         ]);
 
         if ($validator->fails()) {
@@ -256,6 +258,12 @@ class EventManagementController extends Controller
         } else {
             $event->categories()->detach();
         }
+
+        // Sync artists - preserve existing if not provided or empty
+        if ($request->has('artists') && !empty($request->artists)) {
+            $event->artists()->sync($request->artists);
+        }
+        // If artists not provided or empty, keep existing associations (don't detach)
 
         return redirect()->route('admin.events.show', $event)
             ->with('success', "Event updated successfully. Ownership transferred to {$user->name} ({$userRole}).");

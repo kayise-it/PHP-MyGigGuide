@@ -69,6 +69,18 @@
                         @enderror
                     </div>
 
+                    <!-- Contact Email -->
+                    <div>
+                        <label for="contact_email" class="block text-sm font-medium text-gray-700 mb-2">Contact Email</label>
+                        <input type="email" id="contact_email" name="contact_email" value="{{ old('contact_email') }}"
+                               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent @error('contact_email') border-red-500 @enderror"
+                               placeholder="venue@example.com">
+                        @error('contact_email')
+                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                        @enderror
+                        <p class="mt-1 text-sm text-gray-500">Leave empty to auto-generate a placeholder email</p>
+                    </div>
+
                     <!-- Latitude -->
                     <div>
                         <label for="latitude" class="block text-sm font-medium text-gray-700 mb-2">Latitude</label>
@@ -121,6 +133,11 @@
                             </div>
                         </div>
                     </div>
+                </div>
+
+                <!-- Venue Owner Management Component -->
+                <div class="mt-8">
+                    <x-venue-owner-management />
                 </div>
 
                 <div class="flex justify-end space-x-4 mt-8">

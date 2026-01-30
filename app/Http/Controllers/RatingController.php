@@ -48,13 +48,20 @@ class RatingController extends Controller
                 ->first();
 
             if ($existingRating) {
+                // Update existing rating
+                $existingRating->update([
+                    'rating' => $request->rating,
+                    'review' => $request->review,
+                ]);
+
                 return response()->json([
-                    'success' => false,
-                    'message' => 'You have already rated this item',
-                ], 400);
+                    'success' => true,
+                    'message' => 'Rating updated successfully',
+                    'rating' => $existingRating->load('user'),
+                ]);
             }
 
-            // Create the rating
+            // Create new rating
             $rating = Rating::create([
                 'user_id' => $user->id,
                 'rateable_type' => $rateableClass,

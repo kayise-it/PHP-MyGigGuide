@@ -11,6 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
+        // Ensure a clean state in case a partially-created table already exists
+        Schema::dropIfExists('media');
+
         Schema::create('media', function (Blueprint $table) {
             $table->id();
             $table->foreignId('artist_id')->constrained()->onDelete('cascade');
@@ -37,7 +40,5 @@ return new class extends Migration
         Schema::dropIfExists('media');
     }
 };
-
-
 
 

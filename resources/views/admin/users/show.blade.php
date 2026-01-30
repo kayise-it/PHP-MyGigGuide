@@ -43,7 +43,7 @@
                         <div class="ml-4">
                             <h4 class="text-lg font-medium text-gray-900">{{ $user->name }}</h4>
                             <p class="text-sm text-gray-500">{{ $user->email }}</p>
-                            <p class="text-xs text-gray-400">@{{ $user->username }}</p>
+                            <p class="text-xs text-gray-400">{{ '@' . $user->username }}</p>
                         </div>
                     </div>
                     
@@ -54,7 +54,7 @@
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-700">Username</label>
-                            <p class="mt-1 text-sm text-gray-900">@{{ $user->username }}</p>
+                            <p class="mt-1 text-sm text-gray-900">{{ '@' . $user->username }}</p>
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-700">Status</label>
@@ -118,7 +118,7 @@
                     <form method="POST" action="{{ route('admin.users.toggle-status', $user) }}" class="w-full">
                         @csrf
                         @method('PATCH')
-                        <button type="submit" class="w-full btn-secondary">
+                        <x-admin.button variant="secondary" :full="true" class="justify-center">
                             @if($user->is_active)
                                 <svg class="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728L5.636 5.636m12.728 12.728L18.364 5.636M5.636 18.364l12.728-12.728" />
@@ -130,7 +130,7 @@
                                 </svg>
                                 Activate User
                             @endif
-                        </button>
+                        </x-admin.button>
                     </form>
                     
                     <!-- Email verification controls (visible to admins) -->
@@ -139,23 +139,23 @@
                         <form method="POST" action="{{ route('admin.users.verify-email', $user) }}" class="w-full">
                             @csrf
                             @method('PATCH')
-                            <button type="submit" class="w-full btn-primary">
+                            <x-admin.button variant="primary" :full="true" class="justify-center">
                                 <svg class="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
                                 </svg>
                                 Mark Email Verified
-                            </button>
+                            </x-admin.button>
                         </form>
                         @else
                         <form method="POST" action="{{ route('admin.users.unverify-email', $user) }}" class="w-full" onsubmit="return confirm('Mark this account as unverified?')">
                             @csrf
                             @method('PATCH')
-                            <button type="submit" class="w-full btn-secondary">
+                            <x-admin.button variant="secondary" :full="true" class="justify-center">
                                 <svg class="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 5.636l-12.728 12.728M5.636 5.636l12.728 12.728" />
                                 </svg>
                                 Mark Email Unverified
-                            </button>
+                            </x-admin.button>
                         </form>
                         @endif
                     </div>
@@ -163,12 +163,12 @@
                     <form method="POST" action="{{ route('admin.users.destroy', $user) }}" class="w-full" onsubmit="return confirm('Are you sure you want to delete this user? This action cannot be undone.')">
                         @csrf
                         @method('DELETE')
-                        <button type="submit" class="w-full btn-danger">
+                        <x-admin.button variant="danger" :full="true" class="justify-center">
                             <svg class="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 6h18M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2m3 0v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6h14z" />
                             </svg>
                             Delete User
-                        </button>
+                        </x-admin.button>
                     </form>
                 </div>
             </div>

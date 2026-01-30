@@ -23,6 +23,29 @@ class DashboardController extends Controller
             return redirect()->route('login');
         }
 
+        // #region agent log
+        @file_put_contents(
+            '/var/www/mygigguide/.cursor/debug.log',
+            json_encode([
+                'sessionId' => 'debug-session',
+                'runId' => 'run1',
+                'hypothesisId' => 'H1',
+                'location' => 'DashboardController.php:index',
+                'message' => 'Dashboard index accessed',
+                'data' => [
+                    'user_id' => $user->id ?? null,
+                    'roles' => $user->roles->pluck('name')->all() ?? [],
+                    'is_artist' => $user->hasRole('artist'),
+                    'is_organiser' => $user->hasRole('organiser'),
+                    'is_venue_owner' => $user->hasRole('venue_owner'),
+                    'is_admin' => $user->hasRole('admin') || $user->hasRole('superuser'),
+                ],
+                'timestamp' => (int) round(microtime(true) * 1000),
+            ])."\n",
+            FILE_APPEND | LOCK_EX
+        );
+        // #endregion
+
         // Redirect to role-specific dashboard
         if ($user->hasRole('artist')) {
             return $this->artistDashboard();
@@ -48,6 +71,26 @@ class DashboardController extends Controller
             return redirect()->route('login');
         }
 
+        // #region agent log
+        @file_put_contents(
+            '/var/www/mygigguide/.cursor/debug.log',
+            json_encode([
+                'sessionId' => 'debug-session',
+                'runId' => 'run1',
+                'hypothesisId' => 'H2',
+                'location' => 'DashboardController.php:artistDashboard:before',
+                'message' => 'Artist dashboard accessed (before artist resolve)',
+                'data' => [
+                    'user_id' => $user->id ?? null,
+                    'has_artist_relation' => (bool) $user->artist,
+                    'existing_artist_id' => $user->artist->id ?? null,
+                ],
+                'timestamp' => (int) round(microtime(true) * 1000),
+            ])."\n",
+            FILE_APPEND | LOCK_EX
+        );
+        // #endregion
+
         $artist = $user->artist;
 
         if (! $artist) {
@@ -60,6 +103,26 @@ class DashboardController extends Controller
                 'bio' => 'Artist bio coming soon...',
             ]);
         }
+
+        // #region agent log
+        @file_put_contents(
+            '/var/www/mygigguide/.cursor/debug.log',
+            json_encode([
+                'sessionId' => 'debug-session',
+                'runId' => 'run1',
+                'hypothesisId' => 'H2',
+                'location' => 'DashboardController.php:artistDashboard:after',
+                'message' => 'Artist dashboard artist resolved',
+                'data' => [
+                    'user_id' => $user->id ?? null,
+                    'artist_id' => $artist->id ?? null,
+                    'artist_user_id' => $artist->user_id ?? null,
+                ],
+                'timestamp' => (int) round(microtime(true) * 1000),
+            ])."\n",
+            FILE_APPEND | LOCK_EX
+        );
+        // #endregion
 
         // Get all events where artist is involved (either as owner or performer)
         $allEvents = Event::where(function ($query) use ($artist) {
@@ -87,9 +150,17 @@ class DashboardController extends Controller
             return $event->status === 'completed' || $event->date < now();
         })->sortByDesc('date')->take(5);
 
-        // Get venues owned by the user (not the artist profile)
-        $venues = Venue::where('user_id', $user->id)
-            ->get();
+        // Get venues owned by the user (via user_id or venue_owners table)
+        try {
+            $venues = Venue::where('user_id', $user->id)
+                ->orWhereHas('owners', function ($query) use ($user) {
+                    $query->where('user_id', $user->id);
+                })
+                ->get();
+        } catch (\Exception $e) {
+            // Fallback if venue_owners table doesn't exist
+            $venues = Venue::where('user_id', $user->id)->get();
+        }
 
         // Get ratings for the artist
         $ratings = Rating::where('rateable_type', 'artist')
@@ -156,8 +227,17 @@ class DashboardController extends Controller
         })->sortByDesc('date')->take(5);
 
         // Get venues owned by the user (not the organiser profile)
-        $venues = Venue::where('user_id', $user->id)
-            ->get();
+        // Get venues owned by the organiser (via user_id or venue_owners table)
+        try {
+            $venues = Venue::where('user_id', $user->id)
+                ->orWhereHas('owners', function ($query) use ($user) {
+                    $query->where('user_id', $user->id);
+                })
+                ->get();
+        } catch (\Exception $e) {
+            // Fallback if venue_owners table doesn't exist
+            $venues = Venue::where('user_id', $user->id)->get();
+        }
 
         // Get ratings for the organiser
         $ratings = Rating::where('rateable_type', 'organiser')
@@ -194,8 +274,17 @@ class DashboardController extends Controller
             return redirect()->route('login');
         }
 
-        // Get venue owner's venues
-        $venues = Venue::where('user_id', $user->id)->get();
+        // Get venue owner's venues (via user_id or venue_owners table)
+        try {
+            $venues = Venue::where('user_id', $user->id)
+                ->orWhereHas('owners', function ($query) use ($user) {
+                    $query->where('user_id', $user->id);
+                })
+                ->get();
+        } catch (\Exception $e) {
+            // Fallback if venue_owners table doesn't exist
+            $venues = Venue::where('user_id', $user->id)->get();
+        }
 
         // Get events at these venues
         $venueIds = $venues->pluck('id');
@@ -313,28 +402,57 @@ class DashboardController extends Controller
             ->limit(5)
             ->get();
 
-        // Get user's owned venues with pagination
-        $userVenues = Venue::where('user_id', $user->id)
-            ->withCount('events')
-            ->with(['events' => function ($query) {
-                $query->where('status', 'upcoming')
-                    ->whereDate('date', '>=', now()->format('Y-m-d'))
-                    ->orderBy('date', 'asc')
-                    ->limit(3);
-            }])
-            ->orderBy('created_at', 'desc')
-            ->paginate(6);
+        // Get user's owned venues with pagination (via user_id or venue_owners table)
+        try {
+            $userVenues = Venue::where('user_id', $user->id)
+                ->orWhereHas('owners', function ($query) use ($user) {
+                    $query->where('user_id', $user->id);
+                })
+                ->withCount('events')
+                ->with(['events' => function ($query) {
+                    $query->where('status', 'upcoming')
+                        ->whereDate('date', '>=', now()->format('Y-m-d'))
+                        ->orderBy('date', 'asc')
+                        ->limit(3);
+                }])
+                ->orderBy('created_at', 'desc')
+                ->paginate(6);
+        } catch (\Exception $e) {
+            // Fallback if venue_owners table doesn't exist
+            $userVenues = Venue::where('user_id', $user->id)
+                ->withCount('events')
+                ->with(['events' => function ($query) {
+                    $query->where('status', 'upcoming')
+                        ->whereDate('date', '>=', now()->format('Y-m-d'))
+                        ->orderBy('date', 'asc')
+                        ->limit(3);
+                }])
+                ->orderBy('created_at', 'desc')
+                ->paginate(6);
+        }
 
         $statsEnabled = config('features.dashboard_stats', true);
         $stats = [];
 
         if ($statsEnabled) {
+            // Calculate venues owned count (via user_id or venue_owners table)
+            $venuesOwnedCount = 0;
+            try {
+                $venuesOwnedCount = Venue::where('user_id', $user->id)
+                    ->orWhereHas('owners', function ($query) use ($user) {
+                        $query->where('user_id', $user->id);
+                    })
+                    ->count();
+            } catch (\Exception $e) {
+                $venuesOwnedCount = Venue::where('user_id', $user->id)->count();
+            }
+
             $stats = [
                 'favorite_events' => $favoriteEvents->count(),
                 'favorite_artists' => $favoriteArtists->count(),
                 'upcoming_events' => $upcomingEvents->count(),
                 'ratings_given' => $userRatings->count(),
-                'venues_owned' => Venue::where('user_id', $user->id)->count(),
+                'venues_owned' => $venuesOwnedCount,
             ];
         }
 

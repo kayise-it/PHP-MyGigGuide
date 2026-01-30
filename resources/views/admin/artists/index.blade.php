@@ -5,22 +5,98 @@
 
 @section('content')
 <div class="p-6">
+    <!-- Success/Error Messages -->
+    @if(session('success'))
+        <div class="mb-4 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative" role="alert">
+            <span class="block sm:inline">{{ session('success') }}</span>
+        </div>
+    @endif
+
+    @if(session('error'))
+        <div class="mb-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
+            <span class="block sm:inline">{{ session('error') }}</span>
+        </div>
+    @endif
+
+    @if(session('import_errors') && count(session('import_errors')) > 0)
+        <div class="mb-4 bg-yellow-100 border border-yellow-400 text-yellow-700 px-4 py-3 rounded relative" role="alert">
+            <strong class="font-bold">Import Errors:</strong>
+            <ul class="list-disc list-inside mt-2">
+                @foreach(array_slice(session('import_errors'), 0, 10) as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+                @if(count(session('import_errors')) > 10)
+                    <li>... and {{ count(session('import_errors')) - 10 }} more errors</li>
+                @endif
+            </ul>
+        </div>
+    @endif
+
     <div class="flex justify-between items-center mb-6">
         <div>
             <h1 class="text-2xl font-bold text-gray-900">Artists Management</h1>
             <p class="text-gray-600">Manage all artists in the system</p>
         </div>
-        <a href="{{ route('admin.artists.create') }}" class="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition-colors duration-200 flex items-center space-x-2">
-            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-            </svg>
-            <span>Create Artist</span>
-        </a>
+        <div class="flex space-x-3">
+            <!-- Export Button -->
+            <a href="{{ route('admin.artists.export', request()->query()) }}" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors duration-200 flex items-center space-x-2">
+                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+                <span>Export CSV</span>
+            </a>
+
+            <!-- Import Button -->
+            <button type="button"
+                    onclick="window.AdminModal && AdminModal.openFromElement('#artist-import-modal-content')"
+                    class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors duration-200 flex items-center space-x-2">
+                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                </svg>
+                <span>Import CSV</span>
+            </button>
+
+            <!-- Create Artist Button -->
+            <a href="{{ route('admin.artists.create') }}" class="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition-colors duration-200 flex items-center space-x-2">
+                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                </svg>
+                <span>Create Artist</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- Import Modal body content (rendered inside global admin modal) -->
+    <div id="artist-import-modal-content" class="hidden">
+        <h3 class="text-lg font-medium text-gray-900 mb-4">Import Artists from CSV</h3>
+        <form action="{{ route('admin.artists.import') }}" method="POST" enctype="multipart/form-data">
+            @csrf
+            <div class="mb-4 space-y-2">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">CSV File</label>
+                    <input type="file" name="csv_file" accept=".csv,.txt" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                </div>
+                <p class="mt-1 text-xs text-gray-500">
+                    Upload a CSV file with artist data. The file should match the export format.
+                </p>
+                <a href="{{ route('admin.artists.import-template') }}" class="inline-flex items-center text-xs text-purple-600 hover:text-purple-800 hover:underline">
+                    Download CSV template
+                </a>
+            </div>
+            <div class="flex justify-end space-x-3">
+                <button type="button" onclick="window.AdminModal && AdminModal.close()" class="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400">
+                    Cancel
+                </button>
+                <button type="submit" class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">
+                    Import
+                </button>
+            </div>
+        </form>
     </div>
 
     <!-- Search and Filters -->
     <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4 mb-6">
-        <form method="GET" id="ajax-search-form" class="flex flex-wrap gap-4">
+        <form method="GET" action="{{ route('admin.artists.index') }}" id="ajax-search-form" class="flex flex-wrap gap-4">
             <div class="flex-1 min-w-64">
                 <input type="text" name="search" value="{{ request('search') }}" placeholder="Search artists..." class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
             </div>
@@ -104,8 +180,11 @@ class AjaxSearch {
             }
         }
         
+        const url = this.form.action || window.location.pathname;
+        const fullUrl = `${url}?${params.toString()}`;
+        
         try {
-            const response = await fetch(`${this.form.action}?${params.toString()}`, {
+            const response = await fetch(fullUrl, {
                 method: 'GET',
                 headers: {
                     'X-Requested-With': 'XMLHttpRequest',
@@ -118,6 +197,8 @@ class AjaxSearch {
                 if (this.resultsContainer) {
                     this.resultsContainer.innerHTML = html;
                 }
+                // Update browser URL without reload
+                window.history.pushState({}, '', fullUrl);
             } else {
                 this.showError('Search failed. Please try again.');
             }

@@ -27,6 +27,10 @@
     .lazy-image-container {
         position: relative;
     }
+    
+    [x-cloak] {
+        display: none !important;
+    }
 </style>
 @endsection
 
@@ -58,14 +62,32 @@
         </div>
         
         <div class="flex space-x-3">
-            <!-- Import Venues Button -->
+            <!-- Export Button -->
+            <a href="{{ route('admin.venues.export', request()->query()) }}" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors duration-200 flex items-center space-x-2">
+                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+                <span>Export CSV</span>
+            </a>
+
+            <!-- Import CSV Button -->
+            <button type="button"
+                    onclick="window.AdminModal && AdminModal.openFromElement('#venue-import-modal-content')"
+                    class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors duration-200 flex items-center space-x-2">
+                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                </svg>
+                <span>Import CSV</span>
+            </button>
+
+            <!-- Import from Excel Button (existing) -->
             <form method="POST" action="{{ route('admin.venues.import') }}" onsubmit="return confirm('Import venues from Excel spreadsheet? This will add new venues that don\'t exist yet.');">
                 @csrf
-                <button type="submit" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors duration-200 flex items-center space-x-2">
+                <button type="submit" class="bg-yellow-600 text-white px-4 py-2 rounded-lg hover:bg-yellow-700 transition-colors duration-200 flex items-center space-x-2">
                     <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
                     </svg>
-                    <span>Import from Excel</span>
+                    <span>Import Excel</span>
                 </button>
             </form>
 
@@ -77,6 +99,35 @@
                 <span>Create Venue</span>
             </a>
         </div>
+    </div>
+
+    <!-- Import CSV Modal body content (rendered inside global admin modal) -->
+    <div id="venue-import-modal-content" class="hidden">
+        <h3 class="text-lg font-medium text-gray-900 mb-4">Import Venues from CSV</h3>
+        <form action="{{ route('admin.venues.import-csv') }}" method="POST" enctype="multipart/form-data">
+            @csrf
+            <div class="mb-4 space-y-2">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">CSV File</label>
+                    <input type="file" name="csv_file" accept=".csv,.txt" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                </div>
+                <p class="mt-1 text-xs text-gray-500">
+                    Upload a CSV file with venue data. The file should match the export format.
+                </p>
+                <a href="{{ route('admin.venues.import-template') }}" class="inline-flex items-center text-xs text-purple-600 hover:text-purple-800 hover:underline">
+                    Download CSV template
+                </a>
+            </div>
+            <div class="flex justify-end space-x-3">
+                <button type="button" onclick="window.AdminModal && AdminModal.close()" class="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400">
+                    Cancel
+                </button>
+                <button type="submit" class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">
+                    Import
+                </button>
+            </div>
+        </form>
+    </div>
     </div>
 
     <!-- Search and Filters -->
@@ -144,9 +195,9 @@
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200">
                     @forelse($venues as $venue)
-                    <tr class="hover:bg-gray-50">
+                    <tr class="hover:bg-gray-50 cursor-pointer venue-row" data-venue-url="{{ route('admin.venues.show', $venue) }}">
                         <td class="px-6 py-4 whitespace-nowrap">
-                            <input type="checkbox" name="venue_ids[]" value="{{ $venue->id }}" class="venue-checkbox rounded border-gray-300 text-purple-600 focus:ring-purple-500 cursor-pointer" onchange="updateSelectedCount()">
+                            <input type="checkbox" name="venue_ids[]" value="{{ $venue->id }}" class="venue-checkbox rounded border-gray-300 text-purple-600 focus:ring-purple-500 cursor-pointer" onchange="updateSelectedCount()" onclick="event.stopPropagation()">
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
                             <div class="flex items-center">
@@ -194,13 +245,53 @@
                             {{ $venue->user->name ?? 'N/A' }}
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                            <div class="flex space-x-2">
+                            <div class="flex items-center space-x-2" onclick="event.stopPropagation()">
                                 <a href="{{ route('admin.venues.show', $venue) }}" class="text-purple-600 hover:text-purple-900">View</a>
                                 <a href="{{ route('admin.venues.edit', $venue) }}" class="text-blue-600 hover:text-blue-900">Edit</a>
-                                <form method="POST" action="{{ route('admin.venues.destroy.post', $venue) }}" class="inline" onsubmit="return confirm('Are you sure you want to delete this venue?')">
-                                    @csrf
-                                    <button type="submit" class="text-red-600 hover:text-red-900">Delete</button>
-                                </form>
+                                
+                                <!-- Actions Dropdown -->
+                                <div class="relative" x-data="{ open: false }">
+                                    <button @click.stop="open = !open" 
+                                            class="text-gray-600 hover:text-gray-900 focus:outline-none p-1">
+                                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
+                                        </svg>
+                                    </button>
+                                    <div x-show="open" 
+                                         x-cloak
+                                         @click.outside="open = false"
+                                         x-transition:enter="transition ease-out duration-100"
+                                         x-transition:enter-start="transform opacity-0 scale-95"
+                                         x-transition:enter-end="transform opacity-100 scale-100"
+                                         x-transition:leave="transition ease-in duration-75"
+                                         x-transition:leave-start="transform opacity-100 scale-100"
+                                         x-transition:leave-end="transform opacity-0 scale-95"
+                                         class="absolute right-0 mt-2 bg-white rounded-lg shadow-xl border border-gray-200 py-1.5 z-50 min-w-[180px]"
+                                         style="display: none;">
+                                        @if(!$venue->user_id || !$venue->owner_id)
+                                            <button type="button"
+                                                    @click.stop="open = false; openLinkModal('venue', {{ $venue->id }}, '{{ addslashes($venue->name) }}')"
+                                                    class="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 whitespace-nowrap">
+                                                <svg class="w-4 h-4 flex-shrink-0 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+                                                </svg>
+                                                Link to User
+                                            </button>
+                                            <div class="border-t border-gray-100 my-1.5"></div>
+                                        @endif
+                                        <form method="POST" action="{{ route('admin.venues.destroy.post', $venue) }}" 
+                                              onsubmit="return confirm('Are you sure you want to delete this venue?')"
+                                              class="inline">
+                                            @csrf
+                                            <button type="submit" class="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 whitespace-nowrap">
+                                                <svg class="w-4 h-4 flex-shrink-0 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                                </svg>
+                                                Delete
+                                            </button>
+                                        </form>
+                                    </div>
+                                </div>
                             </div>
                         </td>
                     </tr>
@@ -555,7 +646,51 @@
     // Initialize modern lazy loading when DOM is ready
     document.addEventListener('DOMContentLoaded', function() {
         new ModernLazyLoader();
+        // Initialize venue row handlers immediately and also after a short delay to ensure DOM is ready
+        initVenueRowClickHandlers();
+        setTimeout(initVenueRowClickHandlers, 100);
     });
+
+    // Initialize venue row click handlers
+    function initVenueRowClickHandlers() {
+        // Attach click handlers directly to each venue row
+        const rows = document.querySelectorAll('tr.venue-row');
+        rows.forEach(function(row) {
+            // Skip if already has handler
+            if (row.hasAttribute('data-click-handler-attached')) {
+                return;
+            }
+            
+            row.addEventListener('click', function(e) {
+                const target = e.target;
+                
+                // Don't navigate if clicking on:
+                // - Checkbox input (specifically) 
+                // - Links
+                // - Buttons  
+                // - Forms
+                // - Elements inside the actions div (which has stopPropagation)
+                if (target.type === 'checkbox' || 
+                    target.closest('input[type="checkbox"]') ||
+                    target.tagName === 'A' || 
+                    target.closest('a') ||
+                    target.tagName === 'BUTTON' || 
+                    target.closest('button') ||
+                    target.tagName === 'FORM' || 
+                    target.closest('form') ||
+                    target.closest('div[onclick*="stopPropagation"]')) {
+                    return;
+                }
+                
+                const url = row.getAttribute('data-venue-url');
+                if (url) {
+                    window.location.href = url;
+                }
+            });
+            
+            row.setAttribute('data-click-handler-attached', 'true');
+        });
+    }
 </script>
 
 <script>
@@ -606,6 +741,10 @@
                             this.results.innerHTML = repl.innerHTML;
                             window.history.pushState({}, '', url);
                             this.attachPerPage();
+                            // Re-initialize venue row click handlers after AJAX update
+                            if (typeof initVenueRowClickHandlers === 'function') {
+                                initVenueRowClickHandlers();
+                            }
                         }
                     })
                     .finally(()=>this.loading(false));
@@ -633,6 +772,10 @@
                             this.results.innerHTML = repl.innerHTML;
                             window.history.pushState({}, '', url);
                             this.attachPerPage();
+                            // Re-initialize venue row click handlers after AJAX update
+                            if (typeof initVenueRowClickHandlers === 'function') {
+                                initVenueRowClickHandlers();
+                            }
                         }
                     })
                     .finally(()=>this.loading(false));
@@ -651,6 +794,276 @@
             window.ajaxSearchInstance = new InlineAjaxSearch();
         });
     })();
+</script>
+
+<!-- Link to User Modal -->
+<div id="link-modal" 
+     x-data="linkModalData()"
+     x-show="show"
+     x-cloak
+     x-transition:enter="transition ease-out duration-300"
+     x-transition:enter-start="opacity-0"
+     x-transition:enter-end="opacity-100"
+     x-transition:leave="transition ease-in duration-200"
+     x-transition:leave-start="opacity-100"
+     x-transition:leave-end="opacity-0"
+     class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center"
+     @keydown.escape.window="closeModal()"
+     @user-selected.window="onUserSelected($event.detail)"
+     style="display: none;">
+    <div class="bg-white rounded-xl shadow-xl max-w-lg w-full mx-4 overflow-hidden" @click.outside="closeModal()">
+        <!-- Main Link Form -->
+        <template x-if="!showConflict">
+            <div>
+                <div class="px-6 py-4 border-b border-gray-200">
+                    <h3 class="text-lg font-semibold text-gray-900">Link to User</h3>
+                    <p class="text-sm text-gray-500 mt-1">Link <span x-text="itemName" class="font-medium text-gray-900"></span> to a registered user</p>
+                </div>
+                <form @submit.prevent="submitLink()" class="p-6">
+                    <div class="mb-6">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Select User</label>
+                        <x-user-selector 
+                            name="user_id" 
+                            placeholder="Search and select a user..."
+                            :required="true"
+                        />
+                        <!-- Checking indicator -->
+                        <div x-show="checkingConflict" class="mt-2 flex items-center gap-2 text-sm text-gray-500">
+                            <svg class="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                            Checking for conflicts...
+                        </div>
+                    </div>
+                    <div x-show="errorMessage" class="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm" x-text="errorMessage"></div>
+                    <div class="flex justify-end gap-3">
+                        <button type="button" @click="closeModal()" class="px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors">
+                            Cancel
+                        </button>
+                        <button type="submit" :disabled="loading || checkingConflict" class="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors disabled:opacity-50">
+                            <span x-show="!loading">Link User</span>
+                            <span x-show="loading" class="flex items-center gap-2">
+                                <svg class="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">
+                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                </svg>
+                                Processing...
+                            </span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </template>
+
+        <!-- Conflict Confirmation -->
+        <template x-if="showConflict">
+            <div>
+                <div class="px-6 py-4 border-b border-gray-200 bg-amber-50">
+                    <div class="flex items-center gap-3">
+                        <div class="p-2 bg-amber-100 rounded-full">
+                            <svg class="w-6 h-6 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                            </svg>
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-semibold text-gray-900">User Already Has Profile</h3>
+                            <p class="text-sm text-amber-700">This action will replace an existing profile</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="p-6">
+                    <div class="bg-gray-50 rounded-lg p-4 mb-4">
+                        <p class="text-sm text-gray-600 mb-3">
+                            <span class="font-medium text-gray-900" x-text="conflictData.user_name"></span> already has an existing 
+                            <span class="font-medium" x-text="conflictData.type"></span> profile:
+                        </p>
+                        <div class="flex items-center gap-3 bg-white p-3 rounded-lg border border-gray-200">
+                            <div class="p-2 bg-purple-100 rounded-lg">
+                                <svg class="w-5 h-5 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                                </svg>
+                            </div>
+                            <div>
+                                <p class="font-medium text-gray-900" x-text="conflictData.existing_name"></p>
+                                <p class="text-xs text-gray-500">ID: <span x-text="conflictData.existing_id"></span></p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-amber-50 border border-amber-200 rounded-lg p-3 mb-6">
+                        <p class="text-sm text-amber-800">
+                            <strong>Warning:</strong> Proceeding will unlink the existing profile and link <span class="font-medium" x-text="itemName"></span> instead. The old profile will become unclaimed.
+                        </p>
+                    </div>
+                    <div class="flex justify-end gap-3">
+                        <button type="button" @click="cancelConflict()" class="px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors">
+                            Cancel
+                        </button>
+                        <button type="button" @click="forceLink()" :disabled="loading" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+                            <span x-show="!loading">Replace & Link</span>
+                            <span x-show="loading" class="flex items-center gap-2">
+                                <svg class="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">
+                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                </svg>
+                                Processing...
+                            </span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </template>
+    </div>
+</div>
+
+<script>
+    // Link modal Alpine.js data
+    function linkModalData() {
+        return {
+            show: false,
+            showConflict: false,
+            loading: false,
+            checkingConflict: false,
+            errorMessage: '',
+            itemName: '',
+            itemType: '',
+            itemId: null,
+            conflictData: {},
+            selectedUserId: null,
+            selectedUserName: '',
+            
+            openModal(type, id, name) {
+                this.itemType = type;
+                this.itemId = id;
+                this.itemName = name;
+                this.showConflict = false;
+                this.errorMessage = '';
+                this.conflictData = {};
+                this.selectedUserId = null;
+                this.selectedUserName = '';
+                this.show = true;
+            },
+            
+            closeModal() {
+                this.show = false;
+                this.showConflict = false;
+                this.loading = false;
+                this.checkingConflict = false;
+                this.errorMessage = '';
+            },
+            
+            // Called when user-selector dispatches user-selected event
+            async onUserSelected(detail) {
+                if (!this.show || !detail || !detail.user) return;
+                
+                const user = detail.user;
+                this.selectedUserId = user.id;
+                this.selectedUserName = user.name;
+                
+                // Venues don't have one-to-one relationships, so no conflict check needed
+                // But we can still check if the user already owns this venue
+                this.checkingConflict = false;
+            },
+            
+            async submitLink() {
+                const userId = document.querySelector('#link-modal input[name="user_id"]').value;
+                if (!userId) {
+                    this.errorMessage = 'Please select a user first';
+                    return;
+                }
+                
+                this.selectedUserId = userId;
+                this.loading = true;
+                this.errorMessage = '';
+                
+                try {
+                    const response = await fetch(`/admin/unclaimed/${this.itemType}/${this.itemId}/link-user`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                            'Accept': 'application/json',
+                        },
+                        body: JSON.stringify({ user_id: userId })
+                    });
+                    
+                    const data = await response.json();
+                    
+                    if (response.status === 409 && data.conflict) {
+                        // Show conflict confirmation
+                        this.conflictData = data.data;
+                        this.showConflict = true;
+                    } else if (response.ok) {
+                        // Success - reload page
+                        window.location.reload();
+                    } else {
+                        this.errorMessage = data.message || 'An error occurred';
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    this.errorMessage = 'Failed to process request';
+                } finally {
+                    this.loading = false;
+                }
+            },
+            
+            cancelConflict() {
+                this.showConflict = false;
+                this.conflictData = {};
+            },
+            
+            async forceLink() {
+                this.loading = true;
+                
+                try {
+                    const response = await fetch(`/admin/unclaimed/${this.itemType}/${this.itemId}/link-user`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                            'Accept': 'application/json',
+                        },
+                        body: JSON.stringify({ 
+                            user_id: this.selectedUserId,
+                            force_replace: true
+                        })
+                    });
+                    
+                    if (response.ok) {
+                        window.location.reload();
+                    } else {
+                        const data = await response.json();
+                        this.errorMessage = data.message || 'Failed to link user';
+                        this.showConflict = false;
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    this.errorMessage = 'Failed to process request';
+                    this.showConflict = false;
+                } finally {
+                    this.loading = false;
+                }
+            }
+        };
+    }
+
+    // Global function to open modal (called from table rows)
+    function openLinkModal(type, id, name) {
+        const modal = document.getElementById('link-modal');
+        if (modal && modal.__x && modal.__x.$data) {
+            modal.__x.$data.openModal(type, id, name);
+        } else {
+            // Wait a bit for Alpine to initialize
+            setTimeout(() => {
+                const modal = document.getElementById('link-modal');
+                if (modal && modal.__x && modal.__x.$data) {
+                    modal.__x.$data.openModal(type, id, name);
+                } else {
+                    console.error('Modal not initialized or Alpine not ready');
+                }
+            }, 100);
+        }
+    }
 </script>
 @endsection
 

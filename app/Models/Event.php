@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Traits\Claimable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -10,6 +11,7 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
 
 class Event extends Model
 {
+    use Claimable;
     protected $fillable = [
         'name',
         'description',
@@ -25,12 +27,27 @@ class Event extends Model
         'venue_id',
         'owner_id',
         'owner_type',
+        // Claim fields
+        'pending_claim_user_id',
+        'pending_claim_at',
+        'dispute_raised',
+        'dispute_raised_at',
+        'dispute_reason',
+        'claim_status',
+        'grace_period_ends_at',
+        'warning_email_sent_at',
     ];
 
     protected $casts = [
         'date' => 'datetime',
         'time' => 'datetime',
         'gallery' => 'array',
+        // Claim field casts
+        'pending_claim_at' => 'datetime',
+        'dispute_raised_at' => 'datetime',
+        'grace_period_ends_at' => 'datetime',
+        'warning_email_sent_at' => 'datetime',
+        'dispute_raised' => 'boolean',
     ];
 
     // Mutator to handle time field conversion
@@ -145,5 +162,13 @@ class Event extends Model
     public function categories(): BelongsToMany
     {
         return $this->belongsToMany(Category::class, 'event_category');
+    }
+
+    /**
+     * Get the YouTube videos for this event.
+     */
+    public function youtubeVideos(): MorphMany
+    {
+        return $this->morphMany(YoutubeVideo::class, 'videoable')->orderBy('order');
     }
 }

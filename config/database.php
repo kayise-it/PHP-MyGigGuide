@@ -98,6 +98,20 @@ return [
             'sslmode' => 'prefer',
         ],
 
+        'mailserver' => [
+            'driver' => 'mysql',
+            'host' => env('MAIL_DB_HOST', '127.0.0.1'),
+            'port' => env('MAIL_DB_PORT', '3306'),
+            'database' => env('MAIL_DB_DATABASE', 'mailserver'),
+            'username' => env('MAIL_DB_USERNAME', 'root'),
+            'password' => env('MAIL_DB_PASSWORD', ''),
+            'charset' => 'utf8mb4',
+            'collation' => 'utf8mb4_unicode_ci',
+            'prefix' => '',
+            'strict' => true,
+            'engine' => null,
+        ],
+
         'sqlsrv' => [
             'driver' => 'sqlsrv',
             'url' => env('DB_URL'),

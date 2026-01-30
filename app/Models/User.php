@@ -28,6 +28,8 @@ class User extends Authenticatable implements LaratrustUser
         'auth_provider_id',
         'profile_picture',
         'settings',
+        'email_verified_at',
+        'is_active',
     ];
 
     /**
@@ -51,6 +53,7 @@ class User extends Authenticatable implements LaratrustUser
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'settings' => 'array',
+            'is_active' => 'boolean',
         ];
     }
 
@@ -124,6 +127,24 @@ class User extends Authenticatable implements LaratrustUser
     public function favoriteOrganisers()
     {
         return $this->belongsToMany(Organiser::class, 'user_organiser_favorites');
+    }
+
+    /**
+     * Get venues owned by this user (many-to-many relationship).
+     */
+    public function ownedVenues()
+    {
+        return $this->belongsToMany(Venue::class, 'venue_owners')
+            ->withPivot('role', 'added_by_user_id', 'added_at')
+            ->withTimestamps();
+    }
+
+    /**
+     * Get venue ownership requests made by this user.
+     */
+    public function venueOwnershipRequests()
+    {
+        return $this->hasMany(\App\Models\VenueOwnerRequest::class, 'requester_user_id');
     }
 
     /**

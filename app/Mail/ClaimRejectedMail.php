@@ -3,6 +3,7 @@
 namespace App\Mail;
 
 use Illuminate\Bus\Queueable;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
 use App\Models\Artist;
@@ -12,23 +13,39 @@ class ClaimRejectedMail extends Mailable
 {
     use Queueable, SerializesModels;
 
+    public $entity;
+    public $entityType;
+    public $entityName;
+    // Backward compatible properties
     public $artist;
     public $user;
     public $reason;
 
-    public function __construct(Artist $artist, User $user, $reason = null)
+    public function __construct(Model $entity, $reason = null)
     {
-        $this->artist = $artist;
-        $this->user = $user;
+        $this->entity = $entity;
+        $this->entityType = $entity->getClaimableType();
+        $this->entityName = $entity->getDisplayName();
         $this->reason = $reason;
+        
+        // Backward compatibility for existing views
+        if ($entity instanceof Artist) {
+            $this->artist = $entity;
+        }
+        $this->user = null;
     }
 
     public function build()
     {
-        return $this->subject('Artist Profile Claim Rejected - My Gig Guide')
+        $typeLabel = ucfirst($this->entityType);
+        
+        return $this->subject("{$typeLabel} Profile Claim Rejected - My Gig Guide")
                     ->view('emails.claim-rejected')
                     ->with([
-                        'artist' => $this->artist,
+                        'entity' => $this->entity,
+                        'entityType' => $this->entityType,
+                        'entityName' => $this->entityName,
+                        'artist' => $this->artist, // Backward compatibility
                         'user' => $this->user,
                         'reason' => $this->reason,
                     ]);

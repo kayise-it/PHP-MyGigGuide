@@ -9,17 +9,17 @@
     "format:blade": "blade-formatter \"resources/views/**/*.blade.php\" --write",
     "format:check": "prettier --check \"resources/**/*.{js,ts,css,scss,md}\""
     },
-  "devDependencies": {
-    "@prettier/plugin-php": "^0.22.2",
-    "@shufo/prettier-plugin-blade": "^1.14.0",
+    "devDependencies": {
+        "@prettier/plugin-php": "^0.22.2",
+        "@shufo/prettier-plugin-blade": "^1.14.0",
         "@tailwindcss/vite": "^4.0.0",
         "autoprefixer": "^10.4.21",
         "axios": "^1.11.0",
-    "blade-formatter": "^1.45.0",
+        "blade-formatter": "^1.44.0",
         "concurrently": "^9.0.1",
         "laravel-vite-plugin": "^2.0.0",
         "postcss": "^8.5.6",
-    "prettier": "^3.3.3",
+        "prettier": "^3.3.3",
         "tailwindcss": "^4.1.13",
         "vite": "^7.0.4"
     },

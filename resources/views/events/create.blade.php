@@ -309,6 +309,34 @@
                 </div>
             </div>
 
+            <!-- YouTube Videos -->
+            <div class="bg-white rounded-2xl shadow-sm border border-purple-100 p-6">
+                <h2 class="text-xl font-bold text-gray-900 mb-6">YouTube Videos</h2>
+                
+                <div id="youtube-videos-container" class="space-y-4">
+                    <div class="youtube-video-input flex gap-2">
+                        <input
+                            type="url"
+                            name="youtube_videos[]"
+                            placeholder="https://www.youtube.com/watch?v=..."
+                            class="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent @error('youtube_videos.*') border-red-300 @enderror"
+                        />
+                        <button type="button" onclick="removeYoutubeVideoInput(this)" class="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 hidden remove-video-btn">
+                            Remove
+                        </button>
+                    </div>
+                </div>
+                
+                <button type="button" onclick="addYoutubeVideoInput()" class="mt-4 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700">
+                    + Add Another Video
+                </button>
+                
+                @error('youtube_videos.*')
+                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                @enderror
+                <p class="mt-2 text-sm text-gray-500">Add YouTube video URLs to showcase your event</p>
+            </div>
+
             <!-- Event Images -->
             <div class="bg-white rounded-2xl shadow-sm border border-purple-100 p-6">
                 <h2 class="text-xl font-bold text-gray-900 mb-6">Event Images</h2>
@@ -838,6 +866,52 @@ document.addEventListener('DOMContentLoaded', () => {
             saveBtn.classList.remove('opacity-60');
         }
     });
+});
+
+// YouTube Videos Management
+function addYoutubeVideoInput() {
+    const container = document.getElementById('youtube-videos-container');
+    const newInput = document.createElement('div');
+    newInput.className = 'youtube-video-input flex gap-2';
+    newInput.innerHTML = `
+        <input
+            type="url"
+            name="youtube_videos[]"
+            placeholder="https://www.youtube.com/watch?v=..."
+            class="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+        />
+        <button type="button" onclick="removeYoutubeVideoInput(this)" class="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 remove-video-btn">
+            Remove
+        </button>
+    `;
+    container.appendChild(newInput);
+    
+    // Show remove buttons if there's more than one input
+    updateRemoveButtons();
+}
+
+function removeYoutubeVideoInput(button) {
+    button.closest('.youtube-video-input').remove();
+    updateRemoveButtons();
+}
+
+function updateRemoveButtons() {
+    const inputs = document.querySelectorAll('.youtube-video-input');
+    inputs.forEach((input, index) => {
+        const removeBtn = input.querySelector('.remove-video-btn');
+        if (removeBtn) {
+            if (inputs.length > 1) {
+                removeBtn.classList.remove('hidden');
+            } else {
+                removeBtn.classList.add('hidden');
+            }
+        }
+    });
+}
+
+// Initialize remove buttons visibility
+document.addEventListener('DOMContentLoaded', function() {
+    updateRemoveButtons();
 });
 </script>
 @endsection

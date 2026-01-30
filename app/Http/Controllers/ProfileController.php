@@ -7,6 +7,7 @@ use App\Models\Event;
 use App\Models\Organiser;
 use App\Models\User;
 use App\Models\Venue;
+use App\Rules\UniqueNormalizedName;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -50,6 +51,29 @@ class ProfileController extends Controller
             return redirect()->route('login');
         }
 
+        // #region agent log
+        @file_put_contents(
+            '/var/www/mygigguide/.cursor/debug.log',
+            json_encode([
+                'sessionId' => 'debug-session',
+                'runId' => 'run1',
+                'hypothesisId' => 'H1',
+                'location' => 'ProfileController.php:edit',
+                'message' => 'Profile edit accessed',
+                'data' => [
+                    'user_id' => $user->id ?? null,
+                    'roles' => $user->roles->pluck('name')->all() ?? [],
+                    'has_artist_profile' => (bool) $user->artist,
+                    'artist_id' => $user->artist->id ?? null,
+                    'has_organiser_profile' => (bool) $user->organiser,
+                    'organiser_id' => $user->organiser->id ?? null,
+                ],
+                'timestamp' => (int) round(microtime(true) * 1000),
+            ])."\n",
+            FILE_APPEND | LOCK_EX
+        );
+        // #endregion
+
         // Get role-specific profile data
         $profile = null;
         if ($user->hasRole('artist')) {
@@ -73,7 +97,7 @@ class ProfileController extends Controller
         }
 
         $request->validate([
-            'name' => 'required|string|max:255',
+            'name' => ['required', 'string', 'max:255', UniqueNormalizedName::forUser($user->id)],
             'current_password' => 'nullable|string',
             'password' => 'nullable|string|min:8|confirmed',
             'profile_picture' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:10240',
@@ -122,8 +146,10 @@ class ProfileController extends Controller
      */
     private function updateArtistProfile($user, $request)
     {
+        $artistId = $user->artist ? $user->artist->id : null;
+        
         $request->validate([
-            'stage_name' => 'required|string|max:255',
+            'stage_name' => ['required', 'string', 'max:255', UniqueNormalizedName::forArtist($artistId)],
             'real_name' => 'required|string|max:255',
             'genre' => 'required|string|max:255',
             'bio' => 'nullable|string|max:1000',
@@ -165,8 +191,10 @@ class ProfileController extends Controller
      */
     private function updateOrganiserProfile($user, $request)
     {
+        $organiserId = $user->organiser ? $user->organiser->id : null;
+        
         $request->validate([
-            'organisation_name' => 'required|string|max:255',
+            'organisation_name' => ['required', 'string', 'max:255', UniqueNormalizedName::forOrganiser($organiserId)],
             'contact_phone' => 'nullable|string|max:20',
             'contact_email' => 'nullable|email|max:255',
             'website' => 'nullable|url|max:255',

@@ -99,7 +99,42 @@
                     </div>
                 </div>
             @else
-                <p class="text-gray-500">No claimant found</p>
+                <div class="space-y-3">
+                    <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
+                        <p class="text-sm text-yellow-800">
+                            <strong>No Active Claimant:</strong> This artist is marked as disputed but has no pending claim. 
+                            The dispute may have been raised manually or the pending claim was cleared.
+                        </p>
+                    </div>
+                    @if($artist->dispute_reason)
+                    <div>
+                        <span class="text-sm text-gray-500">Dispute Reason:</span>
+                        <p class="text-sm text-gray-900 mt-1">{{ $artist->dispute_reason }}</p>
+                    </div>
+                    @endif
+                    @if($artist->dispute_raised_at)
+                    <div>
+                        <span class="text-sm text-gray-500">Dispute Raised:</span>
+                        <p class="text-sm text-gray-600">{{ $artist->dispute_raised_at->format('M d, Y g:i A') }}</p>
+                    </div>
+                    @endif
+                    @if($artist->user_id)
+                    <div>
+                        <span class="text-sm text-gray-500">Currently Linked To:</span>
+                        <p class="text-sm text-gray-900">
+                            User ID: {{ $artist->user_id }}
+                            @if($artist->user)
+                                ({{ $artist->user->name }} - {{ $artist->user->email }})
+                            @endif
+                        </p>
+                    </div>
+                    @else
+                    <div>
+                        <span class="text-sm text-gray-500">Status:</span>
+                        <p class="text-sm text-gray-900">Unclaimed (not linked to any user)</p>
+                    </div>
+                    @endif
+                </div>
             @endif
         </div>
     </div>
@@ -171,6 +206,7 @@
             </div>
         @endif
 
+        @if($artist->pending_claim_user_id)
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <!-- Approve -->
             <form method="POST" action="{{ route('admin.artist-disputes.approve', $artist) }}">
@@ -202,6 +238,14 @@
                 </div>
             </form>
         </div>
+        @else
+        <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+            <p class="text-sm text-yellow-800">
+                <strong>Note:</strong> This artist is marked as disputed but has no active pending claim. 
+                You can clear the dispute flag if it was raised in error, or manually link this artist to a user from the Unclaimed Items page.
+            </p>
+        </div>
+        @endif
     </div>
 </div>
 @endsection

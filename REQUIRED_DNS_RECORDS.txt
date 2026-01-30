@@ -1,0 +1,72 @@
+================================================================================
+REQUIRED DNS RECORDS FOR EMAIL AUTHENTICATION
+================================================================================
+
+Add these DNS records at your domain registrar for mygigguide.co.za:
+
+--------------------------------------------------------------------------------
+1. MX RECORD (Mail Exchange)
+--------------------------------------------------------------------------------
+Type: MX
+Name: @ (or leave blank/root domain)
+Priority: 10
+Value: mail.mygigguide.co.za
+
+--------------------------------------------------------------------------------
+2. A RECORD (for mail subdomain)
+--------------------------------------------------------------------------------
+Type: A
+Name: mail
+Value: 41.61.20.39
+
+--------------------------------------------------------------------------------
+3. SPF RECORD (Sender Policy Framework)
+--------------------------------------------------------------------------------
+Type: TXT
+Name: @ (or leave blank/root domain)
+Value: v=spf1 mx a:mail.mygigguide.co.za ip4:41.61.20.39 ~all
+
+--------------------------------------------------------------------------------
+4. DKIM RECORD (DomainKeys Identified Mail)
+--------------------------------------------------------------------------------
+Type: TXT
+Name: default._domainkey
+Value: v=DKIM1; h=sha256; k=rsa; p=MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAw2AgPlC2UHQ+qG/hf8UnXMaEc1/+utRv7EN/zXMgZcXmIfcJc4QAERA8D9en9daA6W0ueNZ/ffNUIMzG6IMQfBR6IBrmfTeh4q2ujALMTZezeea26q/i0DU2Y3omGOvYjFJKf4TxrEoJ8wUW2GAy5HXSZFUOqEHSJo74dkvx2y3BNNN+63petLDI/07oEYGhKyRe92S55geUPg0yiWqPN7uj2oel2bt6vQpXbr6ik889NPTUYWuXoBAOZhaf+Y5C48kOJmK6kYdQnrCpLJPUTtF3E6rNzGuo1GO89YyPCGL5Zr8K6r+wxUi3H2Uf2LgJOuPy6wW6X1pt/CSqzwF1aQIDAQAB
+
+Note: This is a long value - make sure to copy the ENTIRE value including the "p=" part
+
+--------------------------------------------------------------------------------
+5. DMARC RECORD (Domain-based Message Authentication)
+--------------------------------------------------------------------------------
+Type: TXT
+Name: _dmarc
+Value: v=DMARC1; p=quarantine; rua=mailto:admin@mygigguide.co.za
+
+================================================================================
+TESTING
+================================================================================
+
+After adding these records, wait 5-10 minutes for DNS propagation, then test:
+
+1. Verify DNS records:
+   dig +short mx mygigguide.co.za
+   dig +short txt mygigguide.co.za | grep spf
+   dig +short txt default._domainkey.mygigguide.co.za
+   dig +short txt _dmarc.mygigguide.co.za
+
+2. Test email again:
+   php /var/www/mygigguide/simple-test-email.php
+
+================================================================================
+CURRENT STATUS
+================================================================================
+
+✅ Postfix is installed and running
+✅ OpenDKIM is configured and running
+✅ DKIM signing is enabled
+✅ Mail database and accounts are set up
+✅ Email was sent from server
+❌ Gmail rejected it due to missing SPF/DKIM DNS records
+✅ Once DNS records are added, emails should be accepted
+
+================================================================================

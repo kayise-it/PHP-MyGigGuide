@@ -65,13 +65,15 @@
 
     <!-- Dropdown -->
     <div x-show="isOpen" 
+         x-cloak
          x-transition:enter="transition ease-out duration-200"
          x-transition:enter-start="opacity-0 scale-95"
          x-transition:enter-end="opacity-100 scale-100"
          x-transition:leave="transition ease-in duration-150"
          x-transition:leave-start="opacity-100 scale-100"
          x-transition:leave-end="opacity-0 scale-95"
-         class="absolute top-full left-0 right-0 mt-2 bg-white border border-gray-200 rounded-xl shadow-lg z-50 max-h-96 overflow-hidden">
+         class="absolute top-full left-0 right-0 mt-2 bg-white border border-gray-200 rounded-xl shadow-lg max-h-96 overflow-hidden"
+         style="display: none; z-index: 9999;"
         
         <!-- Search and Filters -->
         <div class="p-4 border-b border-gray-100">
@@ -284,6 +286,8 @@ function userSelector(config) {
         
         // Methods
         init() {
+            // Ensure dropdown starts closed
+            this.isOpen = false;
             this.fetchUsers();
             this.findSelectedUser();
         },

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Traits\Claimable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -10,6 +11,7 @@ use Illuminate\Database\Eloquent\Relations\MorphMany;
 
 class Artist extends Model
 {
+    use Claimable;
     protected $fillable = [
         'user_id',
         'stage_name',
@@ -29,6 +31,7 @@ class Artist extends Model
         'pending_claim_at',
         'dispute_raised',
         'dispute_raised_at',
+        'dispute_reason',
         'claim_status',
         'grace_period_ends_at',
         'warning_email_sent_at',
@@ -43,14 +46,6 @@ class Artist extends Model
         'warning_email_sent_at' => 'datetime',
         'dispute_raised' => 'boolean',
     ];
-    
-    /**
-     * Get the user who has a pending claim on this artist.
-     */
-    public function pendingClaimUser()
-    {
-        return $this->belongsTo(User::class, 'pending_claim_user_id');
-    }
 
     // Mutator to sanitize profile picture assignment and negate ops storing paths
     public function setProfilePictureAttribute($value)
@@ -176,5 +171,13 @@ class Artist extends Model
         $settings = $this->getOrCreateFolderSettings();
 
         return 'artists/' . $settings['folder_name'];
+    }
+
+    /**
+     * Get the YouTube videos for this artist.
+     */
+    public function youtubeVideos(): MorphMany
+    {
+        return $this->morphMany(YoutubeVideo::class, 'videoable')->orderBy('order');
     }
 }

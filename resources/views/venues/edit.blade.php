@@ -208,6 +208,58 @@
                     @enderror
                 </div>
 
+                <!-- YouTube Videos -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        YouTube Videos
+                    </label>
+                    
+                    <!-- Existing Videos -->
+                    @if($venue->youtubeVideos->count() > 0)
+                    <div class="mb-6 space-y-3">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Current Videos</label>
+                        @foreach($venue->youtubeVideos as $video)
+                        <div class="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                            <input type="hidden" name="youtube_video_ids[]" value="{{ $video->id }}">
+                            <div class="flex-1">
+                                <p class="text-sm font-medium text-gray-900">{{ $video->youtube_url }}</p>
+                                @if($video->title)
+                                <p class="text-xs text-gray-500">{{ $video->title }}</p>
+                                @endif
+                            </div>
+                            <button type="button" onclick="removeExistingVideo(this)" class="px-3 py-1 bg-red-500 text-white rounded text-sm hover:bg-red-600">
+                                Remove
+                            </button>
+                        </div>
+                        @endforeach
+                    </div>
+                    @endif
+                    
+                    <!-- New Videos -->
+                    <div id="youtube-videos-container" class="space-y-4">
+                        <div class="youtube-video-input flex gap-2">
+                            <input
+                                type="url"
+                                name="youtube_videos[]"
+                                placeholder="https://www.youtube.com/watch?v=..."
+                                class="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent @error('youtube_videos.*') border-red-300 @enderror"
+                            />
+                            <button type="button" onclick="removeYoutubeVideoInput(this)" class="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 hidden remove-video-btn">
+                                Remove
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <button type="button" onclick="addYoutubeVideoInput()" class="mt-4 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700">
+                        + Add Another Video
+                    </button>
+                    
+                    @error('youtube_videos.*')
+                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                    @enderror
+                    <p class="mt-2 text-sm text-gray-500">Add YouTube video URLs to showcase your venue</p>
+                </div>
+
                 <!-- Submit Buttons -->
                 <div class="flex items-center justify-end space-x-4 pt-6">
                     <a href="{{ route('dashboard') }}" class="btn-secondary">
@@ -276,7 +328,148 @@ function loadGoogleMaps() {
 document.addEventListener('DOMContentLoaded', function() {
     loadGoogleMaps();
 });
+
+// YouTube Videos Management
+function addYoutubeVideoInput() {
+    const container = document.getElementById('youtube-videos-container');
+    const newInput = document.createElement('div');
+    newInput.className = 'youtube-video-input flex gap-2';
+    newInput.innerHTML = `
+        <input
+            type="url"
+            name="youtube_videos[]"
+            placeholder="https://www.youtube.com/watch?v=..."
+            class="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+        />
+        <button type="button" onclick="removeYoutubeVideoInput(this)" class="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 remove-video-btn">
+            Remove
+        </button>
+    `;
+    container.appendChild(newInput);
+    updateRemoveButtons();
+}
+
+function removeYoutubeVideoInput(button) {
+    button.closest('.youtube-video-input').remove();
+    updateRemoveButtons();
+}
+
+function removeExistingVideo(button) {
+    button.closest('.flex.items-center').remove();
+}
+
+function updateRemoveButtons() {
+    const inputs = document.querySelectorAll('.youtube-video-input');
+    inputs.forEach((input) => {
+        const removeBtn = input.querySelector('.remove-video-btn');
+        if (removeBtn) {
+            if (inputs.length > 1) {
+                removeBtn.classList.remove('hidden');
+            } else {
+                removeBtn.classList.add('hidden');
+            }
+        }
+    });
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    updateRemoveButtons();
+});
 </script>
 @endpush
+
+<!-- Owners Management Section (Only visible to venue owners) -->
+@auth
+@if(isset($isOwner) && $isOwner)
+<div class="mt-8 bg-white rounded-xl shadow-sm border border-purple-100 p-6">
+    <h3 class="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+        <svg class="w-5 h-5 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z" />
+        </svg>
+        Venue Owners Management
+    </h3>
+    
+    <!-- Current Owners List -->
+    @if(isset($venueOwners) && $venueOwners->count() > 0)
+    <div class="space-y-3 mb-4">
+        @foreach($venueOwners as $owner)
+        <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+            <div class="flex items-center gap-3">
+                <div class="h-10 w-10 bg-gradient-to-r from-purple-500 to-blue-500 rounded-full flex items-center justify-center">
+                    <span class="text-white text-sm font-semibold">{{ substr($owner->name ?? $owner->email, 0, 1) }}</span>
+                </div>
+                <div>
+                    <p class="text-sm font-medium text-gray-900">{{ $owner->name ?? 'Unknown' }}</p>
+                    <p class="text-xs text-gray-500">{{ $owner->email }}</p>
+                    @if($owner->pivot && $owner->pivot->role === 'primary')
+                        <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-purple-100 text-purple-800 mt-1">Primary Owner</span>
+                    @elseif($owner->pivot && $owner->pivot->role === 'co_owner')
+                        <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800 mt-1">Co-Owner</span>
+                    @elseif($owner->pivot && $owner->pivot->role === 'manager')
+                        <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-800 mt-1">Manager</span>
+                    @endif
+                </div>
+            </div>
+            @if(isset($isPrimaryOwner) && $isPrimaryOwner && $owner->id !== auth()->id())
+            <form action="{{ route('venues.remove-owner', $venue) }}" method="POST" class="inline" onsubmit="return confirm('Are you sure you want to remove this owner?');">
+                @csrf
+                @method('DELETE')
+                <input type="hidden" name="user_id" value="{{ $owner->id }}">
+                <button type="submit" class="text-red-600 hover:text-red-800 text-sm font-medium">
+                    Remove
+                </button>
+            </form>
+            @endif
+        </div>
+        @endforeach
+    </div>
+    @else
+    <p class="text-sm text-gray-500 mb-4">No owners listed.</p>
+    @endif
+    
+    <!-- Pending Ownership Requests (Only visible to primary owner) -->
+    @if(isset($isPrimaryOwner) && $isPrimaryOwner && isset($pendingRequests) && $pendingRequests->count() > 0)
+    <div class="mt-6 pt-6 border-t border-gray-200">
+        <h4 class="text-sm font-semibold text-gray-900 mb-3">Pending Ownership Requests</h4>
+        <div class="space-y-3">
+            @foreach($pendingRequests as $request)
+            <div class="p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+                <div class="flex items-start justify-between">
+                    <div class="flex-1">
+                        <p class="text-sm font-medium text-gray-900">{{ $request->requester->name ?? 'Unknown' }}</p>
+                        <p class="text-xs text-gray-600">{{ $request->requester->email ?? '' }}</p>
+                        @if($request->reason)
+                        <p class="text-xs text-gray-500 mt-1">{{ Str::limit($request->reason, 100) }}</p>
+                        @endif
+                        <p class="text-xs text-gray-400 mt-1">Requested: {{ $request->requested_at->diffForHumans() }}</p>
+                    </div>
+                    <div class="flex gap-2 ml-4">
+                        <form action="{{ route('venues.approve-request', [$venue, $request]) }}" method="POST" class="inline">
+                            @csrf
+                            <button type="submit" class="px-3 py-1 text-xs bg-green-600 text-white rounded hover:bg-green-700">
+                                Approve
+                            </button>
+                        </form>
+                        <form action="{{ route('venues.reject-request', [$venue, $request]) }}" method="POST" class="inline">
+                            @csrf
+                            <button type="submit" class="px-3 py-1 text-xs bg-red-600 text-white rounded hover:bg-red-700">
+                                Reject
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            @endforeach
+        </div>
+    </div>
+    @elseif(isset($isPrimaryOwner) && $isPrimaryOwner)
+    <div class="mt-6 pt-6 border-t border-gray-200">
+        <p class="text-sm text-gray-500">No pending ownership requests.</p>
+    </div>
+    @endif
+</div>
+@endif
+@endauth
+
 @endsection
 

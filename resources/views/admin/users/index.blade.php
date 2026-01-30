@@ -95,8 +95,8 @@
                                     </div>
                                     <div class="ml-4">
                                         <div class="text-sm font-medium text-gray-900">{{ $user->name }}</div>
-                                        <div class="text-sm text-gray-500">{{ $user->email }}</div>
-                                        <div class="text-xs text-gray-400">@{{ $user->username }}</div>
+                                        <!-- <div class="text-sm text-gray-500">{{ $user->email }}</div> -->
+                                        <div class="text-xs text-gray-400">{{ '@' . $user->username }}</div>
                                     </div>
                                 </div>
                             </td>
@@ -118,15 +118,20 @@
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                 <div class="flex items-center justify-end space-x-4">
-                                    <a href="{{ route('admin.users.show', $user) }}" class="text-purple-600 hover:text-purple-800">View</a>
-                                    <a href="{{ route('admin.users.edit', $user) }}" class="text-indigo-600 hover:text-indigo-800">Edit</a>
-                                    <button type="button" class="text-blue-600 hover:text-blue-800 js-change-email" data-url="{{ route('admin.users.update-email', $user) }}" data-current-email="{{ $user->email }}">Change Email</button>
-                                    <form method="POST" action="{{ route('admin.users.toggle-status', $user) }}" class="inline">
-                                        @csrf
-                                        @method('PATCH')
-                                        <button type="submit" class="text-yellow-700 hover:text-yellow-900">Toggle Status</button>
-                                    </form>
-                                    <button type="button" class="text-red-600 hover:text-red-800 js-delete-user" data-url="{{ route('admin.users.destroy', $user) }}" data-user-row>Delete</button>
+                                    <a href="{{ route('admin.users.show', $user) }}"
+                                       class="text-purple-600 hover:text-purple-800 js-user-modal"
+                                       data-user-id="{{ $user->id }}">
+                                        View
+                                    </a>
+                                    <a href="{{ route('admin.users.edit', $user) }}" class="text-indigo-600 hover:text-indigo-800">
+                                        Edit
+                                    </a>
+                                    <button type="button"
+                                            class="text-red-600 hover:text-red-800 js-delete-user"
+                                            data-url="{{ route('admin.users.destroy', $user) }}"
+                                            data-user-row>
+                                        Delete
+                                    </button>
                                 </div>
                             </td>
                         </tr>
@@ -200,6 +205,7 @@
                             this.results.innerHTML = repl.innerHTML;
                             window.history.pushState({}, '', url);
                             this.attachPerPage();
+                            if (window.attachUserModalLinks) window.attachUserModalLinks();
                         }
                     })
                     .finally(()=>this.loading(false));
@@ -227,6 +233,7 @@
                             this.results.innerHTML = repl.innerHTML;
                             window.history.pushState({}, '', url);
                             this.attachPerPage();
+                            if (window.attachUserModalLinks) window.attachUserModalLinks();
                         }
                     })
                     .finally(()=>this.loading(false));
@@ -249,6 +256,25 @@
     let ajaxSearchInstance;
     document.addEventListener('DOMContentLoaded', function() {
         ajaxSearchInstance = window.ajaxSearchInstance;
+
+        window.attachUserModalLinks = function () {
+            const links = document.querySelectorAll('.js-user-modal');
+            if (!window.AdminModal || !links.length) return;
+
+            links.forEach(link => {
+                link.addEventListener('click', function (e) {
+                    // If JS disabled, this handler never runs and link works normally.
+                    e.preventDefault();
+                    const url = this.getAttribute('href');
+                    if (!url) return;
+                    window.AdminModal.openFromUrl(url, {
+                        loadingText: 'Loading user details...'
+                    });
+                }, { once: true });
+            });
+        };
+
+        window.attachUserModalLinks();
 
         // Client-side sorting (no reload)
         const tbody = document.getElementById('users-tbody');

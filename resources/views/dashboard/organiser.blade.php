@@ -15,20 +15,26 @@
                     </h1>
                     <p class="text-gray-600 mt-2">Manage your events and organization</p>
                 </div>
-                <div class="flex space-x-3">
-                    <a href="{{ route('organisers.edit', $organiser->id) }}" class="btn-secondary">
+                <div class="flex flex-wrap items-center gap-3">
+                    <a href="{{ route('organisers.edit', $organiser->id) }}" class="btn-secondary whitespace-nowrap">
                         <svg class="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                         </svg>
                         Edit Profile
                     </a>
-                    <a href="{{ route('venues.index') }}" class="btn-secondary">
+                    <button type="button" onclick="openClaimVenueModal()" class="btn-secondary whitespace-nowrap">
+                        <svg class="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                        Claim Venue
+                    </button>
+                    <a href="{{ route('venues.index') }}" class="btn-secondary whitespace-nowrap">
                         <svg class="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                         </svg>
                         Manage Venues
                     </a>
-                    <a href="{{ route('events.create') }}" class="btn-primary">
+                    <a href="{{ route('events.create') }}" class="btn-primary whitespace-nowrap">
                         <svg class="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                         </svg>
@@ -228,4 +234,6 @@
         @endif
     </div>
 </div>
+
+@include('dashboard.partials.claim-venue-modal')
 @endsection

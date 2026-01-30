@@ -249,8 +249,8 @@ function initGoogleMap(mapId, mapConfig) {
 
             return `
                 <div class="p-4 max-w-xs">
-                    <h3 class="font-bold text-gray-900 mb-2 text-base leading-tight">${event.name}</h3>
-                    <div class="space-y-2 text-sm text-gray-600">
+                    <h3 class="font-bold text-gray-900 mb-2 text-xs leading-tight">${event.name}</h3>
+                    <div class="space-y-2 text-xs text-gray-600">
                         <div class="flex items-center">
                             <svg class="h-4 w-4 text-purple-600 mr-2 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
@@ -271,7 +271,7 @@ function initGoogleMap(mapId, mapConfig) {
                             <span>${event.time || eventDate.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
                         </div>
                         <div class="pt-3">
-                            <a href="/events/${event.id}" class="inline-flex items-center bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 shadow-md">View details</a>
+                            <a href="/events/${event.id}" class="inline-flex items-center bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white px-4 py-2 rounded-lg text-base font-semibold transition-all duration-200 shadow-md">View details</a>
                         </div>
                     </div>
                 </div>

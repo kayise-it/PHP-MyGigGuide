@@ -1,6 +1,7 @@
-@props(['venue'])
+@props(['venue', 'isOwned' => false])
 
-<a href="{{ route('venues.show', $venue) }}" class="group relative bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden cursor-pointer hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 block">
+<a href="{{ route('venues.show', $venue) }}" 
+   class="group relative bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden cursor-pointer transition-all duration-300 transform hover:-translate-y-1 block {{ $isOwned ? 'border-purple-500 ring-2 ring-purple-200 shadow-xl scale-[1.02]' : 'hover:shadow-lg' }}">
     <!-- Venue Image Background -->
     <div class="relative h-48 w-full overflow-hidden">
         @if($venue->main_picture)
@@ -49,11 +50,19 @@
         </button>
         @endauth
         
-        <!-- Venue Type Badge -->
-        <div class="absolute top-3 left-3">
+        <!-- Venue Type / Ownership Badges -->
+        <div class="absolute top-3 left-3 flex flex-col gap-1">
             <span class="px-2 py-1 text-xs font-medium bg-purple-500/90 text-white rounded-full backdrop-blur-sm">
                 Venue
             </span>
+            @if($isOwned)
+                <span class="inline-flex items-center px-2.5 py-1 text-xs font-semibold bg-gradient-to-r from-emerald-500 to-green-500 text-white rounded-full backdrop-blur-sm shadow-md border border-white/40">
+                    <svg class="w-3.5 h-3.5 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M10 3l2.39 4.848 5.343.777-3.867 3.768.913 5.327L10 14.771l-4.779 2.949.913-5.327L2.267 8.625l5.343-.777L10 3z" />
+                    </svg>
+                    Your Venue
+                </span>
+            @endif
         </div>
         
         <!-- Venue Name at Bottom with Gradient Background (Hidden on hover) -->

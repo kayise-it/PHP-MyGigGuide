@@ -15,6 +15,12 @@ use App\Http\Controllers\Admin\FeatureProgramController;
 use App\Http\Controllers\Admin\FeaturePackageController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\UnclaimedArtistController;
+use App\Http\Controllers\Admin\UnclaimedController;
+use App\Http\Controllers\Admin\SettingsController;
+use App\Http\Controllers\Admin\DuplicateManagementController;
+use App\Http\Controllers\Admin\CapabilityManagementController;
+use App\Http\Controllers\Admin\EmailTemplateController;
+use App\Http\Controllers\Admin\MailAccountController;
 
 // Admin Authentication Routes
 Route::prefix('admin')->name('admin.')->group(function () {
@@ -47,21 +53,50 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::patch('events/{event}/toggle-status', [EventManagementController::class, 'toggleStatus'])->name('events.toggle-status');
 
         // Venue Management
-        Route::resource('venues', VenueManagementController::class);
-        Route::patch('venues/{venue}/toggle-status', [VenueManagementController::class, 'toggleStatus'])->name('venues.toggle-status');
+        // IMPORTANT: define literal routes (e.g. export) before the resource {venue} route to avoid collisions.
+        Route::get('venues/export', [VenueManagementController::class, 'export'])->name('venues.export');
+        Route::get('venues/import/template', [VenueManagementController::class, 'downloadImportTemplate'])->name('venues.import-template');
         Route::post('venues/import', [VenueManagementController::class, 'importVenues'])->name('venues.import');
+        Route::post('venues/import-csv', [VenueManagementController::class, 'import'])->name('venues.import-csv');
         Route::post('venues/bulk-action', [VenueManagementController::class, 'bulkAction'])->name('venues.bulk-action');
+        Route::patch('venues/{venue}/toggle-status', [VenueManagementController::class, 'toggleStatus'])->name('venues.toggle-status');
         // Some hosts block HTTP DELETE; provide POST fallback for destroy
         Route::post('venues/{venue}/delete', [VenueManagementController::class, 'destroy'])->name('venues.destroy.post');
+        // Venue role management (superuser only)
+        Route::post('venues/{venue}/add-role', [VenueManagementController::class, 'addRole'])->name('venues.add-role');
+        Route::post('venues/{venue}/remove-role', [VenueManagementController::class, 'removeRole'])->name('venues.remove-role');
+        Route::post('venues/{venue}/update-role', [VenueManagementController::class, 'updateRole'])->name('venues.update-role');
+        Route::resource('venues', VenueManagementController::class);
 
         // Artist Management
-        Route::resource('artists', ArtistManagementController::class);
+        // IMPORTANT: define literal routes (e.g. export) before the resource {artist} route to avoid collisions.
+        Route::get('artists/export', [ArtistManagementController::class, 'export'])->name('artists.export');
+        Route::get('artists/import/template', [ArtistManagementController::class, 'downloadImportTemplate'])->name('artists.import-template');
+        Route::post('artists/import', [ArtistManagementController::class, 'import'])->name('artists.import');
         Route::patch('artists/{artist}/toggle-status', [ArtistManagementController::class, 'toggleStatus'])->name('artists.toggle-status');
+        Route::resource('artists', ArtistManagementController::class);
 
-        // Unclaimed Artists
-        Route::get('unclaimed-artists', [UnclaimedArtistController::class, 'index'])->name('unclaimed-artists.index');
-        Route::get('unclaimed-artists/{artist}/edit', [UnclaimedArtistController::class, 'edit'])->name('unclaimed-artists.edit');
-        Route::put('unclaimed-artists/{artist}', [UnclaimedArtistController::class, 'update'])->name('unclaimed-artists.update');
+        // Unclaimed Items (unified dashboard for all entity types)
+        Route::prefix('unclaimed')->name('unclaimed.')->group(function () {
+            Route::get('/', [UnclaimedController::class, 'index'])->name('index');
+            Route::post('/bulk-send-email', [UnclaimedController::class, 'bulkSendClaimEmails'])->name('bulk-send-email');
+            Route::get('/{type}/{id}/edit', [UnclaimedController::class, 'edit'])->name('edit')
+                ->where('type', 'artist|venue|event|organiser');
+            Route::put('/{type}/{id}', [UnclaimedController::class, 'update'])->name('update')
+                ->where('type', 'artist|venue|event|organiser');
+            Route::delete('/{type}/{id}', [UnclaimedController::class, 'destroy'])->name('destroy')
+                ->where('type', 'artist|venue|event|organiser');
+            Route::post('/{type}/{id}/send-invite', [UnclaimedController::class, 'sendClaimInvite'])->name('send-invite')
+                ->where('type', 'artist|venue|event|organiser');
+            Route::post('/{type}/{id}/link-user', [UnclaimedController::class, 'linkToUser'])->name('link-user')
+                ->where('type', 'artist|venue|event|organiser');
+            Route::post('/{type}/{id}/check-link-conflict', [UnclaimedController::class, 'checkLinkConflict'])->name('check-link-conflict')
+                ->where('type', 'artist|venue|event|organiser');
+        });
+
+        // Legacy route redirects for backward compatibility
+        Route::get('unclaimed-artists', fn() => redirect()->route('admin.unclaimed.index', ['type' => 'artist']))->name('unclaimed-artists.index');
+        Route::get('unclaimed-artists/{artist}/edit', fn($artist) => redirect()->route('admin.unclaimed.edit', ['type' => 'artist', 'id' => $artist]))->name('unclaimed-artists.edit');
 
         // Artist Claim Disputes
         Route::get('artist-disputes', [ArtistClaimDisputeController::class, 'index'])->name('artist-disputes.index');
@@ -100,6 +135,31 @@ Route::prefix('admin')->name('admin.')->group(function () {
             Route::get('packages/{featurePackage}/edit', [FeaturePackageController::class, 'edit'])->name('feature-packages.edit');
             Route::put('packages/{featurePackage}', [FeaturePackageController::class, 'update'])->name('feature-packages.update');
             Route::delete('packages/{featurePackage}', [FeaturePackageController::class, 'destroy'])->name('feature-packages.destroy');
+        });
+
+        // Site Settings
+        Route::get('settings', [SettingsController::class, 'index'])->name('settings.index');
+        Route::post('settings', [SettingsController::class, 'update'])->name('settings.update');
+        Route::post('settings/toggle', [SettingsController::class, 'toggle'])->name('settings.toggle');
+
+        // Email Templates
+        Route::resource('email-templates', EmailTemplateController::class);
+
+        // Mail Accounts Management
+        Route::resource('mail-accounts', MailAccountController::class);
+
+        // Capabilities (role ↔ permission matrix)
+        Route::get('capabilities', [CapabilityManagementController::class, 'index'])->name('capabilities.index');
+        Route::post('capabilities', [CapabilityManagementController::class, 'update'])->name('capabilities.update');
+
+        // Duplicate Names Management
+        Route::prefix('duplicates')->name('duplicates.')->group(function () {
+            Route::get('/', [DuplicateManagementController::class, 'index'])->name('index');
+            Route::get('/summary', [DuplicateManagementController::class, 'summary'])->name('summary');
+            Route::get('/{type}/{id}', [DuplicateManagementController::class, 'show'])->name('show')
+                ->where('type', 'users|artists|organisers|venues');
+            Route::post('/{type}/{id}/rename', [DuplicateManagementController::class, 'rename'])->name('rename')
+                ->where('type', 'users|artists|organisers|venues');
         });
     });
 });

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Organiser;
 use App\Models\User;
+use App\Rules\UniqueNormalizedName;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
@@ -39,7 +40,7 @@ class OrganiserManagementController extends Controller
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'organisation_name' => 'required|string|max:255',
+            'organisation_name' => ['required', 'string', 'max:255', UniqueNormalizedName::forOrganiser()],
             'contact_person' => 'required|string|max:255',
             'description' => 'nullable|string',
             'contact_phone' => 'nullable|string',
@@ -77,7 +78,7 @@ class OrganiserManagementController extends Controller
     public function update(Request $request, Organiser $organiser)
     {
         $validator = Validator::make($request->all(), [
-            'organisation_name' => 'required|string|max:255',
+            'organisation_name' => ['required', 'string', 'max:255', UniqueNormalizedName::forOrganiser($organiser->id)],
             'contact_person' => 'required|string|max:255',
             'description' => 'nullable|string',
             'contact_phone' => 'nullable|string',

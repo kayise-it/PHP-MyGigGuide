@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Traits\Claimable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -10,6 +11,8 @@ use Illuminate\Database\Eloquent\Relations\MorphMany;
 
 class Organiser extends Model
 {
+    use Claimable;
+
     protected $fillable = [
         'user_id',
         'organisation_name',
@@ -19,10 +22,25 @@ class Organiser extends Model
         'description',
         'logo',
         'settings',
+        // Claim fields
+        'pending_claim_user_id',
+        'pending_claim_at',
+        'dispute_raised',
+        'dispute_raised_at',
+        'dispute_reason',
+        'claim_status',
+        'grace_period_ends_at',
+        'warning_email_sent_at',
     ];
 
     protected $casts = [
         'settings' => 'array',
+        // Claim field casts
+        'pending_claim_at' => 'datetime',
+        'dispute_raised_at' => 'datetime',
+        'grace_period_ends_at' => 'datetime',
+        'warning_email_sent_at' => 'datetime',
+        'dispute_raised' => 'boolean',
     ];
 
     /**

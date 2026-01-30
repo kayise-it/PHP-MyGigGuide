@@ -54,8 +54,8 @@
                                 <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
                                 </svg>
-                                <a href="mailto:dave@mygigguide.co.za" class="text-purple-600 hover:text-purple-700 transition-colors">
-                                    dave@mygigguide.co.za
+                                <a href="mailto:admin@mygigguide.co.za" class="text-purple-600 hover:text-purple-700 transition-colors">
+                                    admin@mygigguide.co.za
                                 </a>
                             </div>
                             

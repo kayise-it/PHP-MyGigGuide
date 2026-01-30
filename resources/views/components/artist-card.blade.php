@@ -7,11 +7,14 @@
 @php
     $targetUrl = $href ?? route('artists.show', $artist->id);
     
-    // Handle profile picture with temp path filtering
+    // Handle profile picture with temp path filtering and file existence check
     $image = asset('logos/logo2.jpeg'); // Default placeholder
     $profilePicture = $artist->profile_picture ?? $artist->user->profile_picture ?? null;
     if ($profilePicture && !str_contains($profilePicture, '/tmp/php') && !str_contains($profilePicture, 'tmp.php')) {
-        $image = \Illuminate\Support\Facades\Storage::url($profilePicture);
+        // Use 'public' disk since images are stored in storage/app/public
+        if (\Illuminate\Support\Facades\Storage::disk('public')->exists($profilePicture)) {
+            $image = \Illuminate\Support\Facades\Storage::disk('public')->url($profilePicture);
+        }
     }
     
     $computedRating = $rating ?? (method_exists($artist, 'ratings') ? round((float) ($artist->ratings()->avg('rating') ?? 0), 1) : null);

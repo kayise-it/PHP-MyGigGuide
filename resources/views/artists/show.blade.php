@@ -2,17 +2,56 @@
 
 @section('title', ($artist->stage_name ?? $artist->user->name) . ' - Artist')
 
+@push('head')
+@php
+    $artistName = $artist->stage_name ?? $artist->user->name ?? 'Artist';
+    $description = \Illuminate\Support\Str::limit(strip_tags($artist->bio ?? 'Discover this amazing artist on My Gig Guide.'), 160);
+    $imageUrl = null;
+    $profilePicture = $artist->profile_picture ?? $artist->user->profile_picture ?? null;
+    if ($profilePicture && !str_contains($profilePicture, '/tmp/php') && !str_contains($profilePicture, 'tmp.php')) {
+        if (\Illuminate\Support\Facades\Storage::disk('public')->exists($profilePicture)) {
+            $imageUrl = url(\Illuminate\Support\Facades\Storage::disk('public')->url($profilePicture));
+        }
+    }
+    if (!$imageUrl) {
+        $imageUrl = url(asset('logos/logo2.jpeg'));
+    }
+@endphp
+<!-- Open Graph / Facebook -->
+<meta property="og:type" content="profile">
+<meta property="og:url" content="{{ route('artists.show', $artist) }}">
+<meta property="og:title" content="{{ $artistName }} - My Gig Guide">
+<meta property="og:description" content="{{ $description }}">
+@if($imageUrl)
+<meta property="og:image" content="{{ $imageUrl }}">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+@endif
+<meta property="og:site_name" content="My Gig Guide">
+
+<!-- Twitter -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:url" content="{{ route('artists.show', $artist) }}">
+<meta name="twitter:title" content="{{ $artistName }} - My Gig Guide">
+<meta name="twitter:description" content="{{ $description }}">
+@if($imageUrl)
+<meta name="twitter:image" content="{{ $imageUrl }}">
+@endif
+@endpush
+
 @section('content')
 <div class="container mx-auto px-4 py-8">
     <!-- Hero Section -->
     <div class="relative h-96 bg-gradient-to-r from-purple-600 to-blue-600 rounded-2xl mb-8 overflow-hidden">
         @php
             $profilePicture = $artist->profile_picture ?? $artist->user->profile_picture ?? null;
+            $profileImage = asset('logos/logo2.jpeg');
             if ($profilePicture && !str_contains($profilePicture, '/tmp/php') && !str_contains($profilePicture, 'tmp.php')) {
-                $profileImage = \Illuminate\Support\Facades\Storage::url($profilePicture);
-            } else {
-                $profileImage = asset('logos/logo2.jpeg');
-        }
+                // Use 'public' disk since images are stored in storage/app/public
+                if (\Illuminate\Support\Facades\Storage::disk('public')->exists($profilePicture)) {
+                    $profileImage = \Illuminate\Support\Facades\Storage::disk('public')->url($profilePicture);
+                }
+            }
         @endphp
 
         <img src="{{ $profileImage }}" alt="{{ $artist->stage_name ?? $artist->user->name }}" 
@@ -48,7 +87,19 @@
                     {!! nl2br(e($artist->bio)) !!}
                 </div>
             </div>
-                    @endif
+            @endif
+
+            <!-- YouTube Videos -->
+            @if($artist->youtubeVideos->count() > 0)
+            <div class="bg-white rounded-2xl shadow-lg p-8 mb-8">
+                <h2 class="text-2xl font-bold text-gray-900 mb-4">Videos</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    @foreach($artist->youtubeVideos as $video)
+                    <x-youtube-video :video="$video" />
+                    @endforeach
+                </div>
+            </div>
+            @endif
 
             <!-- Upcoming Events -->
             <div class="bg-white rounded-2xl shadow-lg p-8">
