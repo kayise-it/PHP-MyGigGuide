@@ -307,8 +307,9 @@ function venueSelector(config) {
         
         // Methods
         init() {
+            // Initial load of venues; once loaded, it will also try to
+            // hydrate the selected venue based on selectedVenueId (if any).
             this.fetchVenues();
-            this.findSelectedVenue();
             // Listen for quick-add completion to auto-select the new venue
             window.addEventListener('venue-quick-added', (e) => {
                 const v = e && e.detail ? e.detail.venue : null;
@@ -358,6 +359,13 @@ function venueSelector(config) {
                 this.venues = data.venues || [];
                 this.filteredVenues = data.venues || [];
                 this.pagination = data.pagination;
+
+                // Try to resolve the currently selected venue once data is loaded
+                this.findSelectedVenue();
+                // If still not found (e.g. selected venue is not on first page), fetch it by ID
+                if (this.selectedVenueId && !this.selectedVenue) {
+                    this.fetchVenueById(this.selectedVenueId);
+                }
             } catch (error) {
                 console.error('Error fetching venues:', error);
                 this.venues = [];
@@ -411,7 +419,32 @@ function venueSelector(config) {
         
         findSelectedVenue() {
             if (this.selectedVenueId && this.venues.length > 0) {
-                this.selectedVenue = this.venues.find(v => v.id == this.selectedVenueId);
+                const found = this.venues.find(v => v.id == this.selectedVenueId);
+                this.selectedVenue = found || null;
+            }
+        },
+
+        async fetchVenueById(id) {
+            if (!id) return;
+            try {
+                const params = new URLSearchParams({
+                    user_role: this.userRole,
+                    organiser_id: this.organiserId || '',
+                    artist_id: this.artistId || ''
+                });
+                const response = await fetch(`/api/venues/${id}?${params}`);
+                if (!response.ok) return;
+                const venue = await response.json();
+                this.selectedVenue = {
+                    id: venue.id,
+                    name: venue.name,
+                    location: venue.location || venue.address || venue.city || '',
+                    capacity: venue.capacity || null,
+                    isOwnVenue: venue.isOwnVenue || false,
+                    owner: venue.owner || null
+                };
+            } catch (e) {
+                console.error('Error fetching venue by ID:', e);
             }
         }
     }

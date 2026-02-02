@@ -25,7 +25,7 @@
 
         <!-- Reset Password Form -->
         <div class="bg-white rounded-2xl shadow-sm border border-purple-100 p-8">
-            <form method="POST" action="{{ route('password.update') }}" class="space-y-6">
+            <form method="POST" action="{{ route('password.update') }}" class="space-y-6" autocomplete="off">
                 @csrf
                 
                 <input type="hidden" name="token" value="{{ $token }}">
@@ -44,9 +44,10 @@
                         </div>
                         <input
                             id="email"
-                            type="email"
+                            type="text"
                             value="{{ $email }}"
                             readonly
+                            autocomplete="off"
                             class="block w-full pl-10 pr-3 py-3 border border-gray-200 rounded-xl text-gray-500 bg-gray-50 cursor-not-allowed"
                         />
                     </div>
@@ -57,6 +58,7 @@
                     <label for="password" class="block text-sm font-medium text-gray-700 mb-2">
                         New Password
                     </label>
+                    <p class="text-xs text-gray-500 mb-1">Choose a new password (min 8 characters). Do not use your email.</p>
                     <div class="relative">
                         <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                             <svg class="h-5 w-5 text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">

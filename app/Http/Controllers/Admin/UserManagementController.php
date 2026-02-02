@@ -3,11 +3,17 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Mail\PasswordResetMail;
 use App\Models\User;
 use App\Rules\UniqueNormalizedName;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
 
 class UserManagementController extends Controller
 {
@@ -226,6 +232,34 @@ class UserManagementController extends Controller
 
         return redirect()->route('admin.users.index')
             ->with('success', 'User updated successfully.');
+    }
+
+    /**
+     * Send a password reset email to the given user.
+     */
+    public function sendPasswordReset(User $user)
+    {
+        $token = Str::random(64);
+
+        DB::table('password_reset_tokens')
+            ->where('email', $user->email)
+            ->delete();
+
+        DB::table('password_reset_tokens')->insert([
+            'email' => $user->email,
+            'token' => Hash::make($token),
+            'created_at' => Carbon::now(),
+        ]);
+
+        try {
+            Mail::to($user->email)->send(new PasswordResetMail($user, $token));
+            return redirect()->route('admin.users.edit', $user)
+                ->with('success', 'Password reset email sent to ' . $user->email . '.');
+        } catch (\Exception $e) {
+            Log::error('Admin send password reset failed: ' . $e->getMessage());
+            return redirect()->route('admin.users.edit', $user)
+                ->with('error', 'Failed to send password reset email. Please try again.');
+        }
     }
 
     public function destroy(User $user)

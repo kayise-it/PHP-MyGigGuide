@@ -10,8 +10,8 @@
     x-transition:leave-start="opacity-100"
     x-transition:leave-end="opacity-0"
     class="fixed inset-0 bg-black/50 flex items-center justify-center z-50"
-    @click.self="modal = false"
-    @keydown.esc.window="modal = false"
+    @click.self="modal = true"
+    @keydown.esc.window="modal = true"
 >
     <!-- Modal Box -->
     <div 

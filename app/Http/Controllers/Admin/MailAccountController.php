@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\MailAccount;
+use App\Services\MailCredentialsService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
@@ -60,6 +61,23 @@ class MailAccountController extends Controller
      */
     public function store(Request $request)
     {
+        // #region agent log
+        $logPath = base_path('.cursor/debug.log');
+        $log = function ($hypothesisId, $message, $data = []) use ($logPath) {
+            $line = json_encode(array_filter([
+                'timestamp' => (int)(microtime(true) * 1000),
+                'sessionId' => 'debug-session',
+                'runId' => $data['runId'] ?? 'run1',
+                'hypothesisId' => $hypothesisId,
+                'location' => 'MailAccountController.php:store',
+                'message' => $message,
+                'data' => $data,
+            ])) . "\n";
+            @file_put_contents($logPath, $line, FILE_APPEND | LOCK_EX);
+        };
+        $log('A', 'store() entry', ['email_raw' => $request->input('email'), 'domain_id' => $request->input('domain_id'), 'has_at' => str_contains((string)$request->input('email'), '@')]);
+        // #endregion
+
         $validator = Validator::make($request->all(), [
             'email' => 'required|email|max:120',
             'password' => 'required|string|min:8|confirmed',
@@ -75,11 +93,19 @@ class MailAccountController extends Controller
             'domain_id.exists' => 'Selected domain does not exist.',
         ]);
 
+        // #region agent log
+        $log('A', 'after Validator::make', ['fails' => $validator->fails(), 'errors' => $validator->errors()->get('email')]);
+        // #endregion
+
         // Check if email already exists
         $exists = DB::connection('mailserver')
             ->table('virtual_users')
             ->where('email', $request->email)
             ->exists();
+
+        // #region agent log
+        $log('C', 'duplicate check', ['request_email' => $request->email, 'exists' => $exists]);
+        // #endregion
 
         if ($exists) {
             $validator->errors()->add('email', 'This email address already exists.');
@@ -89,6 +115,9 @@ class MailAccountController extends Controller
         }
 
         if ($validator->fails()) {
+            // #region agent log
+            $log('E', 'redirect back due to validation failure', ['failed_rules' => $validator->errors()->keys()]);
+            // #endregion
             return redirect()->back()
                 ->withErrors($validator)
                 ->withInput();
@@ -99,6 +128,9 @@ class MailAccountController extends Controller
 
         // Construct full email if only username provided
         $email = $request->email;
+        // #region agent log
+        $log('E', 'before construct full email', ['email' => $email, 'will_append_domain' => !str_contains($email, '@')]);
+        // #endregion
         if (!str_contains($email, '@')) {
             $domain = DB::connection('mailserver')
                 ->table('virtual_domains')
@@ -241,6 +273,14 @@ class MailAccountController extends Controller
             ->table('virtual_users')
             ->where('id', $id)
             ->update($updateData);
+
+        // Store SMTP credentials (encrypted) when the default app mail account is updated.
+        // Laravel reads these at runtime instead of .env, so the password is never in .env.
+        $defaultAccountId = (int) config('mail.default_account_id', 2);
+        if ((int) $id === $defaultAccountId) {
+            $plainPassword = $request->filled('password') ? $request->password : null;
+            MailCredentialsService::store($request->email, $plainPassword);
+        }
 
         return redirect()->route('admin.mail-accounts.show', $id)
             ->with('success', 'Email account updated successfully.');

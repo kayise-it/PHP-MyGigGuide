@@ -43,7 +43,7 @@
                 <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                 </svg>
-                <span>Export CSV</span>
+                <span>Export Excel</span>
             </a>
 
             <!-- Import Button -->
@@ -53,7 +53,7 @@
                 <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
                 </svg>
-                <span>Import CSV</span>
+                <span>Import Excel</span>
             </button>
 
             <!-- Create Artist Button -->
@@ -68,19 +68,19 @@
 
     <!-- Import Modal body content (rendered inside global admin modal) -->
     <div id="artist-import-modal-content" class="hidden">
-        <h3 class="text-lg font-medium text-gray-900 mb-4">Import Artists from CSV</h3>
+        <h3 class="text-lg font-medium text-gray-900 mb-4">Import Artists from Excel</h3>
         <form action="{{ route('admin.artists.import') }}" method="POST" enctype="multipart/form-data">
             @csrf
             <div class="mb-4 space-y-2">
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">CSV File</label>
-                    <input type="file" name="csv_file" accept=".csv,.txt" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Excel File</label>
+                    <input type="file" name="excel_file" accept=".xlsx,.xls,.csv" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
                 </div>
                 <p class="mt-1 text-xs text-gray-500">
-                    Upload a CSV file with artist data. The file should match the export format.
+                    Upload an Excel file (.xlsx, .xls) or CSV with artist data. Use the template to ensure correct column format.
                 </p>
                 <a href="{{ route('admin.artists.import-template') }}" class="inline-flex items-center text-xs text-purple-600 hover:text-purple-800 hover:underline">
-                    Download CSV template
+                    Download Excel template
                 </a>
             </div>
             <div class="flex justify-end space-x-3">

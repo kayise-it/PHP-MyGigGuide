@@ -16,12 +16,14 @@ use App\Http\Controllers\RatingController;
 use App\Http\Controllers\VenueController;
 use App\Http\Controllers\FeaturePurchaseController;
 use App\Http\Controllers\VerificationController;
+use App\Http\Controllers\NotificationController;
 
 // Public venue creation routes (MUST come before admin routes)
 Route::get('/venues/create', [VenueController::class, 'create'])->name('venues.create');
 Route::post('/venues', [VenueController::class, 'store'])->name('venues.store');
 Route::post('/venues/quick', [VenueController::class, 'quickStore'])->name('venues.quick-store');
 Route::get('/api/venues/search', [VenueController::class, 'search'])->name('api.venues.search');
+Route::get('/api/venues/{venue}', [VenueController::class, 'showApi'])->name('api.venues.show');
 
 // Venue ownership request routes (MUST come before /venues/{venue} route to avoid route conflicts)
 Route::middleware(['auth', 'capability'])->group(function () {
@@ -56,6 +58,11 @@ Route::view('/user-selector-demo', 'user-selector-demo')->name('user-selector-de
 // Contact routes
 Route::get('/contact', [ContactController::class, 'index'])->name('contact.index');
 Route::post('/contact/submit', [ContactController::class, 'submit'])->name('contact.submit');
+
+// Mark notification as read and redirect (auth required)
+Route::middleware(['auth'])->group(function () {
+    Route::get('/notifications/{id}', [NotificationController::class, 'readAndRedirect'])->name('notifications.read');
+});
 
 // Protected routes (require login)
 Route::middleware(['auth', 'capability'])->group(function () {

@@ -19,6 +19,9 @@
 !/storage/logs/.gitkeep
 !/storage/private/.gitkeep
 
+# Mail credentials (set via Admin > Mail Accounts; never commit)
+/storage/app/mail_credentials.json
+
 # Environment files
 .env
 .env.backup

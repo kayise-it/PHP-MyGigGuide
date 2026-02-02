@@ -43,6 +43,7 @@ class AuthController extends Controller
 
     /**
      * Handle login request.
+     * Login is by username only (not email).
      */
     public function login(Request $request)
     {
@@ -51,10 +52,25 @@ class AuthController extends Controller
             'password' => 'required',
         ]);
 
-        $credentials = $request->only('username', 'password');
+        $input = trim($request->input('username'));
+        $user = User::whereRaw('LOWER(username) = ?', [strtolower($input)])->first();
+
+        // #region agent log
+        $logPath = base_path('.cursor/debug.log');
+        @file_put_contents($logPath, json_encode(['timestamp' => time() * 1000, 'location' => 'AuthController::login:user_lookup', 'message' => 'user lookup', 'data' => ['input_length' => strlen((string) $input), 'user_found' => $user !== null, 'user_id' => $user?->id, 'username' => $user?->username, 'email' => $user ? substr($user->email ?? '', 0, 5) . '...' : null], 'sessionId' => 'debug-session', 'runId' => 'reset-login', 'hypothesisId' => 'D']) . "\n", FILE_APPEND | LOCK_EX);
+        // #endregion
+        $credentials = $user
+            ? ['username' => $user->username, 'password' => $request->password]
+            : $request->only('username', 'password');
         $remember = $request->boolean('remember');
 
-        if (Auth::attempt($credentials, $remember)) {
+        $attemptOk = Auth::attempt($credentials, $remember);
+        // #region agent log
+        $storedHash = $user ? $user->getRawOriginal('password') : null;
+        $hashCheck = $user && $storedHash ? Hash::check($request->password, $storedHash) : false;
+        @file_put_contents($logPath, json_encode(['timestamp' => time() * 1000, 'location' => 'AuthController::login:attempt', 'message' => 'attempt result', 'data' => ['attempt_ok' => $attemptOk, 'Hash_check_typed_vs_stored' => $hashCheck], 'sessionId' => 'debug-session', 'runId' => 'reset-login', 'hypothesisId' => 'B']) . "\n", FILE_APPEND | LOCK_EX);
+        // #endregion
+        if ($attemptOk) {
             $request->session()->regenerate();
 
             $user = Auth::user();

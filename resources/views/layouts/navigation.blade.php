@@ -1,10 +1,20 @@
 <nav class="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-50" x-data="{ mobileMenuOpen: false }">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between items-center h-16">
-            <!-- Logo -->
-            <div class="flex items-center">
+            <!-- Logo (with notification dot when user has unread notifications) -->
+            <div class="flex items-center relative">
                 <a href="{{ route('home') }}" class="flex items-center space-x-3">
-                    <img src="{{ asset('logos/logo1.jpeg') }}" alt="My Gig Guide" class="h-10 w-auto">
+                    <span class="relative inline-block">
+                        <img src="{{ asset('logos/logo1.jpeg') }}" alt="My Gig Guide" class="h-10 w-auto">
+                        @auth
+                            @if(isset($unreadNotificationCount) && $unreadNotificationCount > 0)
+                                <span class="absolute -top-0.5 -right-0.5 flex h-3 w-3" title="You have {{ $unreadNotificationCount }} unread notification(s)">
+                                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                                    <span class="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
+                                </span>
+                            @endif
+                        @endauth
+                    </span>
                     <span class="text-xl font-bold text-gray-900 whitespace-nowrap">My Gig Guide</span>
                 </a>
             </div>
@@ -30,6 +40,46 @@
             <!-- User Menu -->
             <div class="flex items-center space-x-4">
                 @auth
+                    <!-- Notifications (bell with dot when unread) -->
+                    <div class="relative" x-data="{ notificationOpen: false }" @click.outside="notificationOpen = false">
+                        <button type="button" @click="notificationOpen = !notificationOpen" class="relative p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 transition-colors" aria-label="Notifications">
+                            <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                            </svg>
+                            @if(isset($unreadNotificationCount) && $unreadNotificationCount > 0)
+                                <span class="absolute top-0.5 right-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white">{{ $unreadNotificationCount > 9 ? '9+' : $unreadNotificationCount }}</span>
+                            @endif
+                        </button>
+                        <div x-show="notificationOpen"
+                             x-transition:enter="transition ease-out duration-100"
+                             x-transition:enter-start="transform opacity-0 scale-95"
+                             x-transition:enter-end="transform opacity-100 scale-100"
+                             x-transition:leave="transition ease-in duration-75"
+                             x-transition:leave-start="transform opacity-100 scale-100"
+                             x-transition:leave-end="transform opacity-0 scale-95"
+                             x-cloak
+                             class="absolute right-0 mt-2 w-80 max-h-96 overflow-hidden bg-white rounded-lg shadow-xl border border-gray-200 z-50">
+                            <div class="px-4 py-3 border-b border-gray-200 bg-gray-50">
+                                <h3 class="text-sm font-semibold text-gray-900">Notifications</h3>
+                            </div>
+                            <div class="max-h-72 overflow-y-auto">
+                                @if(isset($navbarNotifications) && $navbarNotifications->isNotEmpty())
+                                    @foreach($navbarNotifications as $notification)
+                                        @php $data = is_array($notification->data) ? $notification->data : []; @endphp
+                                        <a href="{{ route('notifications.read', $notification->id) }}" class="block px-4 py-3 hover:bg-purple-50 border-b border-gray-100 last:border-b-0 transition-colors">
+                                            <p class="text-sm text-gray-800">{{ $data['message'] ?? 'New notification' }}</p>
+                                            @if(!empty($data['requested_at']))
+                                                <p class="text-xs text-gray-500 mt-0.5">{{ \Carbon\Carbon::parse($data['requested_at'])->diffForHumans() }}</p>
+                                            @endif
+                                        </a>
+                                    @endforeach
+                                @else
+                                    <div class="px-4 py-6 text-center text-sm text-gray-500">No new notifications</div>
+                                @endif
+                            </div>
+                        </div>
+                    </div>
+
                     <div class="relative" x-data="{ open: false }" @click.outside="open = false">
                         <button @click="open = !open" class="flex items-center space-x-3 text-gray-700 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 rounded-lg px-3 py-2 transition-colors duration-200">
                             <div class="relative">

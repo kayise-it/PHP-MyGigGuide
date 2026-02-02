@@ -50,23 +50,32 @@
                     @csrf
                     
                     @guest
-                        <div class="text-left">
-                            <label for="email" class="block text-sm font-medium text-gray-700 mb-2">
-                                Email address used for signup
-                            </label>
-                            <input
-                                id="email"
-                                type="email"
-                                name="email"
-                                value="{{ old('email', session('pending_verification_email')) }}"
-                                required
-                                class="w-full px-4 py-3 border border-purple-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-sm text-gray-900 placeholder-gray-400"
-                                placeholder="you@example.com"
-                            >
-                            <p class="mt-2 text-xs text-gray-500">
-                                We use this to resend the verification link if you are not currently logged in.
-                            </p>
-                        </div>
+                        @php $pendingEmail = old('email', session('pending_verification_email')); @endphp
+                        @if($pendingEmail)
+                            <div class="text-left">
+                                <p class="text-sm font-medium text-gray-700 mb-1">Resend verification to</p>
+                                <p class="text-gray-900 font-medium">{{ $pendingEmail }}</p>
+                                <input type="hidden" name="email" value="{{ $pendingEmail }}">
+                            </div>
+                        @else
+                            <div class="text-left">
+                                <label for="email" class="block text-sm font-medium text-gray-700 mb-2">
+                                    Email address used for signup
+                                </label>
+                                <input
+                                    id="email"
+                                    type="email"
+                                    name="email"
+                                    value="{{ old('email') }}"
+                                    required
+                                    class="w-full px-4 py-3 border border-purple-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-sm text-gray-900 placeholder-gray-400"
+                                    placeholder="you@example.com"
+                                >
+                                <p class="mt-2 text-xs text-gray-500">
+                                    Enter the email you used when signing up so we can resend the verification link.
+                                </p>
+                            </div>
+                        @endif
                     @endguest
 
                     @if ($errors->any())

@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
-@section('title', 'Login - My Gig Guide')
-@section('description', 'Sign in to your My Gig Guide account to access exclusive features and manage your events.')
+@section('title', 'Login with username - My Gig Guide')
+@section('description', 'Sign in with your username to access your My Gig Guide account.')
 
 @section('content')
 <div class="min-h-screen bg-gradient-to-br from-purple-50 via-white to-blue-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
@@ -16,10 +16,10 @@
                 </div>
             </div>
             <h2 class="text-3xl font-bold text-gray-900 mb-2">
-                Welcome Back
+                Login with username
             </h2>
             <p class="text-gray-600">
-                Sign in to your account to continue
+                Sign in with your username and password
             </p>
         </div>
 
@@ -43,7 +43,7 @@
                     <div class="w-full border-t border-gray-300"></div>
                 </div>
                 <div class="relative flex justify-center text-sm">
-                    <span class="px-2 bg-white text-gray-500">Or continue with email</span>
+                    <span class="px-2 bg-white text-gray-500">Or sign in with username</span>
                 </div>
             </div>
             @endif
@@ -56,7 +56,7 @@
                     <input type="hidden" name="continue" value="{{ request()->get('continue') }}">
                 @endif
                 
-                <!-- Username Field -->
+                <!-- Username Field (not email) -->
                 <div>
                     <label for="username" class="block text-sm font-medium text-gray-700 mb-2">
                         Username
@@ -76,9 +76,10 @@
                             autocomplete="username"
                             autofocus
                             class="block w-full pl-10 pr-3 py-3 border border-purple-200 rounded-xl text-gray-900 placeholder-purple-300 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent @error('username') border-red-300 @enderror"
-                            placeholder="Enter your username"
+                            placeholder="Enter your username (not email)"
                         />
                     </div>
+                    <p class="mt-1 text-xs text-gray-500">Use your username to sign in, not your email address.</p>
                     @error('username')
                         <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
                     @enderror

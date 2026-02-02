@@ -47,6 +47,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::patch('users/{user}/verify-email', [UserManagementController::class, 'verifyEmail'])->name('users.verify-email');
         Route::patch('users/{user}/unverify-email', [UserManagementController::class, 'unverifyEmail'])->name('users.unverify-email');
         Route::patch('users/{user}/update-email', [UserManagementController::class, 'updateEmail'])->name('users.update-email');
+        Route::post('users/{user}/send-password-reset', [UserManagementController::class, 'sendPasswordReset'])->name('users.send-password-reset');
 
         // Event Management
         Route::resource('events', EventManagementController::class);

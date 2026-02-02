@@ -116,4 +116,14 @@ return [
         'name' => env('MAIL_FROM_NAME', 'Example'),
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Default Mail Account (admin sync)
+    |--------------------------------------------------------------------------
+    | When the mail account with this ID is updated in Admin > Mail Accounts,
+    | MAIL_USERNAME, MAIL_FROM_ADDRESS and MAIL_PASSWORD in .env are updated
+    | so Laravel uses the same credentials. Set in .env as MAIL_ACCOUNT_ID.
+    */
+    'default_account_id' => env('MAIL_ACCOUNT_ID', 2),
+
 ];

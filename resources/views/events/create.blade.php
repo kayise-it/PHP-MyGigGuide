@@ -208,7 +208,7 @@
                     </label>
                     <x-venue-selector 
                         name="venue_id" 
-                        :selectedVenueId="old('venue_id')"
+                        :selectedVenueId="old('venue_id', $selectedVenueId)"
                         placeholder="Choose a venue for your event..."
                         userRole="organiser"
                         :organiserId="auth()->user()->id"

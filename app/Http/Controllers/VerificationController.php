@@ -145,11 +145,9 @@ class VerificationController extends Controller
         // Persist the email so subsequent resends still work for logged-out users
         session(['pending_verification_email' => $user->email]);
 
-        // Check for unclaimed entities
-        $unclaimedEntities = $this->claimService->findUnclaimedByEmail($user->email);
-        $unclaimedArtist = $unclaimedEntities->first(fn($e) => $e instanceof Artist);
-
-        Mail::to($user->email)->send(new EmailVerificationMail($user, $unclaimedArtist));
+        // Send verification email for the user account only (no artist-claim framing).
+        // Claiming of artist/venue profiles still happens when they click the link (verify() -> autoClaimOnVerification).
+        Mail::to($user->email)->send(new EmailVerificationMail($user, null));
 
         return back()->with('success', 'Verification email sent to ' . $user->email);
     }

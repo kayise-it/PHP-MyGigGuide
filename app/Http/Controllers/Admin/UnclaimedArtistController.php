@@ -62,6 +62,16 @@ class UnclaimedArtistController extends Controller
             'profile_picture' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:10240',
         ]);
 
+        // Superuser editing unclaimed artist: do not use their own email as artist contact
+        $validator->after(function ($validator) use ($request) {
+            if ($request->filled('contact_email') && auth()->check() && auth()->user()->hasRole('superuser')) {
+                $adminEmail = auth()->user()->email;
+                if (strtolower(trim($request->contact_email)) === strtolower($adminEmail)) {
+                    $validator->errors()->add('contact_email', 'Do not use your own email as the unclaimed artist\'s contact. Enter the artist\'s contact email.');
+                }
+            }
+        });
+
         if ($validator->fails()) {
             return back()->withErrors($validator)->withInput();
         }

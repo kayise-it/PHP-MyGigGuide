@@ -2,7 +2,10 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Exports\ArtistsExport;
+use App\Exports\ArtistsImportTemplateExport;
 use App\Http\Controllers\Controller;
+use App\Imports\ArtistsImport;
 use App\Models\Artist;
 use App\Models\Genre;
 use App\Models\User;
@@ -14,54 +17,13 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use Maatwebsite\Excel\Facades\Excel;
 
 class ArtistManagementController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Artist::with('user');
-
-        if ($request->has('search') && $request->search) {
-            $search = trim($request->search);
-            $like = "%{$search}%";
-            $query->where(function ($q) use ($like) {
-                // Substring matching across key fields
-                $q->where('stage_name', 'like', $like)
-                    ->orWhere('real_name', 'like', $like)
-                    ->orWhere('genre', 'like', $like)
-                    ->orWhereHas('user', function ($uq) use ($like) {
-                        $uq->where('name', 'like', $like)
-                           ->orWhere('username', 'like', $like)
-                           ->orWhere('email', 'like', $like);
-                    });
-            });
-        }
-
-        // Filter by genre if provided
-        if ($request->has('genre') && $request->genre) {
-            $genreValue = trim($request->genre);
-            
-            // Try to find genre by slug (since useNames=true sends slugs)
-            $genre = Genre::where('slug', $genreValue)->orWhere('slug', strtolower($genreValue))->first();
-            
-            if ($genre) {
-                // Filter by genre relationship
-                $query->whereHas('genres', function ($q) use ($genre) {
-                    $q->where('genres.id', $genre->id);
-                });
-            } else {
-                // Fallback: check if it's a numeric ID
-                if (is_numeric($genreValue)) {
-                    $query->whereHas('genres', function ($q) use ($genreValue) {
-                        $q->where('genres.id', $genreValue);
-                    });
-                } else {
-                    // Fallback: check legacy genre field
-                    $query->where('genre', $genreValue);
-                }
-            }
-        }
-
+        $query = $this->buildFilteredArtistQuery($request);
         $artists = $query->orderBy('created_at', 'desc')->paginate(15)->appends($request->query());
 
         if ($request->ajax()) {
@@ -101,6 +63,13 @@ class ArtistManagementController extends Controller
         $validator->after(function ($validator) use ($request) {
             if ($request->has('is_unclaimed') && $request->is_unclaimed && empty($request->contact_email)) {
                 $validator->errors()->add('contact_email', 'Contact email is required for unclaimed artists.');
+            }
+            // Superuser creating unclaimed artist: do not use their own email as artist contact
+            if ($request->has('is_unclaimed') && $request->is_unclaimed && $request->filled('contact_email') && auth()->check() && auth()->user()->hasRole('superuser')) {
+                $adminEmail = auth()->user()->email;
+                if (strtolower(trim($request->contact_email)) === strtolower($adminEmail)) {
+                    $validator->errors()->add('contact_email', 'Do not use your own email as the unclaimed artist\'s contact. Enter the artist\'s contact email.');
+                }
             }
         });
 
@@ -191,6 +160,13 @@ class ArtistManagementController extends Controller
             $isUnclaimed = empty($request->user_id) || $artist->user_id === null;
             if ($isUnclaimed && empty($request->contact_email)) {
                 $validator->errors()->add('contact_email', 'Contact email is required for unclaimed artists.');
+            }
+            // Superuser editing unclaimed artist: do not use their own email as artist contact
+            if ($isUnclaimed && $request->filled('contact_email') && auth()->check() && auth()->user()->hasRole('superuser')) {
+                $adminEmail = auth()->user()->email;
+                if (strtolower(trim($request->contact_email)) === strtolower($adminEmail)) {
+                    $validator->errors()->add('contact_email', 'Do not use your own email as the unclaimed artist\'s contact. Enter the artist\'s contact email.');
+                }
             }
         });
 
@@ -333,13 +309,12 @@ class ArtistManagementController extends Controller
     }
 
     /**
-     * Export artists to CSV
+     * Build artist query with search and genre filters.
      */
-    public function export(Request $request)
+    protected function buildFilteredArtistQuery(Request $request): \Illuminate\Database\Eloquent\Builder
     {
         $query = Artist::with('user');
 
-        // Apply same filters as index
         if ($request->has('search') && $request->search) {
             $search = trim($request->search);
             $like = "%{$search}%";
@@ -355,260 +330,76 @@ class ArtistManagementController extends Controller
             });
         }
 
-        // Filter by genre if provided
         if ($request->has('genre') && $request->genre) {
             $genreValue = trim($request->genre);
-            
-            // Try to find genre by slug (since useNames=true sends slugs)
             $genre = Genre::where('slug', $genreValue)->orWhere('slug', strtolower($genreValue))->first();
-            
+
             if ($genre) {
-                // Filter by genre relationship
                 $query->whereHas('genres', function ($q) use ($genre) {
                     $q->where('genres.id', $genre->id);
                 });
+            } elseif (is_numeric($genreValue)) {
+                $query->whereHas('genres', function ($q) use ($genreValue) {
+                    $q->where('genres.id', $genreValue);
+                });
             } else {
-                // Fallback: check if it's a numeric ID
-                if (is_numeric($genreValue)) {
-                    $query->whereHas('genres', function ($q) use ($genreValue) {
-                        $q->where('genres.id', $genreValue);
-                    });
-                } else {
-                    // Fallback: check legacy genre field
-                    $query->where('genre', $genreValue);
-                }
+                $query->where('genre', $genreValue);
             }
         }
 
-        $artists = $query->orderBy('created_at', 'desc')->get();
-
-        $filename = 'artists_export_' . date('Y-m-d_His') . '.csv';
-        $headers = [
-            'Content-Type' => 'text/csv',
-            'Content-Disposition' => "attachment; filename=\"{$filename}\"",
-        ];
-
-        $callback = function() use ($artists) {
-            $file = fopen('php://output', 'w');
-            
-            // CSV Headers
-            fputcsv($file, [
-                'ID',
-                'Stage Name',
-                'Real Name',
-                'Genre',
-                'Bio',
-                'Phone Number',
-                'Contact Email',
-                'Instagram',
-                'Facebook',
-                'Twitter',
-                'User ID',
-                'User Email',
-                'User Name',
-                'Created At',
-                'Updated At'
-            ]);
-
-            // CSV Data
-            foreach ($artists as $artist) {
-                fputcsv($file, [
-                    $artist->id,
-                    $artist->stage_name,
-                    $artist->real_name ?? '',
-                    $artist->genre ?? '',
-                    $artist->bio ?? '',
-                    $artist->phone_number ?? '',
-                    $artist->contact_email ?? '',
-                    $artist->instagram ?? '',
-                    $artist->facebook ?? '',
-                    $artist->twitter ?? '',
-                    $artist->user_id ?? '',
-                    $artist->user->email ?? '',
-                    $artist->user->name ?? '',
-                    $artist->created_at->format('Y-m-d H:i:s'),
-                    $artist->updated_at->format('Y-m-d H:i:s'),
-                ]);
-            }
-
-            fclose($file);
-        };
-
-        return response()->stream($callback, 200, $headers);
+        return $query;
     }
 
     /**
-     * Download a CSV template for artist import.
-     *
-     * Uses the same header structure as the export so that
-     * uploaded CSV files match the expected column order.
+     * Export artists to Excel
+     */
+    public function export(Request $request)
+    {
+        $query = $this->buildFilteredArtistQuery($request);
+        $artists = $query->orderBy('created_at', 'desc')->get();
+
+        $filename = 'artists_export_' . date('Y-m-d_His') . '.xlsx';
+
+        return Excel::download(new ArtistsExport($artists), $filename, \Maatwebsite\Excel\Excel::XLSX);
+    }
+
+    /**
+     * Download an Excel template for artist import.
      */
     public function downloadImportTemplate()
     {
-        $filename = 'artists_import_template.csv';
-        $headers = [
-            'Content-Type' => 'text/csv',
-            'Content-Disposition' => "attachment; filename=\"{$filename}\"",
-        ];
+        $filename = 'artists_import_template.xlsx';
 
-        $callback = function () {
-            $file = fopen('php://output', 'w');
-
-            // CSV Headers (keep in sync with export())
-            fputcsv($file, [
-                'ID',
-                'Stage Name',
-                'Real Name',
-                'Genre',
-                'Bio',
-                'Phone Number',
-                'Contact Email',
-                'Instagram',
-                'Facebook',
-                'Twitter',
-                'User ID',
-                'User Email',
-                'User Name',
-                'Created At',
-                'Updated At',
-            ]);
-
-            // Optionally provide an empty example row
-            fputcsv($file, [
-                '',        // ID (leave blank for new artists)
-                '',        // Stage Name (required)
-                '',        // Real Name
-                '',        // Genre (required)
-                '',        // Bio
-                '',        // Phone Number
-                '',        // Contact Email (auto-generated for unclaimed if blank)
-                '',        // Instagram
-                '',        // Facebook
-                '',        // Twitter
-                '',        // User ID (optional existing artist user)
-                '',        // User Email (ignored on import)
-                '',        // User Name  (ignored on import)
-                '',        // Created At (ignored on import)
-                '',        // Updated At (ignored on import)
-            ]);
-
-            fclose($file);
-        };
-
-        return response()->stream($callback, 200, $headers);
+        return Excel::download(new ArtistsImportTemplateExport, $filename, \Maatwebsite\Excel\Excel::XLSX);
     }
 
     /**
-     * Import artists from CSV
+     * Import artists from Excel
      */
     public function import(Request $request)
     {
         $request->validate([
-            'csv_file' => 'required|file|mimes:csv,txt|max:10240',
+            'excel_file' => 'required|file|mimes:xlsx,xls,csv|max:10240',
+        ], [
+            'excel_file.required' => 'Please select an Excel file to import.',
+            'excel_file.mimes' => 'The file must be an Excel file (.xlsx, .xls) or CSV.',
         ]);
 
-        $file = $request->file('csv_file');
-        $path = $file->getRealPath();
-        
-        $imported = 0;
-        $skipped = 0;
-        $errors = [];
+        $file = $request->file('excel_file');
 
-        // Read CSV file
-        if (($handle = fopen($path, 'r')) !== false) {
-            // Skip header row
-            $headers = fgetcsv($handle);
-            
-            $rowNum = 1; // Start at 1 since we skipped header
-            
-            while (($data = fgetcsv($handle)) !== false) {
-                $rowNum++;
-                
-                // Map CSV columns (adjust indices based on export format)
-                $rowData = [
-                    'id' => $data[0] ?? null,
-                    'stage_name' => trim($data[1] ?? ''),
-                    'real_name' => trim($data[2] ?? ''),
-                    'genre' => trim($data[3] ?? ''),
-                    'bio' => trim($data[4] ?? ''),
-                    'phone_number' => trim($data[5] ?? ''),
-                    'contact_email' => trim($data[6] ?? ''),
-                    'instagram' => trim($data[7] ?? ''),
-                    'facebook' => trim($data[8] ?? ''),
-                    'twitter' => trim($data[9] ?? ''),
-                    'user_id' => !empty($data[10]) ? (int)$data[10] : null,
-                ];
+        $import = new ArtistsImport;
+        Excel::import($import, $file);
 
-                // Validate required fields
-                if (empty($rowData['stage_name'])) {
-                    $errors[] = "Row {$rowNum}: Stage name is required";
-                    $skipped++;
-                    continue;
-                }
-
-                if (empty($rowData['genre'])) {
-                    $errors[] = "Row {$rowNum}: Genre is required";
-                    $skipped++;
-                    continue;
-                }
-
-                // Check if artist exists (by ID or stage_name)
-                $artist = null;
-                if (!empty($rowData['id'])) {
-                    $artist = Artist::find($rowData['id']);
-                }
-                
-                if (!$artist) {
-                    $artist = Artist::where('stage_name', $rowData['stage_name'])->first();
-                }
-
-                // Validate user_id if provided
-                if (!empty($rowData['user_id'])) {
-                    $user = User::find($rowData['user_id']);
-                    if (!$user) {
-                        $errors[] = "Row {$rowNum}: User ID {$rowData['user_id']} not found";
-                        $skipped++;
-                        continue;
-                    }
-                }
-
-                // Generate contact_email if missing and artist is unclaimed
-                if (empty($rowData['contact_email']) && empty($rowData['user_id'])) {
-                    $base = Str::slug($rowData['stage_name']);
-                    $rowData['contact_email'] = $base . '+' . time() . rand(1000, 9999) . '@example.local';
-                }
-
-                try {
-                    if ($artist) {
-                        // Update existing artist
-                        $artist->update($rowData);
-                    } else {
-                        // Create new artist
-                        Artist::create($rowData);
-                    }
-                    $imported++;
-                } catch (\Exception $e) {
-                    $errors[] = "Row {$rowNum}: " . $e->getMessage();
-                    $skipped++;
-                }
-            }
-            
-            fclose($handle);
+        $message = "Import completed: {$import->imported} artists imported";
+        if ($import->skipped > 0) {
+            $message .= ", {$import->skipped} skipped";
         }
-
-        $message = "Import completed: {$imported} artists imported";
-        if ($skipped > 0) {
-            $message .= ", {$skipped} skipped";
-        }
-        if (!empty($errors)) {
-            $message .= ". Errors: " . implode('; ', array_slice($errors, 0, 10));
-            if (count($errors) > 10) {
-                $message .= " (and " . (count($errors) - 10) . " more)";
-            }
+        if (! empty($import->errors)) {
+            $message .= '. ' . count($import->errors) . ' error(s) occurred.';
         }
 
         return redirect()->route('admin.artists.index')
             ->with('success', $message)
-            ->with('import_errors', $errors);
+            ->with('import_errors', $import->errors);
     }
 }

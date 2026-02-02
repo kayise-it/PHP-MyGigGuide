@@ -11,7 +11,16 @@
             <h2 class="text-2xl font-bold text-gray-900">Edit User</h2>
             <p class="mt-1 text-sm text-gray-600">Update user information and permissions</p>
         </div>
-        <div class="mt-4 sm:mt-0">
+        <div class="mt-4 sm:mt-0 flex flex-wrap items-center gap-2">
+            <form method="POST" action="{{ route('admin.users.send-password-reset', $user) }}" class="inline" onsubmit="return confirm('Send a password reset email to this user?');">
+                @csrf
+                <button type="submit" class="btn-secondary">
+                    <svg class="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                    </svg>
+                    Send password reset
+                </button>
+            </form>
             <a href="{{ route('admin.users.show', $user) }}" class="btn-secondary">
                 <svg class="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />

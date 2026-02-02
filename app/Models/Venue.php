@@ -183,16 +183,17 @@ class Venue extends Model
      */
     public function isOwnedBy(int $userId): bool
     {
-        // First check new venue_owners table
+        // First check new venue_owners table (any role: primary, co_owner, manager).
+        // If the table or connection is missing, we silently fall back to legacy checks.
         try {
-            if ($this->owners()->where('user_id', $userId)->exists()) {
+            if (\Illuminate\Support\Facades\DB::table('venue_owners')
+                ->where('venue_id', $this->id)
+                ->where('user_id', $userId)
+                ->exists()) {
                 return true;
             }
-        } catch (\Illuminate\Database\QueryException $e) {
-            // If venue_owners table doesn't exist, fall through to legacy check
-            if (!str_contains($e->getMessage(), "doesn't exist") && !str_contains($e->getMessage(), 'Base table or view not found')) {
-                throw $e;
-            }
+        } catch (\Throwable $e) {
+            // Ignore and fall through to legacy ownership logic.
         }
         
         // Fallback to legacy ownership check

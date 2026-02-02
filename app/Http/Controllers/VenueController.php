@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException;
@@ -96,6 +97,24 @@ class VenueController extends Controller
                 'totalPages' => ceil($total / $limit)
             ]
         ]);
+    }
+
+    /**
+     * Return a single venue as JSON for the venue selector (e.g. when preselected venue is not on first page).
+     */
+    public function showApi(Venue $venue)
+    {
+        $venue->load('owner');
+        $venue->isOwnVenue = false;
+        $userRole = request()->get('user_role', 'all');
+        $organiserId = request()->get('organiser_id');
+        $artistId = request()->get('artist_id');
+        if ($userRole === 'organiser' && $organiserId && $venue->owner_id == $organiserId && $venue->owner_type === 'organiser') {
+            $venue->isOwnVenue = true;
+        } elseif ($userRole === 'artist' && $artistId && $venue->owner_id == $artistId && $venue->owner_type === 'artist') {
+            $venue->isOwnVenue = true;
+        }
+        return response()->json($venue);
     }
 
     /**
@@ -196,10 +215,6 @@ class VenueController extends Controller
      */
     public function store(Request $request)
     {
-        // #region agent log
-        @file_put_contents('/var/www/mygigguide/.cursor/debug.log', json_encode(['location'=>'VenueController.php:store:entry','message'=>'Frontend venue CREATE entry','data'=>['request_contact_email'=>$request->input('contact_email'),'request_name'=>$request->input('name')],'timestamp'=>now()->timestamp*1000,'sessionId'=>'debug-session','runId'=>'run1','hypothesisId'=>'F'])."\n", FILE_APPEND | LOCK_EX);
-        // #endregion
-
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'address' => 'required|string|max:500',
@@ -293,29 +308,6 @@ class VenueController extends Controller
      */
     public function show(Request $request, Venue $venue)
     {
-        // #region agent log
-        try {
-            $logData = [
-                'sessionId' => 'debug-session',
-                'runId' => 'run1',
-                'hypothesisId' => 'A',
-                'location' => 'VenueController.php:242',
-                'message' => 'Venue show method entry',
-                'data' => [
-                    'venue_id' => $venue->id,
-                    'venue_name' => $venue->name,
-                    'main_picture' => $venue->main_picture,
-                    'user_agent' => $request->userAgent(),
-                    'is_facebook_crawler' => $this->isSocialPreviewRequest($request),
-                ],
-                'timestamp' => now()->timestamp * 1000,
-            ];
-            @file_put_contents('/var/www/mygigguide/.cursor/debug.log', json_encode($logData) . "\n", FILE_APPEND | LOCK_EX);
-        } catch (\Exception $e) {
-            // Silently fail logging
-        }
-        // #endregion
-
         $venue->load(['owner', 'events' => function ($query) {
             $query->orderBy('date', 'asc');
         }, 'youtubeVideos']);
@@ -493,21 +485,6 @@ class VenueController extends Controller
         if ($this->isSocialPreviewRequest($request)) {
             $shareData = $this->buildSocialPreviewData($venue);
 
-            // #region agent log
-            $logData = [
-                'sessionId' => 'debug-session',
-                'runId' => 'run1',
-                'hypothesisId' => 'C',
-                'location' => 'VenueController.php:270',
-                'message' => 'Social preview request detected, returning share preview',
-                'data' => [
-                    'share_data' => $shareData,
-                ],
-                'timestamp' => now()->timestamp * 1000,
-            ];
-            @file_put_contents('/var/www/mygigguide/.cursor/debug.log', json_encode($logData) . "\n", FILE_APPEND | LOCK_EX);
-            // #endregion
-
             return response()
                 ->view('venues.share-preview', compact('venue', 'shareData'))
                 ->header('Cache-Control', 'public, max-age=600')
@@ -526,24 +503,6 @@ class VenueController extends Controller
                 $gallery = array_filter(array_map('trim', explode(',', $venue->venue_gallery)));
             }
         }
-
-        // #region agent log
-        $logData = [
-            'sessionId' => 'debug-session',
-            'runId' => 'run1',
-            'hypothesisId' => 'B',
-            'location' => 'VenueController.php:295',
-            'message' => 'Image path checks before URL generation',
-            'data' => [
-                'main_picture_exists' => $venue->main_picture ? Storage::disk('public')->exists($venue->main_picture) : false,
-                'main_picture_path' => $venue->main_picture,
-                'gallery_count' => count($gallery),
-                'first_gallery_exists' => count($gallery) > 0 ? Storage::disk('public')->exists($gallery[0]) : false,
-            ],
-            'timestamp' => now()->timestamp * 1000,
-        ];
-        file_put_contents('/var/www/mygigguide/.cursor/debug.log', json_encode($logData) . "\n", FILE_APPEND);
-        // #endregion
 
         $upcomingEvents = $venue->events
             ->filter(function ($e) {
@@ -598,23 +557,6 @@ class VenueController extends Controller
 
         $imageUrl = null;
 
-        // #region agent log
-        $logData = [
-            'sessionId' => 'debug-session',
-            'runId' => 'run1',
-            'hypothesisId' => 'A',
-            'location' => 'VenueController.php:buildSocialPreviewData',
-            'message' => 'Building social preview data - checking images',
-            'data' => [
-                'venue_id' => $venue->id,
-                'main_picture' => $venue->main_picture,
-                'main_picture_exists' => $venue->main_picture ? Storage::disk('public')->exists($venue->main_picture) : false,
-            ],
-            'timestamp' => now()->timestamp * 1000,
-        ];
-        file_put_contents('/var/www/mygigguide/.cursor/debug.log', json_encode($logData) . "\n", FILE_APPEND);
-        // #endregion
-
         // Try main picture first - match EventController pattern exactly
         if ($venue->main_picture && Storage::disk('public')->exists($venue->main_picture)) {
             $storageUrl = Storage::disk('public')->url($venue->main_picture);
@@ -622,22 +564,6 @@ class VenueController extends Controller
             $imageUrl = (str_starts_with($storageUrl, 'http://') || str_starts_with($storageUrl, 'https://')) 
                 ? $storageUrl 
                 : url($storageUrl);
-            
-            // #region agent log
-            $logData = [
-                'sessionId' => 'debug-session',
-                'runId' => 'run1',
-                'hypothesisId' => 'A',
-                'location' => 'VenueController.php:buildSocialPreviewData',
-                'message' => 'Main picture URL generated for social preview',
-                'data' => [
-                    'final_url' => $imageUrl,
-                    'is_absolute' => str_starts_with($imageUrl, 'http'),
-                ],
-                'timestamp' => now()->timestamp * 1000,
-            ];
-            @file_put_contents('/var/www/mygigguide/.cursor/debug.log', json_encode($logData) . "\n", FILE_APPEND | LOCK_EX);
-            // #endregion
         } else {
             // Try gallery - normalize same way as show() method
             $gallery = [];
@@ -658,61 +584,13 @@ class VenueController extends Controller
                 $imageUrl = (str_starts_with($storageUrl, 'http://') || str_starts_with($storageUrl, 'https://')) 
                     ? $storageUrl 
                     : url($storageUrl);
-                
-                // #region agent log
-                $logData = [
-                    'sessionId' => 'debug-session',
-                    'runId' => 'run1',
-                    'hypothesisId' => 'A',
-                    'location' => 'VenueController.php:buildSocialPreviewData',
-                    'message' => 'Gallery image URL generated for social preview',
-                    'data' => [
-                        'final_url' => $imageUrl,
-                        'is_absolute' => str_starts_with($imageUrl, 'http'),
-                    ],
-                    'timestamp' => now()->timestamp * 1000,
-                ];
-                @file_put_contents('/var/www/mygigguide/.cursor/debug.log', json_encode($logData) . "\n", FILE_APPEND | LOCK_EX);
-                // #endregion
             }
         }
 
         // Fallback to logo
         if (!$imageUrl) {
             $imageUrl = url(asset('logos/logo1.jpeg'));
-            
-            // #region agent log
-            $logData = [
-                'sessionId' => 'debug-session',
-                'runId' => 'run1',
-                'hypothesisId' => 'D',
-                'location' => 'VenueController.php:buildSocialPreviewData',
-                'message' => 'Using fallback logo for social preview',
-                'data' => [
-                    'fallback_url' => $fallbackUrl,
-                    'final_url' => $imageUrl,
-                ],
-                'timestamp' => now()->timestamp * 1000,
-            ];
-            @file_put_contents('/var/www/mygigguide/.cursor/debug.log', json_encode($logData) . "\n", FILE_APPEND | LOCK_EX);
-            // #endregion
         }
-
-        // #region agent log
-        $logData = [
-            'sessionId' => 'debug-session',
-            'runId' => 'run1',
-            'hypothesisId' => 'E',
-            'location' => 'VenueController.php:buildSocialPreviewData',
-            'message' => 'Final social preview data',
-            'data' => [
-                'final_image_url' => $imageUrl,
-                'is_absolute' => str_starts_with($imageUrl, 'http'),
-            ],
-            'timestamp' => now()->timestamp * 1000,
-        ];
-        file_put_contents('/var/www/mygigguide/.cursor/debug.log', json_encode($logData) . "\n", FILE_APPEND);
-        // #endregion
 
         return [
             'title' => $venue->name.' - My Gig Guide',
@@ -727,53 +605,30 @@ class VenueController extends Controller
      */
     public function edit(Venue $venue)
     {
-        // Load venue owners and pending requests if user is an owner
+        // Load venue owners and pending requests for the UI.
+        // Authorization is enforced centrally by the capability middleware.
         $venueOwners = collect();
         $pendingRequests = collect();
         $isOwner = false;
         $isPrimaryOwner = false;
-        
-        if (auth()->check()) {
+        $userId = auth()->id();
+
+        if ($userId) {
             try {
-                $isOwner = $venue->isOwnedBy(auth()->id());
+                $isOwner = $venue->isOwnedBy($userId);
                 if ($isOwner) {
                     $venueOwners = $venue->owners()->get();
                     $primaryOwner = $venue->owners()->wherePivot('role', 'primary')->first();
-                    $isPrimaryOwner = $primaryOwner && $primaryOwner->id === auth()->id();
+                    $isPrimaryOwner = $primaryOwner && $primaryOwner->id === $userId;
                     $pendingRequests = $venue->venueOwnerRequests()
                         ->where('status', 'pending')
                         ->with(['requester'])
                         ->get();
                 }
             } catch (\Exception $e) {
-                // If venue_owners table doesn't exist, fallback to legacy check
-                $isOwner = ($venue->user_id === auth()->id()) || 
-                          ($venue->owner_id && $venue->owner_type === \App\Models\User::class && $venue->owner_id === auth()->id());
+                // If ownership checks fail, we still show the edit form;
+                // middleware has already determined this user may access it.
             }
-        }
-        // Authorize: admin/superuser OR creator OR linked owner user
-        $user = Auth::user();
-        $isAdmin = $user && method_exists($user, 'hasRole') && $user->hasRole(['admin', 'superuser']);
-
-        $ownsViaCreator = $venue->user_id === Auth::id();
-
-        $ownsViaOwner = false;
-        if ($venue->owner_id && $venue->owner_type) {
-            // If the owner is a User record
-            if ($venue->owner_type === \App\Models\User::class) {
-                $ownsViaOwner = $venue->owner_id === Auth::id();
-            } else {
-                // Owner might be Artist or Organiser models that have a user_id
-                $ownerModel = $venue->owner; // polymorphic relation
-                if ($ownerModel && isset($ownerModel->user_id)) {
-                    $ownsViaOwner = (int) $ownerModel->user_id === (int) Auth::id();
-                }
-            }
-        }
-
-        // Also check new venue_owners system for authorization
-        if (! $isAdmin && ! $ownsViaCreator && ! $ownsViaOwner && ! $isOwner) {
-            abort(403, 'Unauthorized');
         }
 
         return view('venues.edit', compact('venue', 'venueOwners', 'pendingRequests', 'isOwner', 'isPrimaryOwner'));
@@ -784,35 +639,6 @@ class VenueController extends Controller
      */
     public function update(Request $request, Venue $venue)
     {
-        // Authorize: admin/superuser OR creator OR linked owner user
-        $user = Auth::user();
-        $isAdmin = $user && method_exists($user, 'hasRole') && $user->hasRole(['admin', 'superuser']);
-        $isOwner = false;
-        if ($user) {
-            try {
-                // Use unified ownership check so co-owners/managers can also edit
-                $isOwner = $venue->isOwnedBy($user->id);
-            } catch (\Exception $e) {
-                // If venue_owners table doesn't exist, fall back to legacy checks below
-                $isOwner = false;
-            }
-        }
-        $ownsViaCreator = $venue->user_id === Auth::id();
-        $ownsViaOwner = false;
-        if ($venue->owner_id && $venue->owner_type) {
-            if ($venue->owner_type === \App\Models\User::class) {
-                $ownsViaOwner = $venue->owner_id === Auth::id();
-            } else {
-                $ownerModel = $venue->owner;
-                if ($ownerModel && isset($ownerModel->user_id)) {
-                    $ownsViaOwner = (int) $ownerModel->user_id === (int) Auth::id();
-                }
-            }
-        }
-        if (! $isAdmin && ! $ownsViaCreator && ! $ownsViaOwner && ! $isOwner) {
-            abort(403, 'Unauthorized');
-        }
-
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'address' => 'required|string|max:500',
