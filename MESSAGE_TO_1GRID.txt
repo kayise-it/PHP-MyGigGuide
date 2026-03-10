@@ -1,0 +1,42 @@
+Subject: Urgent - Request Reverse DNS (PTR Record) Configuration for IP 41.61.20.39
+
+Hello 1-GRID Support Team,
+
+I need to configure a reverse DNS (PTR) record for my server's IP address to enable proper email delivery. Currently, emails cannot be sent because receiving mail servers are rejecting connections due to missing reverse DNS.
+
+Server Details:
+- Server Hostname: mel55-nix02
+- IP Address: 41.61.20.39
+- Domain: mygigguide.co.za
+- Mail Server Hostname: mail.mygigguide.co.za
+
+Request:
+Please configure a PTR (reverse DNS) record so that reverse DNS lookup for IP address 41.61.20.39 returns "mail.mygigguide.co.za"
+
+Current Status:
+- Forward DNS (A record): ✅ Configured - mail.mygigguide.co.za → 41.61.20.39
+- Reverse DNS (PTR record): ❌ Missing - 41.61.20.39 → (nothing)
+
+Why This Is Needed:
+Many mail servers require reverse DNS for email delivery. Without it, emails are being rejected with the error: "Reverse DNS for 41.61.20.39 failed"
+
+Impact:
+- Emails to recipients are being rejected
+- Email queue is building up (currently 3 emails waiting)
+- Business email delivery is blocked
+- This is urgent for business operations
+
+Verification:
+After configuration, this command should return "mail.mygigguide.co.za":
+dig -x 41.61.20.39 +short
+
+Currently it returns nothing, which is causing email delivery failures.
+
+Please let me know:
+1. If you can configure this PTR record
+2. Estimated time for configuration
+3. If there's a self-service option in the control panel
+
+Thank you for your urgent assistance!
+
+Best regards

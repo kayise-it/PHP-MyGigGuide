@@ -1,0 +1,5187 @@
+{
+  "summary": {
+    "total_excel_venues": 305,
+    "total_folders": 290,
+    "matched": 284,
+    "venues_without_folders": 21
+  },
+  "matched_venues": [
+    {
+      "folder": "72 Grant Ave, Norwood",
+      "excel_name": "72 Grant Ave, Norwood.",
+      "data": {
+        "name": "72 Grant Ave, Norwood.",
+        "address": "72 Grant Ave, Norwood.",
+        "phone": "",
+        "email": "",
+        "website": "",
+        "facebook": "",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-26.157604556714848, 28.076526470319223",
+        "description": ""
+      },
+      "match_type": "fuzzy",
+      "score": 0.9767441860465116
+    },
+    {
+      "folder": "86 Public Randburg",
+      "excel_name": "86 Public Randburg",
+      "data": {
+        "name": "86 Public Randburg",
+        "address": "Malibongwe Drive, Clubhouse Shopping Centre, Ferndale, Randburg, 2194",
+        "phone": "081 378 3299",
+        "email": "86publicrandburg@gmail.com",
+        "website": "http://www.86public.co.za/",
+        "facebook": "https://www.facebook.com/86PublicRandburg",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-26.09489002288373, 27.985251909535087",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "@ The Beach Restaurant",
+      "excel_name": "@ The Beach Restaurant",
+      "data": {
+        "name": "@ The Beach Restaurant",
+        "address": "2 Boschkop Rd, Zwavelpoort, Pretoria, 0081",
+        "phone": "082 899 9590",
+        "email": "",
+        "website": "https://paralialife.co.za/",
+        "facebook": "",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-25.8063936148879, 28.39350693504369",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "AJ_s Pub",
+      "excel_name": "AJ's Pub",
+      "data": {
+        "name": "AJ's Pub",
+        "address": "72 Rinyani Ave, Weltevreden Park",
+        "phone": "082 823 5186",
+        "email": "",
+        "website": "ajspub.co.za",
+        "facebook": "https://www.facebook.com/profile.php?id=100069830192680",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-26.116959235800245, 27.923718905287313",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "Agar_s Brewery",
+      "excel_name": "Agar's Brewery",
+      "data": {
+        "name": "Agar's Brewery",
+        "address": "Unit 2A, Kya North Park, Kya Sand, South Africa",
+        "phone": "076 191 5331",
+        "email": "donovan@agarsbrewery.co.za",
+        "website": "agarsbrewery.co.za",
+        "facebook": "https://www.facebook.com/agarsbrewery",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-26.02383963299112, 27.94733937068007",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "Alberton Rugby Club",
+      "excel_name": "Alberton Rugby Club",
+      "data": {
+        "name": "Alberton Rugby Club",
+        "address": "Elandsfontein Dr, Elandsfontein, Alberton, 1449",
+        "phone": "083 238 3711",
+        "email": "rugbyclub@mweb.co.za",
+        "website": "rugbyclub.info",
+        "facebook": "https://www.facebook.com/profile.php?id=100054502417492",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-26.276378476165487, 28.13365452727961",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "Alberton Tennis Club",
+      "excel_name": "Alberton Tennis Club",
+      "data": {
+        "name": "Alberton Tennis Club",
+        "address": "",
+        "phone": "",
+        "email": "",
+        "website": "",
+        "facebook": "",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-26.267016349127406, 28.13217426029381",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "Aviator, Harties",
+      "excel_name": "Aviator, Harties",
+      "data": {
+        "name": "Aviator, Harties",
+        "address": "Portion 34, De Rust, R512, Hartbeespoort, 0216",
+        "phone": "073 668 3024",
+        "email": "",
+        "website": "http://www.aviatorsharties.co.za/",
+        "facebook": "https://www.facebook.com/search/top?q=aviator%20harties",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-25.78291109809825, 27.7893990343869",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "Bailey_s",
+      "excel_name": "Bailey's",
+      "data": {
+        "name": "Bailey's",
+        "address": "61C Van Buuren Road, Johannesburg",
+        "phone": "066 268 2803",
+        "email": "events@baileyslive.co.za",
+        "website": "Baileyslive.co.za",
+        "facebook": "https://www.facebook.com/BaileysBedfordview/about",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-26.17826295044022, 28.13735970798328",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "Barrels & Bottles",
+      "excel_name": "Barrels &amp; Bottles",
+      "data": {
+        "name": "Barrels &amp; Bottles",
+        "address": "",
+        "phone": "",
+        "email": "",
+        "website": "",
+        "facebook": "",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-26.073124099027346, 28.014204902538896",
+        "description": ""
+      },
+      "match_type": "fuzzy",
+      "score": 0.8947368421052632
+    },
+    {
+      "folder": "Bassline",
+      "excel_name": "Bassline",
+      "data": {
+        "name": "Bassline",
+        "address": "Melville",
+        "phone": "",
+        "email": "",
+        "website": "",
+        "facebook": "",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-26.1869128449333, 28.044537028690847",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "Bennigans",
+      "excel_name": "Bennigans",
+      "data": {
+        "name": "Bennigans",
+        "address": "Shop 25 Sunward Lifestyle Centre, Kingfisher Ave, Sunward Park, Boksburg, 1470",
+        "phone": "011 913 3646",
+        "email": "gc@bennigans.co.za",
+        "website": "bennigansboksburg.co.za",
+        "facebook": "https://www.facebook.com/BennigansBoksburg",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-26.259152615354154, 28.269748032902235",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "Benoni Country Club",
+      "excel_name": "Benoni Country Club",
+      "data": {
+        "name": "Benoni Country Club",
+        "address": "Morris Ave, Benoni Country Club, Benoni, Gauteng, 1501",
+        "phone": "011 849 8821",
+        "email": "info@benonicc.co.za",
+        "website": "benonicc.co.za",
+        "facebook": "https://www.facebook.com/profile.php?id=100063662915311",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-26.172114461191107, 28.34244200361901",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "Benoni Northerns Sports Club",
+      "excel_name": "Benoni Northerns Sports Club",
+      "data": {
+        "name": "Benoni Northerns Sports Club",
+        "address": "1 Brodigan St, Northmead, Benoni, 1501",
+        "phone": "011 849 3410",
+        "email": "info@bnsc.co.za",
+        "website": "http://www.bnsc.co.za/",
+        "facebook": "https://www.facebook.com/BenoniNortherns",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-26.155255706134785, 28.318057794228487",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "Black Horse Brewery & Distillery",
+      "excel_name": "Black Horse Brewery &amp; Distillery",
+      "data": {
+        "name": "Black Horse Brewery &amp; Distillery",
+        "address": "32 Zeekoeihoek Road, Magaliesburg, 1791",
+        "phone": "082 453 5295",
+        "email": "information@blackhorse.co.za",
+        "website": "https://www.blackhorse.co.za/",
+        "facebook": "https://www.facebook.com/groups/825519100856489/user/100064760434010/",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-25.95319701647206, 27.538086135565177",
+        "description": ""
+      },
+      "match_type": "fuzzy",
+      "score": 0.9411764705882353
+    },
+    {
+      "folder": "Black Labone",
+      "excel_name": "Black Labone",
+      "data": {
+        "name": "Black Labone",
+        "address": "320 Pretorius St, Pretoria Central, Pretoria, 0001",
+        "phone": "082 094 6266",
+        "email": "blacklabonemusic@gmail.com",
+        "website": "",
+        "facebook": "https://www.facebook.com/BlacklaboneShowingupishowinglove",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-25.746675055963877, 28.195245242267415",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "Blue Hills Nursery",
+      "excel_name": "Blue Hills Nursery",
+      "data": {
+        "name": "Blue Hills Nursery",
+        "address": "R56  Kyalami",
+        "phone": "",
+        "email": "",
+        "website": "",
+        "facebook": "",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-26.205781409182553, 28.026155776276948",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "Boiler Room Bar, Pretoria",
+      "excel_name": "Boiler Room Bar, Pretoria",
+      "data": {
+        "name": "Boiler Room Bar, Pretoria",
+        "address": "558 Graaff Reinet St, Faerie Glen, Pretoria, 0081",
+        "phone": "068 583 2560",
+        "email": "",
+        "website": "https://www.boilerroombar.co.za/",
+        "facebook": "",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-25.784781870169947, 28.308572608436624",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "Boscos",
+      "excel_name": "Bosco",
+      "data": {
+        "name": "Bosco",
+        "address": "Sunhill Centre, Corner Tana &amp; Naivasha Rd, Sunninghill, Johannesburg, 2191",
+        "phone": "011 807 6708",
+        "email": "hanlee7louw@gmail.com",
+        "website": "http://www.boscos.co.za/",
+        "facebook": "https://www.facebook.com/BoscoRistoranteItaliano",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-26.025254124568832, 28.06715189702683",
+        "description": ""
+      },
+      "match_type": "fuzzy",
+      "score": 0.9090909090909091
+    },
+    {
+      "folder": "Bossa",
+      "excel_name": "Bossa",
+      "data": {
+        "name": "Bossa",
+        "address": "Hammets Crossing Office Park, 2 Selbourne Rd, Fourways, Johannesburg, South Africa",
+        "phone": "010 100 8882",
+        "email": "fourways@bossa.co.za",
+        "website": "https://bossa.co.za/",
+        "facebook": "https://www.facebook.com/bossafourways",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-26.027793064989154, 27.979202971164618",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "Bosvelder Pub & Restaurant",
+      "excel_name": "Bosvelder Pub &amp; Restaurant",
+      "data": {
+        "name": "Bosvelder Pub &amp; Restaurant",
+        "address": "Migmatite Dr &amp;, Edward Ave, Centurion, 0051",
+        "phone": "073 237 2888",
+        "email": "",
+        "website": "http://www.bosvelder.co.za/",
+        "facebook": "",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-25.862440878368258, 28.17513667248891",
+        "description": ""
+      },
+      "match_type": "fuzzy",
+      "score": 0.9285714285714286
+    },
+    {
+      "folder": "Bourbon Bar, Boksburg",
+      "excel_name": "Bourbon Bar, Boksburg",
+      "data": {
+        "name": "Bourbon Bar, Boksburg",
+        "address": "Unit A1, 686 Trichardt Rd, Beyers Park, Boksburg, 1459",
+        "phone": "073 557 0819",
+        "email": "bourbonbadgergroup@gmail.com",
+        "website": "http://www.bourbon-group.co.za/",
+        "facebook": "https://www.facebook.com/bourbonrestrobarboksburg",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-26.180453942474053, 28.25447689372976",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "Broadacres Padel Club",
+      "excel_name": "Broadacres Padel Club",
+      "data": {
+        "name": "Broadacres Padel Club",
+        "address": "Cnr, Cedar Rd, and Valley, Johannesburg, 2191",
+        "phone": "079 927 7780",
+        "email": "Broadacres@padelandsocialclub.com",
+        "website": "https://www.padelandsocialclub.com/",
+        "facebook": "https://www.facebook.com/profile.php?id=61551879908424",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-25.999332111257523, 27.983596572963712",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "Bryanston Sports Club",
+      "excel_name": "Bryanston Sports Club",
+      "data": {
+        "name": "Bryanston Sports Club",
+        "address": "Cnr Payne &amp; Main Rd , Bryanston, South Africa",
+        "phone": "011 706 2170",
+        "email": "admin@bryanstonsportsclub.co.za",
+        "website": "bryanstonsportsclub.co.za",
+        "facebook": "https://www.facebook.com/bryanstonsportsclub",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-26.0618852443902, 28.023158966149218",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "Bush Wackers Pub ",
+      "excel_name": "Bush Wackers Pub",
+      "data": {
+        "name": "Bush Wackers Pub",
+        "address": "Plot 105 Oaktree R563, Mogale City, South Africa",
+        "phone": "081 035 7627",
+        "email": "bushwhackers1050@gmail.com",
+        "website": "bushwhackers.co.za",
+        "facebook": "https://www.facebook.com/Bushwhackerspub",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-26.0312592325339, 27.730345628053815",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "Bustop 7 Open Air Market",
+      "excel_name": "Bustop 7 Open Air Market",
+      "data": {
+        "name": "Bustop 7 Open Air Market",
+        "address": "Cnr Duiker and, Foxtrot St, Mooikloof Heights, Pretoria, 0181",
+        "phone": "",
+        "email": "admin@busstop7.co.za",
+        "website": "",
+        "facebook": "https://www.facebook.com/busstop7market",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-25.87192472477165, 28.326847690472505",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "Cafe Barcelona",
+      "excel_name": "Cafe Barcelona",
+      "data": {
+        "name": "Cafe Barcelona",
+        "address": "53 Thomson St, Colbyn, Pretoria, 0153",
+        "phone": "012 430 2495",
+        "email": "info@cafebarcelona.co.za",
+        "website": "http://www.cafebarcelona.co.za/",
+        "facebook": "https://www.facebook.com/CafeBarcelonaGigs",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-25.741747634643726, 28.241427509078093",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "Capital Craft Beer Academy",
+      "excel_name": "Capital Craft Beer Academy",
+      "data": {
+        "name": "Capital Craft Beer Academy",
+        "address": "Shop 20, Greenlyn Village Centre, Corner of Thomas Edison &amp; 12th Street East, Menlo Park, Pretoria",
+        "phone": "081 877 6924",
+        "email": "info@capitalcraft.co.za",
+        "website": "http://capitalcraft.co.za/",
+        "facebook": "https://www.facebook.com/CapitalCraftFestival",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-25.76955885865758, 28.25685448274831",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "Captains island",
+      "excel_name": "Captains island",
+      "data": {
+        "name": "Captains island",
+        "address": "Cnr Garsfontein Road &amp;, Sinovich Dr, Grootfontein, Pretoria, 0059",
+        "phone": "076 687 1339",
+        "email": "",
+        "website": "",
+        "facebook": "https://www.facebook.com/captainsisland",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-25.879652355749407, 28.369613156647347",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "Cardoso Portuguese Kitchen & Bar Muldersdrift",
+      "excel_name": "Cardoso Portuguese Kitchen &amp; Bar Muldersdrift",
+      "data": {
+        "name": "Cardoso Portuguese Kitchen &amp; Bar Muldersdrift",
+        "address": "plot 293 Rietfontein muldersdrift, Roodepoort, 1980",
+        "phone": "010 634 4385",
+        "email": "deckanddam24@gmail.com",
+        "website": "",
+        "facebook": "https://www.facebook.com/DeckandDam",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-26.00157025900334, 27.900902181328988",
+        "description": ""
+      },
+      "match_type": "fuzzy",
+      "score": 0.9574468085106383
+    },
+    {
+      "folder": "Cardoso Portuguese Kitchen & Bar, Pretoria",
+      "excel_name": "Cardoso Portuguese Kitchen &amp; Bar, Pretoria",
+      "data": {
+        "name": "Cardoso Portuguese Kitchen &amp; Bar, Pretoria",
+        "address": "69 Freight Rd, Louwlardia, Centurion, 1683",
+        "phone": "012 007 0599",
+        "email": "info@cardoso77.co.za",
+        "website": "cardosokitchenandbar.co.za",
+        "facebook": "https://www.facebook.com/cardosoportuguesekitchenandbar",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-25.902787962450464, 28.18738835229773",
+        "description": ""
+      },
+      "match_type": "fuzzy",
+      "score": 0.9545454545454546
+    },
+    {
+      "folder": "Cassalinga",
+      "excel_name": "Cassalinga",
+      "data": {
+        "name": "Cassalinga",
+        "address": "328 Rocky Ridge Road, Muldersdrif, South Africa",
+        "phone": "010 595 4563",
+        "email": "restaurant@casalinga.co.za",
+        "website": "casalinga.co.za",
+        "facebook": "https://www.facebook.com/casalingarestuarant",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-26.04450241564532, 27.872754238120542",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "Cedar Lakes Clubhouse",
+      "excel_name": "Cedar Lakes Clubhouse",
+      "data": {
+        "name": "Cedar Lakes Clubhouse",
+        "address": "Cedar Boulevard Cedar Lakes, Lifestyle Estate, 2191",
+        "phone": "064 134 5607",
+        "email": "",
+        "website": "https://www.cedarlakes.co.za/",
+        "facebook": "",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-26.00584458829767, 27.981378317134194",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "Chalk Craft Eatery Lakefield",
+      "excel_name": "Chalk Craft Eatery Lakefield",
+      "data": {
+        "name": "Chalk Craft Eatery Lakefield",
+        "address": "41 Lakefield Ave, Benoni, 1501, South Africa, Benoni, South Africa",
+        "phone": "067 914 3233",
+        "email": "Chalklakefield@gmail.com",
+        "website": "chalkcrafteatery.com",
+        "facebook": "https://www.facebook.com/chalklakefield",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-26.179633900344577, 28.287471090158814",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "Chameleon Village, Harties",
+      "excel_name": "Chameleon Village, Harties",
+      "data": {
+        "name": "Chameleon Village, Harties",
+        "address": "Chameleon Village R104 Old Rustenburg rd Damdoryn, Hartbeespoort, 0216",
+        "phone": "012 003 4033",
+        "email": "marketing@chameleonvillage.co.za",
+        "website": "http://www.chameleonvillage.co.za/",
+        "facebook": "https://web.facebook.com/chameleonvillagehartbeespoort",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-25.72480213923827, 27.826797215596933",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "Chicago_s Piano Bar",
+      "excel_name": "Chicago's Piano Bar",
+      "data": {
+        "name": "Chicago's Piano Bar",
+        "address": "Shop 15, Honeycrest Centre, Beyers Naud\u00e9 Dr, Randpark Ridge, Johannesburg, 2169",
+        "phone": "063 542 2355",
+        "email": "kathyholls@gmail.com",
+        "website": "http://www.chicagospianobar.com/",
+        "facebook": "https://www.facebook.com/ChicagosRandpark",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-26.093780441912177, 27.94169934218925",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "Chubbies Grill, Capital Park",
+      "excel_name": "Chubbies Grill, Capital Park",
+      "data": {
+        "name": "Chubbies Grill, Capital Park",
+        "address": "196 Venter St, Capital Park, Pretoria, 0084",
+        "phone": "079 624 7612",
+        "email": "bookings@chubbiesgrill.co.za",
+        "website": "",
+        "facebook": "https://www.facebook.com/coffeeatcapital",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-25.728798325524018, 28.188484523692818",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "Chucky_s Bar",
+      "excel_name": "Chucky's Bar",
+      "data": {
+        "name": "Chucky's Bar",
+        "address": "Unit 3 &amp; 4, Phoenix Center, Malibongwe Dr, Ferndale, Randburg, 2194",
+        "phone": "082 666 0319",
+        "email": "preven05@gmail.com",
+        "website": "",
+        "facebook": "https://www.facebook.com/profile.php?id=61567899551288",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-26.076944992470978, 27.977409212732393",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "Clarens Townsquare",
+      "excel_name": "Clarens Townsquare",
+      "data": {
+        "name": "Clarens Townsquare",
+        "address": "12 Market St, Clarens, 9707",
+        "phone": "",
+        "email": "",
+        "website": "",
+        "facebook": "",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-28.511918284244448, 28.433817593918146",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "Clay Caf\u00e9 @ Maggies Farm",
+      "excel_name": "Clay Caf\u00e9 @ Maggies Farm",
+      "data": {
+        "name": "Clay Caf\u00e9 @ Maggies Farm",
+        "address": "Linley farm, 121 Pelindaba Rd, Lanseria",
+        "phone": "068 606 2152",
+        "email": "Claycafe@maggiesfarm.co.za",
+        "website": "bit.ly/3WTiQNB",
+        "facebook": "https://www.facebook.com/profile.php?id=61554088750358",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-25.914299926893236, 27.902200659627276",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "Club Chevelle",
+      "excel_name": "Club Chevelle",
+      "data": {
+        "name": "Club Chevelle",
+        "address": "147 Van Riebeeck Ave, Edenvale, Johannesburg, 1609",
+        "phone": "078 735 9976",
+        "email": "marketing@chevelle.co.za",
+        "website": "chevelle.co.za",
+        "facebook": "https://www.facebook.com/clubchevelle",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-26.130573786999257, 28.147984643800257",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "Coca Restaurant And Lounge",
+      "excel_name": "Coca Restaurant And Lounge",
+      "data": {
+        "name": "Coca Restaurant And Lounge",
+        "address": "2 7th St, Melville, Johannesburg, 2109",
+        "phone": "066 224 6670",
+        "email": "",
+        "website": "https://cocalounge.com/",
+        "facebook": "",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-26.177568241618125, 28.00924444973181",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "Cock & Bull Pub and Grill, Vanderbijl",
+      "excel_name": "Cock &amp; Bull Pub and Grill, Vanderbijl",
+      "data": {
+        "name": "Cock &amp; Bull Pub and Grill, Vanderbijl",
+        "address": "14 Vaal Dr, Sylviavale, Vanderbijlpark, 1911",
+        "phone": "",
+        "email": "",
+        "website": "",
+        "facebook": "",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-26.73346303949135, 27.82623499309144",
+        "description": ""
+      },
+      "match_type": "fuzzy",
+      "score": 0.9487179487179487
+    },
+    {
+      "folder": "Cool Runnings, Cradle",
+      "excel_name": "Cool Runnings, Cradle",
+      "data": {
+        "name": "Cool Runnings, Cradle",
+        "address": "46 R374, Muldersdrift, 1747",
+        "phone": "",
+        "email": "",
+        "website": "",
+        "facebook": "",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-25.99026898687486, 27.827006602564186",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "Coppers Craft Bar & Grill, Bel Air",
+      "excel_name": "Coppers Craft Bar &amp; Grill, Bel Air",
+      "data": {
+        "name": "Coppers Craft Bar &amp; Grill, Bel Air",
+        "address": "1st Floor, Bel Air Shopping Centre, Bellairs Dr, Northriding, Johannesburg, 2153",
+        "phone": "010 140 1379",
+        "email": "",
+        "website": "coppersbargrill.co.za",
+        "facebook": "https://www.facebook.com/profile.php?id=61569865396281",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-26.05942110706612, 27.95976116340371",
+        "description": ""
+      },
+      "match_type": "fuzzy",
+      "score": 0.9444444444444444
+    },
+    {
+      "folder": "Coppers Craft Bar & Grill, Broadacres",
+      "excel_name": "Coppers Craft Bar &amp; Grill, Broadacres",
+      "data": {
+        "name": "Coppers Craft Bar &amp; Grill, Broadacres",
+        "address": "Shop 2 &amp; 3 Broadacres Shopping Centre, Corner Valley Road &amp;, Cedar Rd",
+        "phone": "068 103 9843",
+        "email": "",
+        "website": "coppersbargrill.co.za",
+        "facebook": "https://www.facebook.com/CoppersBarGrillFourways",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-26.001539969912358, 27.98658205958809",
+        "description": ""
+      },
+      "match_type": "fuzzy",
+      "score": 0.9487179487179487
+    },
+    {
+      "folder": "Cors Diner",
+      "excel_name": "Cors Diner",
+      "data": {
+        "name": "Cors Diner",
+        "address": "193 Aletta Ave, Raslouw, Centurion, 0157",
+        "phone": "071 121 8325",
+        "email": "dewet@jdt.co.za",
+        "website": "",
+        "facebook": "https://www.facebook.com/corsdiner",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-25.86432520501432, 28.15171619910343",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "Cowboy Town, Krugersdorp",
+      "excel_name": "Cowboy Town, Krugersdorp",
+      "data": {
+        "name": "Cowboy Town, Krugersdorp",
+        "address": "1 Mclean St, West Village, Krugersdorp, 1739",
+        "phone": "",
+        "email": "",
+        "website": "",
+        "facebook": "",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-26.121131814336653, 27.75131981283224",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "Crossroads Lounge",
+      "excel_name": "Crossroads Lounge",
+      "data": {
+        "name": "Crossroads Lounge",
+        "address": "3 Main Rd, Irene, Centurion, 0157",
+        "phone": "083 608 1554",
+        "email": "crossroadsirene@gmail.com",
+        "website": "",
+        "facebook": "https://www.facebook.com/CrossroadsIrene",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-25.87674475876368, 28.22491425351491",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "Cullinan NGK Gronde",
+      "excel_name": "Cullinan NGK Gronde",
+      "data": {
+        "name": "Cullinan NGK Gronde",
+        "address": "12 Zonderwater Rd, Cullinan, 1000",
+        "phone": "083 865 0563",
+        "email": "",
+        "website": "",
+        "facebook": "",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-25.67630114401679, 28.536437526989165",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "Delta Cafe",
+      "excel_name": "Delta Cafe",
+      "data": {
+        "name": "Delta Cafe",
+        "address": "76 Marlborough Ave, Craighall Park, Randburg, 2196",
+        "phone": "010 900 3850",
+        "email": "donovan@agarsbrewery.co.za",
+        "website": "",
+        "facebook": "",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-26.12741189808488, 28.017351425692837",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "Democracy Bar",
+      "excel_name": "Democracy Bar",
+      "data": {
+        "name": "Democracy Bar",
+        "address": "198 Oxford Rd, Illovo, Johannesburg, 2918",
+        "phone": "010 446 0280",
+        "email": "",
+        "website": "https://www.democracybar.co.za/",
+        "facebook": "",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-26.130370421221325, 28.050530361321403",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "Design Quarter, Fourways",
+      "excel_name": "Design Quarter, Fourways",
+      "data": {
+        "name": "Design Quarter, Fourways",
+        "address": "William Nicol Dr &amp;, Leslie Ave, Magaliessig, Sandton, 2067",
+        "phone": "011 46 75152",
+        "email": "info@designquarter.co.za",
+        "website": "http://www.designquarter.co.za/",
+        "facebook": "https://www.facebook.com/DQJozi",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-26.03055398262709, 28.012215218497087",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "Die Blou Hond",
+      "excel_name": "Die Blou Hond",
+      "data": {
+        "name": "Die Blou Hond",
+        "address": "5 Darlington Rd, Pretoria, South Africa",
+        "phone": "012 348 8820",
+        "email": "bookings@casatoscana.co.za",
+        "website": "casatoscana.co.za",
+        "facebook": "https://www.facebook.com/blouhondwoof",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-25.758637169182112, 28.275322628484034",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "Die Draad",
+      "excel_name": "Die Draad",
+      "data": {
+        "name": "Die Draad",
+        "address": "Cnr Lud Hersch Drive, Robert Broom Dr, Noordheuwel, Krugersdorp, 1739",
+        "phone": "076 101 6449",
+        "email": "",
+        "website": "diedraad.co.za",
+        "facebook": "",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-26.088293098273468, 27.822254100336384",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "Die Eiland Pub & Grill",
+      "excel_name": "Die Eiland Pub &amp; Grill",
+      "data": {
+        "name": "Die Eiland Pub &amp; Grill",
+        "address": "Small Holding, 301 Moepel St, Derdepoort, Pretoria, 0039",
+        "phone": "079 492 5871",
+        "email": "dieeiland@webmail.co.za",
+        "website": "",
+        "facebook": "https://m.facebook.com/DieEilandPubAndGrill/",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-25.682126443748896, 28.29216448450665",
+        "description": ""
+      },
+      "match_type": "fuzzy",
+      "score": 0.9166666666666666
+    },
+    {
+      "folder": "Die Kantoor",
+      "excel_name": "Die Kantoor",
+      "data": {
+        "name": "Die Kantoor",
+        "address": "Willow Way Shopping Centre, 404 Lynnwood Rd, Die Wilgers, Pretoria, 0184",
+        "phone": "012 030 1161",
+        "email": "",
+        "website": "",
+        "facebook": "",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-25.765053321689074, 28.31679235758279",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "Die Ysterbees, Pretoria",
+      "excel_name": "Die Ysterbees, Pretoria",
+      "data": {
+        "name": "Die Ysterbees, Pretoria",
+        "address": "CNR Emily Hobhouse Ave &amp;, Genl De Wet St, Pretoria North, Pretoria, 0116",
+        "phone": "067 380 3280",
+        "email": "",
+        "website": "",
+        "facebook": "https://www.facebook.com/Die-Ysterbees-105157834737831/",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-25.67155574134324, 28.173290034623907",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "Dikhololo Hololo Restaurant",
+      "excel_name": "Dikhololo Hololo Restaurant",
+      "data": {
+        "name": "Dikhololo Hololo Restaurant",
+        "address": "Brits",
+        "phone": "",
+        "email": "",
+        "website": "",
+        "facebook": "",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-25.408785695049144, 27.741558059655716",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "Dros, Edenvale",
+      "excel_name": "Dros, Edenvale",
+      "data": {
+        "name": "Dros, Edenvale",
+        "address": "Edenmeadow Centre, Shop 41, Erf 1050 &amp; 1051, Modderfontein Rd, Edenvale, Johannesburg, 1401",
+        "phone": "",
+        "email": "",
+        "website": "",
+        "facebook": "",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-26.120810444658577, 28.138188187187396",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "Dros, Krugersdorp",
+      "excel_name": "Dros, Krugersdorp",
+      "data": {
+        "name": "Dros, Krugersdorp",
+        "address": "Heritage Sq, 5 Cecil Knight St, Krugersdorp, South Africa",
+        "phone": "011 66 05191",
+        "email": "",
+        "website": "http://www.dros.co.za/",
+        "facebook": "",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-26.08481582383712, 27.78065152380042",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "Eagle_s Nest Pub & Grill",
+      "excel_name": "Eagle's Nest Pub &amp; Grill",
+      "data": {
+        "name": "Eagle's Nest Pub &amp; Grill",
+        "address": "Shop 8, Kamval Centre, 46 Broadway East Road 0185 Valhalla, South Africa",
+        "phone": "082 336 2975",
+        "email": "vanessae@iburst.co.za",
+        "website": "eagles-nest-centurion.business.site",
+        "facebook": "",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-25.813087570601034, 28.151921913378374",
+        "description": ""
+      },
+      "match_type": "fuzzy",
+      "score": 0.9230769230769231
+    },
+    {
+      "folder": "Eduplex Oppitrack ",
+      "excel_name": "Eduplex Oppitrack",
+      "data": {
+        "name": "Eduplex Oppitrack",
+        "address": "1180 Wesley Rd, Queenswood, Pretoria, South Africa",
+        "phone": "012 333 7143",
+        "email": "",
+        "website": "eduplex.co.za",
+        "facebook": "https://www.facebook.com/eduplexoppitrackmusicfest",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-25.7219889973689, 28.245691333902176",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "Elephant and Friends - Moreleta Park, Pretoria",
+      "excel_name": "Elephant and Friends - Moreleta Park, Pretoria",
+      "data": {
+        "name": "Elephant and Friends - Moreleta Park, Pretoria",
+        "address": "De Villebois Mareuil Dr, Moreleta Park, Pretoria, 0181",
+        "phone": "076 483 4784",
+        "email": "admin.moreleta@elephantandfriends.co.za",
+        "website": "elephantandfriends.co.za",
+        "facebook": "https://www.facebook.com/ElliesPub",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-25.84129998202719, 28.281389637057842",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "Fairtree Atterbury Theatre",
+      "excel_name": "Fairtree Atterbury Teater/Theatre",
+      "data": {
+        "name": "Fairtree Atterbury Teater/Theatre",
+        "address": "4 Daventry St, Lynnwood Manor, Pretoria, 0081",
+        "phone": "012 942 5951",
+        "email": "info@atterburytheatre.co.za",
+        "website": "https://atterburytheatre.co.za/",
+        "facebook": "https://www.facebook.com/AtterburyTheatre",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-25.765967719676944, 28.27937695643389",
+        "description": ""
+      },
+      "match_type": "fuzzy",
+      "score": 0.8813559322033898
+    },
+    {
+      "folder": "Fangios",
+      "excel_name": "Fangios",
+      "data": {
+        "name": "Fangios",
+        "address": "Rose Road &amp; Maple Road, Knopjeslaagte, Midrand, Johannesburg, Gauteng, Johannesburg, South Africa",
+        "phone": "010 972 2777",
+        "email": "Ayrton@fangios.co.za",
+        "website": "fangios.co.za",
+        "facebook": "https://www.facebook.com/profile.php?id=61550303782239",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-25.956748311970824, 28.049849331315848",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "Featherbrook Estate",
+      "excel_name": "Featherbrook Estate",
+      "data": {
+        "name": "Featherbrook Estate",
+        "address": "6 Falls Road, Krugersdorp",
+        "phone": "",
+        "email": "",
+        "website": "",
+        "facebook": "",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-26.071534084785608, 27.835462762060914",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "Ferreira_s Restaurant and Sports Bar",
+      "excel_name": "Ferreira's Restaurant and Sports Bar",
+      "data": {
+        "name": "Ferreira's Restaurant and Sports Bar",
+        "address": "Rietfontein Rd, Jansen Park, Johannesburg, 1460",
+        "phone": "",
+        "email": "",
+        "website": "",
+        "facebook": "",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-26.191272590765088, 28.242414434734695",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "Fourways Action Sports",
+      "excel_name": "Fourways Action Sports",
+      "data": {
+        "name": "Fourways Action Sports",
+        "address": "Northlands Production Park, 8 Epsom Ave, Northriding, Johannesburg, 2162",
+        "phone": "071 672 0056",
+        "email": "dante@fourwaysfalcons.co.za",
+        "website": "http://fourwaysfalcons.co.za/",
+        "facebook": "",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-26.034501159914218, 27.95156714133253",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "Fourways Farmer_s Market",
+      "excel_name": "Fourways Farmer's Market",
+      "data": {
+        "name": "Fourways Farmer's Market",
+        "address": "Taroko Farm Modderfontein Reserve, Norfolk Ln, Klipfontein View, Lethabong, 1609",
+        "phone": "064 870 4103",
+        "email": "",
+        "website": "4waysfarmersmarket.com",
+        "facebook": "https://www.facebook.com/TheFourwaysFarmersMarket",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-26.06353102146428, 28.12436192169649",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "Fourways Gardens Club House",
+      "excel_name": "Fourways Gardens Club House",
+      "data": {
+        "name": "Fourways Gardens Club House",
+        "address": "69 Camdeboo Rd, Fourways, Sandton, 2191",
+        "phone": "",
+        "email": "",
+        "website": "",
+        "facebook": "",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-26.00148774693286, 28.00688451110189",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "Foxwood Theatre",
+      "excel_name": "Foxwood Theatre",
+      "data": {
+        "name": "Foxwood Theatre",
+        "address": "13 5th St, Houghton",
+        "phone": "011 486 0935",
+        "email": "info@foxwood.co.za",
+        "website": "foxwood.co.za",
+        "facebook": "https://www.facebook.com/foxwood.co.za",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-26.16225314750607, 28.053898916401014",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "Franco_s Portuguese Restaurant, CarletonVille",
+      "excel_name": "Francos Portuguese Restuarant, CarletonVille",
+      "data": {
+        "name": "Francos Portuguese Restuarant, CarletonVille",
+        "address": "82 Van Zyl Smit St, Oberholzer, Carletonville, 2499",
+        "phone": "076 204 2622",
+        "email": "",
+        "website": "",
+        "facebook": "https://www.facebook.com/profile.php?id=61570415835015",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-26.35045914912052, 27.3906574942105",
+        "description": ""
+      },
+      "match_type": "fuzzy",
+      "score": 0.9662921348314607
+    },
+    {
+      "folder": "Fu-Bar",
+      "excel_name": "Fu-Bar",
+      "data": {
+        "name": "Fu-Bar",
+        "address": "33 Troupant Avenue, Magaliessig, Sandton, Johannesburg, South Africa",
+        "phone": "011 463 3847",
+        "email": "",
+        "website": "",
+        "facebook": "",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-26.035320771006095, 28.021494963464832",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "Gathering o_ the Clans",
+      "excel_name": "Gathering o' the Clans",
+      "data": {
+        "name": "Gathering o' the Clans",
+        "address": "Douglasdale Shopping Centre, 33 Leslie Avenue, Douglasdale Ext 4, South Africa",
+        "phone": "010 006 2061",
+        "email": "info@gotc.co.za",
+        "website": "",
+        "facebook": "",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-26.03951490675806, 27.993995883818304",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "Gillooly_s Farm",
+      "excel_name": "Gillooly's Farm",
+      "data": {
+        "name": "Gillooly's Farm",
+        "address": "47 Boeing W Rd, Bedfordview, 2007",
+        "phone": "08 605 43000",
+        "email": "",
+        "website": "",
+        "facebook": "",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-26.166176998811988, 28.13161535214975",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "Gilroy_s Brewery (Pty) Ltd",
+      "excel_name": "Gilroy's Brewery (Pty) Ltd",
+      "data": {
+        "name": "Gilroy's Brewery (Pty) Ltd",
+        "address": "Rivonia Crossing, Achter Road, Paulshof, Johannesburg, South Africa",
+        "phone": "011 796 3020",
+        "email": "hannes@gilroysbrewery.co.za",
+        "website": "gilroysbrewery.co.za",
+        "facebook": "https://www.facebook.com/Gilroys.Brewery",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-26.03646506139356, 28.059647292914747",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "Golf Bar",
+      "excel_name": "Golf Bar",
+      "data": {
+        "name": "Golf Bar",
+        "address": "Upper Level, Cedar Square Shopping Centre, Fourways, South Africa",
+        "phone": "064 974 2688",
+        "email": "bookings@golfbar.co.za",
+        "website": "golfbar.co.za",
+        "facebook": "https://www.facebook.com/golfbarsouthafrica",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-26.011577198421207, 28.01159772499238",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "Good Friends",
+      "excel_name": "Good Friends",
+      "data": {
+        "name": "Good Friends",
+        "address": "C/O Rachel De Beer &amp;, Sylvia St, Heatherdale AH, Akasia, 0182",
+        "phone": "079 070 4965",
+        "email": "cornehenn18@gmail.com",
+        "website": "",
+        "facebook": "https://www.facebook.com/profile.php?id=61571526118498",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "Gotcha Cafe Pizzeria",
+      "excel_name": "Gotcha Cafe Pizzeria",
+      "data": {
+        "name": "Gotcha Cafe Pizzeria",
+        "address": "68 4th Ave, Linden, Randburg, 2104",
+        "phone": "011 022 3300",
+        "email": "",
+        "website": "",
+        "facebook": "https://www.facebook.com/gotchapizzeria/",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-26.13901620039615, 27.991670785243574",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "Granadilla Cafe",
+      "excel_name": "Granadilla Cafe",
+      "data": {
+        "name": "Granadilla Cafe",
+        "address": "185 High Rd, Pomona, Kempton Park, 1619",
+        "phone": "063 657 1003",
+        "email": "granadillacafe01@gmail.com",
+        "website": "granadillacafe.co.za",
+        "facebook": "https://www.facebook.com/profile.php?id=61562826008590",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-26.08820490856837, 28.293751289274166",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "Greensleeves Medieval Kingdom",
+      "excel_name": "Greensleeves Medieval Kingdom",
+      "data": {
+        "name": "Greensleeves Medieval Kingdom",
+        "address": "R563, Sterkfontein, Krugersdorp, 1739",
+        "phone": "083 229 5677",
+        "email": "",
+        "website": "",
+        "facebook": "",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-26.031692731853273, 27.717769073059806",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "Grondpad Harties",
+      "excel_name": "Grondpad Harties",
+      "data": {
+        "name": "Grondpad Harties",
+        "address": "Plot 98 R511, Hartbeespoort, 0183",
+        "phone": "065 109 2370",
+        "email": "info@grondpadbrauhaus.co.za",
+        "website": "",
+        "facebook": "",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-25.736906519025812, 27.905081844974468",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "Hangklip Hotel",
+      "excel_name": "Hangklip Hotel",
+      "data": {
+        "name": "Hangklip Hotel",
+        "address": "High Level Rd, Pringle Bay, 7196",
+        "phone": "028 273 8310",
+        "email": "",
+        "website": "https://thehangkliphotel.com/",
+        "facebook": "",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-34.36813693543366, 18.823070272178203",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "Heartfelt Arena, Pretoria",
+      "excel_name": "Heartfelt Arena, Pretoria",
+      "data": {
+        "name": "Heartfelt Arena, Pretoria",
+        "address": "1000 Voortrekker Rd, Thaba Tshwane, Pretoria, 0027",
+        "phone": "012 651 2251",
+        "email": "events@heartfelt.co.za",
+        "website": "heartfeltarena.co.za",
+        "facebook": "https://www.facebook.com/HeartfeltArena",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-25.77770341806468, 28.172009042461408",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "Heito Potato Function Venue",
+      "excel_name": "Heito Potato Function Venue",
+      "data": {
+        "name": "Heito Potato Function Venue",
+        "address": "284 Deodar St, Pomona, Kempton Park, 1619",
+        "phone": "066 201 2170",
+        "email": "Heito6284@yahoo.com",
+        "website": "",
+        "facebook": "https://www.facebook.com/profile.php?id=61560172054743",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-26.107209724664433, 28.274648936166773",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "Hennie_s Jolly Prawn",
+      "excel_name": "Hennie's Jolly Prawn",
+      "data": {
+        "name": "Hennie's Jolly Prawn",
+        "address": "42 Boundary Rd, Mnandi AH, Centurion, 0157",
+        "phone": "072 020 8913",
+        "email": "Wpadstal@gmail.com",
+        "website": "",
+        "facebook": "https://www.facebook.com/HenniesJollyprawn",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-25.89173672178664, 28.06429819423615",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "Hennies, Harties",
+      "excel_name": "Hennies, Harties",
+      "data": {
+        "name": "Hennies, Harties",
+        "address": "Road &amp;, Shop 43 Sediba Plaza c/o Die Ou Wapad, Beethoven St, R511, Hartbeespoort, 0216",
+        "phone": "012 883 4959",
+        "email": "",
+        "website": "http://www.therealhennies.co.za/",
+        "facebook": "",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-25.736438007382194, 27.89961602350161",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "Hennies, Krugersdorp",
+      "excel_name": "Hennies, Krugersdorp",
+      "data": {
+        "name": "Hennies, Krugersdorp",
+        "address": "Shop No.3 Monument Mall c/o Voortrekker Rd &amp;, Shannon Rd, Monument, Krugersdorp, 1739",
+        "phone": "010 800 1477",
+        "email": "blaf@therealhennies.co.za",
+        "website": "http://www.therealhennies.co.za/",
+        "facebook": "https://www.facebook.com/therealhennies",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-26.109211291528002, 27.8048728038983",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "Hennies, Montana",
+      "excel_name": "Hennies, Montana",
+      "data": {
+        "name": "Hennies, Montana",
+        "address": "Shop No.2 Montana Park Shopping Centre cnr Sefako Makgatho Dr &amp;, Visvanger Rd, Montana Park, Pretoria, 0182",
+        "phone": "012 010 5026",
+        "email": "therealhennies.co.za",
+        "website": "https://therealhennies.co.za/menu-specials/",
+        "facebook": "https://www.facebook.com/therealhennies",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-25.682931788288876, 28.271655136831473",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "Hennies, Silver Lakes",
+      "excel_name": "Hennies, Silver Lakes",
+      "data": {
+        "name": "Hennies, Silver Lakes",
+        "address": "Shop 8 Six Fountains Lifestyle &amp; Decor Centre c/o Solomon Mahlangu Drive, Bendeman Blvd, &amp;, Six Fountains Residential Estate, 0001",
+        "phone": "012 941 2238",
+        "email": "",
+        "website": "http://www.therealhennies.co.za/",
+        "facebook": "",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-25.776774430900225, 28.352387089766395",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "Higher Ground",
+      "excel_name": "Higher Ground",
+      "data": {
+        "name": "Higher Ground",
+        "address": "St. Stithians College Property 40 Peter Place",
+        "phone": "011 024 3433\n\n082 4480285",
+        "email": "",
+        "website": "http://www.highergroundrestaurant.com/",
+        "facebook": "",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-26.03994, 27.99535",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "Hogshead Centurion",
+      "excel_name": "Hogshead Centurion",
+      "data": {
+        "name": "Hogshead Centurion",
+        "address": "Mall@Reds c/o Hendrik Verwoerd Drive &amp;, Rooihuiskraal Rd, Rooihuiskraal, Centurion, 0149",
+        "phone": "076 016 2430",
+        "email": "centurion@hogshead.co.za",
+        "website": "hogshead.co.za",
+        "facebook": "https://www.facebook.com/HogsheadCT",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-25.871164854354454, 28.137521600827636",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "Hogshead Douglasdale",
+      "excel_name": "Hogshead Douglasdale",
+      "data": {
+        "name": "Hogshead Douglasdale",
+        "address": "shop 27, Douglasdale Village Shopping Centre, c/o Leslie Avenue &amp; Douglas Drive, Johannesburg, South Africa",
+        "phone": "011 704 4175",
+        "email": "douglasdale@hogshead.co.za",
+        "website": "hogshead.co.za",
+        "facebook": "https://www.facebook.com/HogsheadPub",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-26.03986182959863, 27.994645667427136",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "Hogshead Illovo",
+      "excel_name": "Hogshead Illovo",
+      "data": {
+        "name": "Hogshead Illovo",
+        "address": "10 Illovo Muse, 198 Oxford Rd, Illovo, Johannesburg, 2196",
+        "phone": "011 268 0871",
+        "email": "illovo@hogshead.co.za",
+        "website": "hogshead.co.za",
+        "facebook": "https://www.facebook.com/hogsheadillovo",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-26.130442226931628, 28.050449318639714",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "Hogshead Rock Cottage",
+      "excel_name": "Hogshead Rock Cottage",
+      "data": {
+        "name": "Hogshead Rock Cottage",
+        "address": "Rock Cottage Shopping Centre, c/o John Vorster &amp; Christian De Wet Road, Weltevreden Park , Roodepoort, South Africa",
+        "phone": "011 794 3061",
+        "email": "rockcottage@hogshead.co.za",
+        "website": "hogshead.co.za",
+        "facebook": "https://www.facebook.com/HogsheadRockCottage",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-26.103608286189345, 27.926392431733472",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "Honeyrock Motel",
+      "excel_name": "Honeyrock Motel",
+      "data": {
+        "name": "Honeyrock Motel",
+        "address": "Beyers Naude Drive &amp;, Juice St, Honeydew, 2194",
+        "phone": "010 447 3569",
+        "email": "",
+        "website": "",
+        "facebook": "",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-26.075588755361682, 27.921149082547043",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "Hooters Fourways",
+      "excel_name": "Hooters Fourways",
+      "data": {
+        "name": "Hooters Fourways",
+        "address": "The Buzz Shopping Centre, Witkoppen Rd &amp;, Nerine St, Fourways, Johannesburg, 2055",
+        "phone": "010 443 5926",
+        "email": "",
+        "website": "https://hooters.co.za/",
+        "facebook": "",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-26.023376983374817, 27.99150862143695",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "Hotstix Music & Pool Bar",
+      "excel_name": "Hotstix Music &amp; Pool Bar",
+      "data": {
+        "name": "Hotstix Music &amp; Pool Bar",
+        "address": "1333 Stanza Bopape St, Hatfield, Pretoria, 0028",
+        "phone": "078 475 5863",
+        "email": "hotstixbar@gmail.com",
+        "website": "",
+        "facebook": "",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-25.74263365695932, 28.24610088682498",
+        "description": ""
+      },
+      "match_type": "fuzzy",
+      "score": 0.9230769230769231
+    },
+    {
+      "folder": "Huddle Park Golf Course",
+      "excel_name": "Huddle Park Golf Course",
+      "data": {
+        "name": "Huddle Park Golf Course",
+        "address": "121 Club St, Linksfield, Johannesburg,",
+        "phone": "079 430 5414",
+        "email": "theresa@irishrock.co.za",
+        "website": "http://www.irishrock.co.za/",
+        "facebook": "https://www.facebook.com/IrishRockLittleFalls",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-26.155849658075475, 28.120258627471646",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "In Shere",
+      "excel_name": "In Shere",
+      "data": {
+        "name": "In Shere",
+        "address": "4 Graham Rd, Shere, 0084",
+        "phone": "083 649 8100",
+        "email": "lianevv@gmail.com",
+        "website": "inshere.co.za",
+        "facebook": "lianevv@gmail.com",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-25.782278274470652, 28.34799272827685",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "Irene Country Club",
+      "excel_name": "Irene Country Club",
+      "data": {
+        "name": "Irene Country Club",
+        "address": "1 MI8, Doringkloof, Centurion, 0157",
+        "phone": "012 667 1081",
+        "email": "membership@irenecc.co.za",
+        "website": "http://irenecc.co.za/",
+        "facebook": "https://www.facebook.com/IreneCClub",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-25.88482663868941, 28.224282323074092",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "Irene Homes, Irene",
+      "excel_name": "Irene Homes, Irene",
+      "data": {
+        "name": "Irene Homes, Irene",
+        "address": "2 Albert Rd, Irene, Centurion, 0062",
+        "phone": "012 667 1035",
+        "email": "",
+        "website": "http://www.irenehomes.co.za/",
+        "facebook": "https://www.facebook.com/IreneHomes4IntellectuallyDisabled",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-25.871099205393108, 28.21316929259496",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "Irene Village Market",
+      "excel_name": "Irene Village Market",
+      "data": {
+        "name": "Irene Village Market",
+        "address": "7 Nelson Rd, Sunlawns AH, Olifantsfontein, 1666",
+        "phone": "060 965 4894",
+        "email": "",
+        "website": "http://www.irenemarket.co.za/",
+        "facebook": "",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-25.92134730483069, 28.22816722677151",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "Irish Rock Little Falls",
+      "excel_name": "Irish Rock Little Falls",
+      "data": {
+        "name": "Irish Rock Little Falls",
+        "address": "34, West Rand Retail Crossing &amp; Hendrik Potgieter Road, 1732 Nic Diederichs Rd, Little Falls, Roodepoort, 1735",
+        "phone": "",
+        "email": "",
+        "website": "",
+        "facebook": "",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-26.11289088793621, 27.89618344223199",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "Jacaranda 94.2",
+      "excel_name": "Jacaranda 94.2",
+      "data": {
+        "name": "Jacaranda 94.2",
+        "address": "89 14th Rd, Erand Gardens, Midrand, 1685",
+        "phone": "011 063 5700",
+        "email": "",
+        "website": "https://www.jacarandafm.com/",
+        "facebook": "https://www.facebook.com/Jacaranda942",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-25.966790096383985, 28.130245068052922",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "Jack Friday_s",
+      "excel_name": "Jack Friday's",
+      "data": {
+        "name": "Jack Friday's",
+        "address": "680 Rubinstein Drive, Moreleta Park, Pretoria, South Africa",
+        "phone": "012 941 0156",
+        "email": "jackfridaysbookings@gmail.com",
+        "website": "",
+        "facebook": "https://www.facebook.com/JackfridaysSA",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-25.818274946156222, 28.29045668586234",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "Jackal_s Den, Jackal_s Creek",
+      "excel_name": "Jackal's Den, Jackal's Creek",
+      "data": {
+        "name": "Jackal's Den, Jackal's Creek",
+        "address": "North Riding, Club house Jackal Creek golfing estate, Boundary Rd, Northriding, 2169",
+        "phone": "073 324 2331",
+        "email": "",
+        "website": "http://jackalden.co.za/",
+        "facebook": "",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-26.062858377610244, 27.918362538393616",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "Jan Se Skuld",
+      "excel_name": "Jan Se Skuld",
+      "data": {
+        "name": "Jan Se Skuld",
+        "address": "545 3rd Rd, Montana, Pretoria, 0151",
+        "phone": "071 226 4976",
+        "email": "admin@janseskuld.co.za",
+        "website": "janseskuld.co.za",
+        "facebook": "https://www.facebook.com/janseskuld",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-25.66727561461575, 28.24723701805414",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "Jitterbugz",
+      "excel_name": "Jitterbugz",
+      "data": {
+        "name": "Jitterbugz",
+        "address": "2 Charles De Gaulle Cres Centurion, Highveld, Pretoria, 0157",
+        "phone": "010 746 0476",
+        "email": "",
+        "website": "",
+        "facebook": "",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-25.876659039502623, 28.198496333192793",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "Jock Pub & Grill",
+      "excel_name": "Jock Pub &amp; Grill",
+      "data": {
+        "name": "Jock Pub &amp; Grill",
+        "address": "Shop 2B, 23 Ferreira St, Mbombela, 1200",
+        "phone": "013 755 4969",
+        "email": "admin@jockpubandgrill.co.za",
+        "website": "http://www.jockpubandgrill.co.za/",
+        "facebook": "https://www.facebook.com/JockPubandGrill",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-25.47605728637468, 30.983457320299195",
+        "description": ""
+      },
+      "match_type": "fuzzy",
+      "score": 0.8888888888888888
+    },
+    {
+      "folder": "Jozi_s Show Bar",
+      "excel_name": "Jozi's Show Bar",
+      "data": {
+        "name": "Jozi's Show Bar",
+        "address": "Boundary Rd, North Riding AH, Roodepoort, 2169",
+        "phone": "071 515 5783",
+        "email": "topdog@barkingdog.co.za",
+        "website": "",
+        "facebook": "https://www.facebook.com/profile.php?id=100057380502284",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-26.034078882892146, 27.94650433524202",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "Jubilee Showbar",
+      "excel_name": "Jubilee Showbar",
+      "data": {
+        "name": "Jubilee Showbar",
+        "address": "43 Van Buuren Rd, Bedfordview, 2008",
+        "phone": "061 504 4526",
+        "email": "info@jubileeshowbar.co.za",
+        "website": "https://www.jubileeshowbar.co.za/",
+        "facebook": "https://www.facebook.com/profile.php?id=61556540378225",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-26.18232506874707, 28.136063013245206",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "Kapstadt Brauhaus Centurion",
+      "excel_name": "Kapstadt Brauhaus Centurion",
+      "data": {
+        "name": "Kapstadt Brauhaus Centurion",
+        "address": "130 Akkerboom St, Zwartkop, Centurion, 0157",
+        "phone": "072 047 3612",
+        "email": "",
+        "website": "",
+        "facebook": "https://www.facebook.com/pages/Kapstadt-Brauhaus-Centurion/284461364741139",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-25.865026630824975, 28.19049547959091",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "Katzy_s Live",
+      "excel_name": "Katzy's Live",
+      "data": {
+        "name": "Katzy's Live",
+        "address": "17, Shop 2 The Firs, Hyatt Shopping Centre, 19 Biermann Ave, Rosebank, Johannesburg, 2196",
+        "phone": "",
+        "email": "",
+        "website": "",
+        "facebook": "",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-26.142894248455963, 28.0427360049741",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "Killarney Country Club",
+      "excel_name": "Killarney Country Club",
+      "data": {
+        "name": "Killarney Country Club",
+        "address": "60 5th St, Houghton Estate, Johannesburg, 2198",
+        "phone": "",
+        "email": "",
+        "website": "",
+        "facebook": "",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-26.151257437254678, 28.055003428443523",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "Kirstenbosch Gardens",
+      "excel_name": "Kirstenbosch Gardens",
+      "data": {
+        "name": "Kirstenbosch Gardens",
+        "address": "",
+        "phone": "",
+        "email": "",
+        "website": "",
+        "facebook": "",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "Kleinkaap Boutique Hotel, Littleton",
+      "excel_name": "Kleinkaap Boutique Hotel, Littleton",
+      "data": {
+        "name": "Kleinkaap Boutique Hotel, Littleton",
+        "address": "87 Jim Van Der Merwe St, Clubview, Centurion, 0140",
+        "phone": "012 654 9878",
+        "email": "info@kleinkaap.co.za",
+        "website": "http://www.kleinkaap.co.za/",
+        "facebook": "https://www.facebook.com/Kleinkaap",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-25.835268940594634, 28.21316182967585",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "Krugersdorp Bolwing Cliub ",
+      "excel_name": "Krugersdorp Bolwing Cliub",
+      "data": {
+        "name": "Krugersdorp Bolwing Cliub",
+        "address": "Down St, Kenmare, Krugersdorp, 1739",
+        "phone": "071 430 4367",
+        "email": "",
+        "website": "http://www.krugersdorpbowlingclub.co.za/",
+        "facebook": "",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-26.10964989619773, 27.806363849299757",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "Kyalami Country Pub & Restuarant",
+      "excel_name": "Kyalami Country Pub &amp; Restuarant",
+      "data": {
+        "name": "Kyalami Country Pub &amp; Restuarant",
+        "address": "Cedar Rd, Kyalami, Midrand, 1684",
+        "phone": "010 786 1109",
+        "email": "",
+        "website": "",
+        "facebook": "https://www.facebook.com/CountrypubJHB",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-25.98544917890095, 28.06613232920282",
+        "description": ""
+      },
+      "match_type": "fuzzy",
+      "score": 0.9411764705882353
+    },
+    {
+      "folder": "La Parada Kyalami Corner",
+      "excel_name": "La Parada Kyalami Corner",
+      "data": {
+        "name": "La Parada Kyalami Corner",
+        "address": "Shop 116, Kyalami Corner, Begonia Rd, Witpoort, Midrand, 1684",
+        "phone": "010 001 2520",
+        "email": "",
+        "website": "",
+        "facebook": "",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-25.98478930480288, 28.07500877969776",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "Lakeside Bistro, Cedar Lakes",
+      "excel_name": "Lakeside Bistro, Cedar Lakes",
+      "data": {
+        "name": "Lakeside Bistro, Cedar Lakes",
+        "address": "Cedar Boulevard Cedar Lakes, Lifestyle Estate, 2191",
+        "phone": "064 134 5607",
+        "email": "",
+        "website": "https://www.cedarlakes.co.za/",
+        "facebook": "",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-26.00581413988319, 27.981284281224642",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "Legends Adventure Farm & MX Track _ Rhino Park",
+      "excel_name": "Legends Adventure Farm &amp; MX Track | Rhino Park",
+      "data": {
+        "name": "Legends Adventure Farm &amp; MX Track | Rhino Park",
+        "address": "R515 Rhino Park, Pretoria, 1001",
+        "phone": "082 312 8310",
+        "email": "",
+        "website": "http://www.legendsmx.co.za/",
+        "facebook": "https://www.facebook.com/LegendsMXCullinan",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-25.828599186017318, 28.519990228795713",
+        "description": ""
+      },
+      "match_type": "fuzzy",
+      "score": 0.9375
+    },
+    {
+      "folder": "Lisboa - Fire and Salt, Serengeti Lifestyle Estate",
+      "excel_name": "Lisboa - Fire and Salt, Serengeti Lifestyle Estate",
+      "data": {
+        "name": "Lisboa - Fire and Salt, Serengeti Lifestyle Estate",
+        "address": "Serengeti Kempton Park, 300 Grosvenor St, Glen marais, Johannesburg, 1600",
+        "phone": "",
+        "email": "",
+        "website": "",
+        "facebook": "https://www.facebook.com/profile.php?id=61553744775744",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-26.032911964054062, 28.27424840536349",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "Living Room Jozi",
+      "excel_name": "Living Room Jozi",
+      "data": {
+        "name": "Living Room Jozi",
+        "address": "Maboneng. 5th Floor, Main Change Building, 20 Kruger St, City and Suburban, Johannesburg",
+        "phone": "",
+        "email": "",
+        "website": "",
+        "facebook": "",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-26.204322075325322, 28.059931142958096",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "Livys restuarant",
+      "excel_name": "Livys restuarant",
+      "data": {
+        "name": "Livys restuarant",
+        "address": "49 EASTWOOD ROAD, DUNKELD, Johannesburg, South Africa",
+        "phone": "078 409 2233",
+        "email": "manager@livys.co.za",
+        "website": "livys.co.za",
+        "facebook": "https://www.facebook.com/profile.php?id=61552407097804",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-26.139729448219967, 28.04286122360306",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "Lock Stock Beer Fourways",
+      "excel_name": "Lock Stock Beer Fourways",
+      "data": {
+        "name": "Lock Stock Beer Fourways",
+        "address": "3 Sunset Ave, Lone Hill, Sandton, 2062",
+        "phone": "010 200 9942",
+        "email": "",
+        "website": "",
+        "facebook": "https://www.facebook.com/LSBFourways",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-26.021225598672782, 28.01366165188547",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "Lock Stock Beer Weltevreden",
+      "excel_name": "Lock Stock Beer Weltevreden",
+      "data": {
+        "name": "Lock Stock Beer Weltevreden",
+        "address": "Corner J.G Strydom, &amp; Cornelius Drive, Weltevredenpark, South Africa",
+        "phone": "069 806 4808",
+        "email": "",
+        "website": "",
+        "facebook": "https://www.facebook.com/LSBWeltevreden",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-26.12487966319139, 27.9322799560067",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "Mad Giant Taproom",
+      "excel_name": "Mad Giant Taproom",
+      "data": {
+        "name": "Mad Giant Taproom",
+        "address": "96 Conrad Dr, Blairgowrie, Randburg, 2194",
+        "phone": "087 148 2628",
+        "email": "hello@jhbtaproom.com",
+        "website": "madgianttaproom.co.za",
+        "facebook": "https://www.facebook.com/madgianttaproom",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-26.11416570659629, 28.01869752454102",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "Mall@Reds, Centurion",
+      "excel_name": "Mall@Reds, Centurion",
+      "data": {
+        "name": "Mall@Reds, Centurion",
+        "address": "Cnr Hendrik Verwoerd Drive &amp;, Rooihuiskraal Rd, Rooihuiskraal Ext 15, Centurion, 0157",
+        "phone": "012 656 8957",
+        "email": "info@anaprop.co.za",
+        "website": "mallatreds.co.za",
+        "facebook": "https://www.facebook.com/MallatReds",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-25.871816975056344, 28.13785213312108",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "Manzi Maningi Private Game Lodge",
+      "excel_name": "Manzi Maningi Private Game Lodge",
+      "data": {
+        "name": "Manzi Maningi Private Game Lodge",
+        "address": "Farm 223, Elba, Brits, 0250",
+        "phone": "083 566 3318",
+        "email": "info@manzimaningi.co.za",
+        "website": "book.nightsbridge.com/35411",
+        "facebook": "https://www.facebook.com/manzimaningi",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-25.439321412759085, 27.76429638936429",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "Margo_s Bistro ",
+      "excel_name": "Margo's Bistro",
+      "data": {
+        "name": "Margo's Bistro",
+        "address": "72 Grant Avenue &amp;, 111 Nellie Rd, Norwood, Johannesburg, 2192",
+        "phone": "079 961 0925",
+        "email": "",
+        "website": "",
+        "facebook": "https://www.facebook.com/profile.php?id=61563345856364",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-26.15787973087698, 28.07760362675641",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "Marks Park",
+      "excel_name": "Marks Park",
+      "data": {
+        "name": "Marks Park",
+        "address": "Judith Road, Emmarentia, South Africa, 2195",
+        "phone": "011 486 6012",
+        "email": "manager@markspark.co.za",
+        "website": "http://www.marksparksportsclub.co.za/",
+        "facebook": "https://www.facebook.com/profile.php?id=100063707374602&amp;sk=about",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-26.162450421885733, 28.00246647582006",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "Mikes Sportsbar, Lephalale",
+      "excel_name": "Mikes Sportsbar, Lephalale",
+      "data": {
+        "name": "Mikes Sportsbar, Lephalale",
+        "address": "Onverwacht Business Center, 10 Walter Sisulu Dr, Lephalale, 0555",
+        "phone": "014 763 6118",
+        "email": "vicky.dupreez22@gmail.com",
+        "website": "",
+        "facebook": "",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "Milk Bar",
+      "excel_name": "Milk Bar",
+      "data": {
+        "name": "Milk Bar",
+        "address": "11 Holt Street E, Parkmore, Sandton, Johannesburg, South Africa",
+        "phone": "072 641 8977",
+        "email": "georgeleapark@milkbar.co.za",
+        "website": "https://milkbar.co.za",
+        "facebook": "",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-26.098429462044415, 28.036046823826346",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "Misty Waters",
+      "excel_name": "Misty Waters",
+      "data": {
+        "name": "Misty Waters",
+        "address": "Lake Umuzi South Bank, Kingfisher Street, Secunda, Mpumalanga",
+        "phone": "017 361 3452",
+        "email": "mistywaters@lakeumuzi.co.za",
+        "website": "lakeumuzi.co.za/misty-waters-music-festival",
+        "facebook": "",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-26.518072026427276, 29.184169290616357",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "Mix 93.8",
+      "excel_name": "Mix 93.8",
+      "data": {
+        "name": "Mix 93.8",
+        "address": "Office 3B, North Midgate, International Business Gateway, New Road 1685 Midrand, South Africa",
+        "phone": "010 900 0338",
+        "email": "info@mix938.com",
+        "website": "https://mix938.com/",
+        "facebook": "https://www.facebook.com/MixFM93.8",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-25.978317390649888, 28.122029277503376",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "Molecule Cocktail Lounge, Emperors Palace",
+      "excel_name": "Molecule Cocktail Lounge, Emperors Palace",
+      "data": {
+        "name": "Molecule Cocktail Lounge, Emperors Palace",
+        "address": "Emperors Palace, O.R. Tambo, Johannesburg, 1627",
+        "phone": "011 928 1000",
+        "email": "",
+        "website": "https://emperorspalace.com/molecule-cocktails-lounge-bar/",
+        "facebook": "",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-26.144454413078453, 28.22330551334656",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "Molly Malone_s",
+      "excel_name": "Molly Malone's",
+      "data": {
+        "name": "Molly Malone's",
+        "address": "16 Sunset Ave, Pine Slopes AH, Sandton, 2194, South Africa",
+        "phone": "011 467 8052",
+        "email": "mollymalones011@gmail.com\nJenny@mollymalones.co.za",
+        "website": "mollymalones.co.za",
+        "facebook": "https://www.facebook.com/MollyMalonesFourways",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-26.02008450854604, 28.014814823336632",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "Moo Moos, Brooklyn",
+      "excel_name": "Moo Moos, Brooklyn",
+      "data": {
+        "name": "Moo Moos, Brooklyn",
+        "address": "31 Middle Street &amp; Middle Street, Brooklyn, Pretoria, 0181",
+        "phone": "082 356 0756",
+        "email": "brooklyn@moo-moo.co.za",
+        "website": "http://www.moo-moo.co.za/?utm_source=google_maps&amp;utm_medium=website_button&amp;utm_campaign=SP&amp;utm_content=SP",
+        "facebook": "",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-25.77165341589233, 28.233769416044456",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "Moo Moos, Pineslopes",
+      "excel_name": "Moo Moos, Pineslopes",
+      "data": {
+        "name": "Moo Moos, Pineslopes",
+        "address": "Shop No. GF21 Pineslopes Boulevard, Witkoppen Rd, Fourways, 2194",
+        "phone": "061 528 0175",
+        "email": "pineslopes@moo-moo.co.za",
+        "website": "http://www.moo-moo.co.za/?utm_source=google_maps&amp;utm_medium=website_button&amp;utm_campaign=SP&amp;utm_content=SP",
+        "facebook": "",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-26.01287065680243, 27.97586254943923",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "Morningside Country Club",
+      "excel_name": "Morningside Country Club",
+      "data": {
+        "name": "Morningside Country Club",
+        "address": "1 De La Rey Rd, Morningside, Sandton, 2196",
+        "phone": "011 803 1805",
+        "email": "manager@morningsidecc.co.za",
+        "website": "http://www.morningsidecc.co.za/",
+        "facebook": "https://www.facebook.com/profile.php?id=61561147133084",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-26.062475848686752, 28.05969955884129",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "Morrie_s Pantry",
+      "excel_name": "Morrie's Pantry",
+      "data": {
+        "name": "Morrie's Pantry",
+        "address": "204 Florence Ribeiro Ave, Nieuw Muckleneuk, Pretoria, 0181",
+        "phone": "012 881 3841",
+        "email": "",
+        "website": "",
+        "facebook": "https://www.facebook.com/morriespantry",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-25.771257502178045, 28.2245617185956",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "Mount Rock Pub & Grill",
+      "excel_name": "Mount Rock Pub &amp; Grill",
+      "data": {
+        "name": "Mount Rock Pub &amp; Grill",
+        "address": "1190 Mignon St, Mountain View, Pretoria, 0082",
+        "phone": "082 927 6542",
+        "email": "",
+        "website": "",
+        "facebook": "https://www.facebook.com/profile.php?id=100054523926456",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-25.70121826866418, 28.16167916494189",
+        "description": ""
+      },
+      "match_type": "fuzzy",
+      "score": 0.9166666666666666
+    },
+    {
+      "folder": "Nasrex Expo Centre",
+      "excel_name": "Nasrex Expo Centre",
+      "data": {
+        "name": "Nasrex Expo Centre",
+        "address": "Nasrec rd, corner Rand Show Rd, Nasrec, Johannesburg, 2091",
+        "phone": "011 494 1920",
+        "email": "",
+        "website": "http://www.expocentre.co.za/",
+        "facebook": "",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-26.242448032857656, 27.981668748865346",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "Newton_s Pub and Grill, Spartan",
+      "excel_name": "Newton's Pub and Grill, Spartan",
+      "data": {
+        "name": "Newton's Pub and Grill, Spartan",
+        "address": "17 Newton St, Spartan, Kempton Park, 1619",
+        "phone": "062 608 7020",
+        "email": "newtonspubandgrill@gmail.com",
+        "website": "",
+        "facebook": "https://www.facebook.com/newtonspubandgrill",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-26.11677597679079, 28.21611631937839",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "Ngwenya Glass Village Muldersdrift ",
+      "excel_name": "Ngwenya Glass Village Muldersdrift",
+      "data": {
+        "name": "Ngwenya Glass Village Muldersdrift",
+        "address": "Cnr Shady Road and R114 Muldersdrift, Muldersdrift, South Africa",
+        "phone": "072 695 6707",
+        "email": "accounts@shadesofngwenya.co.za",
+        "website": "shadesofngwenya.co.za",
+        "facebook": "https://www.facebook.com/ngwenyaglasscountryvillage",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-26.02231098716826, 27.8679665514846",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "Nineteen69",
+      "excel_name": "Nineteen69",
+      "data": {
+        "name": "Nineteen69",
+        "address": "0A President Fouche Dr, Bromhof, Randburg, 2154",
+        "phone": "060 455 5032",
+        "email": "events@nineteen69pub.co.za",
+        "website": "nineteen69.co.za",
+        "facebook": "https://www.facebook.com/nineteen69pub",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-26.086442405097586, 27.959045281459687",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "Nokuphila School",
+      "excel_name": "Nokuphila School",
+      "data": {
+        "name": "Nokuphila School",
+        "address": "59 Steyn Road, President Park AH\nMidrand, 1685, Gauteng, South Africa",
+        "phone": "010 023 7370",
+        "email": "principal@nokuphila.co.za",
+        "website": "http://www.lovetrust.co.za/",
+        "facebook": "",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-26.00197312259469, 28.161806277275023",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "Northwood Crusaders Sports Club",
+      "excel_name": "Northwood Crusaders Sports Club",
+      "data": {
+        "name": "Northwood Crusaders Sports Club",
+        "address": "10 Ranleigh Crescent, Durban North, South Africa",
+        "phone": "087 153 3412",
+        "email": "info@northwoodcrusaders.co.za",
+        "website": "crusaderssportsclub.co.za",
+        "facebook": "https://www.facebook.com/northwoodcrusaders",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-29.727527001022764, 31.288925335835245",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "Old School Pub and Grill, Roodeplaat",
+      "excel_name": "Old School Pub and Grill, Roodeplaat",
+      "data": {
+        "name": "Old School Pub and Grill, Roodeplaat",
+        "address": "210 Kameeldrift Rd, Kameeldrift East, Roodeplaat, 0035",
+        "phone": "079 051 5920",
+        "email": "",
+        "website": "",
+        "facebook": "https://www.facebook.com/Oldschoolpubandgrill",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-25.65991328626078, 28.310274376933915",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "Olive Wood Lifestyle Centre, Kempton Park",
+      "excel_name": "Olive Wood Lifestyle Centre, Kempton Park",
+      "data": {
+        "name": "Olive Wood Lifestyle Centre, Kempton Park",
+        "address": "300 Grosvenor St, Witfontein, Kempton Park, 1620",
+        "phone": "082 465 4458",
+        "email": "",
+        "website": "https://olivewood-lifestyle.co.za/",
+        "facebook": "",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-26.030168127055536, 28.2888288615629",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "Oppidam Vygeboom",
+      "excel_name": "Oppidam Vygeboom",
+      "data": {
+        "name": "Oppidam Vygeboom",
+        "address": "Vygeboomdam, Vygeboom Dam, eManzana, 1190",
+        "phone": "066 327 1068",
+        "email": "info@oppidam.co.za",
+        "website": "",
+        "facebook": "https://www.facebook.com/OppidamHouseboats",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-25.82838619271938, 30.48807916869928",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "Oppistasie restaurant and pub",
+      "excel_name": "Oppistasie restaurant and pub",
+      "data": {
+        "name": "Oppistasie restaurant and pub",
+        "address": "4 Hotel St, Cullinan, 1000",
+        "phone": "",
+        "email": "",
+        "website": "",
+        "facebook": "https://www.facebook.com/groups/374440148859660/",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-25.67470472949139, 28.519576471454616",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "Os Tio_s Restaurant & Sky Bar",
+      "excel_name": "Os Tio's Restaurant &amp; Sky Bar",
+      "data": {
+        "name": "Os Tio's Restaurant &amp; Sky Bar",
+        "address": "412 Honeydew Rd W, Sundowner, Randburg, 2188",
+        "phone": "074 746 3476",
+        "email": "info@ostios.co.za",
+        "website": "http://ostios.co.za/",
+        "facebook": "https://www.facebook.com/ostiosskybar",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-26.077313840865003, 27.92940663951621",
+        "description": ""
+      },
+      "match_type": "fuzzy",
+      "score": 0.9354838709677419
+    },
+    {
+      "folder": "Pablo_s Mexican Cantina",
+      "excel_name": "Pablo's Mexican Cantina",
+      "data": {
+        "name": "Pablo's Mexican Cantina",
+        "address": "1 6th Ave &amp;, 1st St, Northmead, Benoni, 1501",
+        "phone": "",
+        "email": "",
+        "website": "",
+        "facebook": "",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-26.172933182354882, 28.330494304716588",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "Pano_s Grill, Helderkruin",
+      "excel_name": "Pano's Grill, Helderkruin",
+      "data": {
+        "name": "Pano's Grill, Helderkruin",
+        "address": "200 Ouklip Rd cnr, Wilgerood Rd, Helderkruin, Johannesburg, 1733",
+        "phone": "073 368 2836",
+        "email": "",
+        "website": "https://panosgrill.co.za/",
+        "facebook": "",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-26.123564712726964, 27.875242474838608",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "Panorama Flea Market",
+      "excel_name": "Panorama Flea Market",
+      "data": {
+        "name": "Panorama Flea Market",
+        "address": "Klipriver Drive cnr Jordie Road, Mulbarton, Johannesburg, South Africa",
+        "phone": "067 909 9593",
+        "email": "ingrid@panoramasa.com",
+        "website": "panoramasa.com",
+        "facebook": "https://www.facebook.com/panoramafleamarketsa",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-26.295462149334423, 28.049716920450457",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "Papoulis",
+      "excel_name": "Papoulis",
+      "data": {
+        "name": "Papoulis",
+        "address": "Shop 1, Kingfisher Shopping Centre, 39 Kingfisher Dr, Fourways, Sandton, 2055",
+        "phone": "072 420 6740",
+        "email": "manager@papoulis.co.za",
+        "website": "",
+        "facebook": "https://www.facebook.com/papoulis.pizza",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-26.028572308179765, 28.002464340433768",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "Pepper Chair Restaurant",
+      "excel_name": "Pepper Chair Restaurant",
+      "data": {
+        "name": "Pepper Chair Restaurant",
+        "address": "Lyttelton Rd &amp;, Adam Tas St, Clubview, Centurion, 0157",
+        "phone": "012 654 1749",
+        "email": "info@pepperchairrestaurant.co.za",
+        "website": "pepperchairrestaurant.co.za",
+        "facebook": "https://www.facebook.com/pepperchair",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-25.834660192086528, 28.185705284330837",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "Pete_s Diner",
+      "excel_name": "Pete's Diner",
+      "data": {
+        "name": "Pete's Diner",
+        "address": "84 Main Street, Walkerville, gauteng",
+        "phone": "010 100 8317",
+        "email": "info@petesdiner.co.za",
+        "website": "",
+        "facebook": "",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-26.414813857009893, 27.95670802625169",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "Picolino_s",
+      "excel_name": "Picolino's",
+      "data": {
+        "name": "Picolino's",
+        "address": "42 Witkoppen Road, Sandton, Gauteng, Johannesburg, South Africa",
+        "phone": "064 695 0079",
+        "email": "Picolino@mweb.co.za",
+        "website": "https://picolinos.co.za/",
+        "facebook": "https://www.facebook.com/PicolinosFourways",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-26.023135288689005, 27.99409703502513",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "Pirate_s Sports Club",
+      "excel_name": "Pirate's Sports Club",
+      "data": {
+        "name": "Pirate's Sports Club",
+        "address": "25 Braeside Rd, Greenside, Randburg, 2034",
+        "phone": "011 646 5025",
+        "email": "",
+        "website": "http://piratesclub.co.za/",
+        "facebook": "https://www.facebook.com/PiratesRugbyOldBoys",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-26.144881389351333, 28.01610941230417",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "Place2b",
+      "excel_name": "Place2b",
+      "data": {
+        "name": "Place2b",
+        "address": "Lanseria Country Estate, Palamino Drive, Lindley, Lanseria, 1739",
+        "phone": "083 446 7663",
+        "email": "",
+        "website": "",
+        "facebook": "",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-25.913336239502694, 27.905205758024366",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "Ponta Malongane, Mozambique",
+      "excel_name": "Ponta Malongane, Mozambique",
+      "data": {
+        "name": "Ponta Malongane, Mozambique",
+        "address": "5V4P+V9Q, Ponta do Ouro, Mozambique",
+        "phone": "+27 82 803 1981",
+        "email": "andries@strab.co.za",
+        "website": "www.strab.co.za",
+        "facebook": "https://www.facebook.com/STRABfest",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-26.84257978279042, 32.88717308037106",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "Premiermyn Hervormde Kerk",
+      "excel_name": "Premiermyn Hervormde Kerk",
+      "data": {
+        "name": "Premiermyn Hervormde Kerk",
+        "address": "Corner of Zonderwater &amp; R515, Cullinan, South Africa",
+        "phone": "012 734 0130",
+        "email": "",
+        "website": "",
+        "facebook": "",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-25.678297451900747, 28.537638970992766",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "Pretoria National Botanical Gardens",
+      "excel_name": "Pretoria National Botanical Gardens",
+      "data": {
+        "name": "Pretoria National Botanical Gardens",
+        "address": "2 Cussonia Ave, Brummeria, Pretoria, 0184",
+        "phone": "012 843 5000",
+        "email": "PTAGarden@sanbi.org.za",
+        "website": "sanbi.org/gardens/pretoria",
+        "facebook": "https://www.facebook.com/pretoriapnbg",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-25.739228938177448, 28.273717107130096",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "Prison Break Market",
+      "excel_name": "Prison Break Market",
+      "data": {
+        "name": "Prison Break Market",
+        "address": "10 MacMillan Rd, Glenferness AH, Johannesburg, 2191",
+        "phone": "082 522 1739",
+        "email": "info@prisonbreak.co.za",
+        "website": "prisonbreakmarket.co.za",
+        "facebook": "https://www.facebook.com/prisonbreakmarket",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-26.0013126682013, 28.041395144182186",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "Quin & Bull, Pretoria",
+      "excel_name": "Quin &amp; Bull, Pretoria",
+      "data": {
+        "name": "Quin &amp; Bull, Pretoria",
+        "address": "56 Totius St, Groenkloof, Pretoria, 0181",
+        "phone": "072 844 6781",
+        "email": "quinandbull21@gmail.com",
+        "website": "",
+        "facebook": "https://www.facebook.com/quinandbull",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-25.768494213269708, 28.217304443675168",
+        "description": ""
+      },
+      "match_type": "fuzzy",
+      "score": 0.9130434782608695
+    },
+    {
+      "folder": "Railways Caf\u00e9",
+      "excel_name": "Railways Caf\u00e9",
+      "data": {
+        "name": "Railways Caf\u00e9",
+        "address": "2 Hack Rd, Irene, Pretoria, 0157",
+        "phone": "084 018 5098",
+        "email": "bookings@railwayscafe.co.za",
+        "website": "railwayscafe.co.za",
+        "facebook": "https://www.facebook.com/RailwaysCafe",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-25.875327403537153, 28.223838734346018",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "Railways Caf\u00e9, Cullinan",
+      "excel_name": "Railways Caf\u00e9, Cullinan",
+      "data": {
+        "name": "Railways Caf\u00e9, Cullinan",
+        "address": "88 Oak Ave, Cullinan, 0001",
+        "phone": "084 018 5098",
+        "email": "bookings@railwayscafe.co.za",
+        "website": "railwayscafe.co.za",
+        "facebook": "https://www.facebook.com/RailwaysCafe",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-25.669978777326598, 28.51604881703605",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "Red Barn Cafe",
+      "excel_name": "Red Barn Cafe",
+      "data": {
+        "name": "Red Barn Cafe",
+        "address": "7 Nelson Rd, Sunlawns AH, Olifantsfontein, 1666",
+        "phone": "066 563 7558",
+        "email": "",
+        "website": "",
+        "facebook": "",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-25.927258213958282, 28.229420367179408",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "Rep en Roer",
+      "excel_name": "Rep en Roer",
+      "data": {
+        "name": "Rep en Roer",
+        "address": "Shop 57, Glen Village Shopping Centre, 717 Skukuza St, Faerie Glen, Pretoria, 0081",
+        "phone": "076 138 6391",
+        "email": "",
+        "website": "",
+        "facebook": "",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-25.789243291957185, 28.329907360922505",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "Riboville Boutique Hotel and Restaurant",
+      "excel_name": "Riboville Boutique Hotel and Restaurant",
+      "data": {
+        "name": "Riboville Boutique Hotel and Restaurant",
+        "address": "Gate 9, Waterfall Equestrian Estate, 1 Apaloosa Dr, Waterfall, Midrand, 1682",
+        "phone": "011 234 2456",
+        "email": "",
+        "website": "",
+        "facebook": "https://www.facebook.com/profile.php?id=100095487316285",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-26.022970377878153, 28.08233699329781",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "Ridge Park Sports Club",
+      "excel_name": "Ridge Park Sports Club",
+      "data": {
+        "name": "Ridge Park Sports Club",
+        "address": "George Mann St, Turffontein, Johannesburg, 2000",
+        "phone": "011 681 0409",
+        "email": "",
+        "website": "https://ridgeparksc.co.za/",
+        "facebook": "",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "Riverglades Estate",
+      "excel_name": "Riverglades Estate",
+      "data": {
+        "name": "Riverglades Estate",
+        "address": "67 Juweel St, Jukskei Park, Randburg, 2153",
+        "phone": "011 658 1083",
+        "email": "office@riverglades.org",
+        "website": "riverglades.org",
+        "facebook": "https://www.facebook.com/rivergladesestate",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-26.0293800265143, 27.984094626818763",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "Riversands",
+      "excel_name": "Riversands",
+      "data": {
+        "name": "Riversands",
+        "address": "Rose Road, Knopjeslaagte, Midrand, 2189, South Africa, Midrand, South Africa",
+        "phone": "083 663 5115",
+        "email": "events@riversands.co.za",
+        "website": "riversandsfarm.co.za",
+        "facebook": "https://www.facebook.com/riversandsfarmvillage",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-25.96155890881414, 28.02789297823292",
+        "description": "-25.960734441009077, 28.029953972465172"
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "Riverstone Mall, Meyerton",
+      "excel_name": "Riverstone Mall, Meyerton",
+      "data": {
+        "name": "Riverstone Mall, Meyerton",
+        "address": "Shop 49, Riverstone Mall, Pierneef Blvd, Meyerton, 1837",
+        "phone": "",
+        "email": "",
+        "website": "",
+        "facebook": "",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-26.5807420705736, 28.015295564827625",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "Rose Tulee",
+      "excel_name": "Rosetulee",
+      "data": {
+        "name": "Rosetulee",
+        "address": "189 Dirk Van Der Hoff St, Rand Collieries SH, Brakpan, 1549",
+        "phone": "084 600 7000",
+        "email": "",
+        "website": "rosetulee.co.za",
+        "facebook": "",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-26.253216863343674, 28.35100900213351",
+        "description": ""
+      },
+      "match_type": "fuzzy",
+      "score": 0.9473684210526315
+    },
+    {
+      "folder": "Rumours Lounge",
+      "excel_name": "Rumours Lounge",
+      "data": {
+        "name": "Rumours Lounge",
+        "address": "Cnr CR Swart and Tungsten, Randburg, South Africa",
+        "phone": "079 825 7995",
+        "email": "rumoursrockcity1@gmail.com",
+        "website": "rumoursrockcity.co.za",
+        "facebook": "https://www.facebook.com/rumoursloungerv2",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-26.07959833806861, 27.974699658562557",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "Rustic Barrel",
+      "excel_name": "Rustic Barrel",
+      "data": {
+        "name": "Rustic Barrel",
+        "address": "56b Plantation Rd, Eastleigh, Johannesburg, 1609",
+        "phone": "078 230 2260",
+        "email": "",
+        "website": "https://www.rusticbarrel.co.za/",
+        "facebook": "https://www.facebook.com/profile.php?id=61556839512624",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-26.129057833076402, 28.15263296867972",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "Rustique Boutique Hotel",
+      "excel_name": "Rustique Boutique Hotel",
+      "data": {
+        "name": "Rustique Boutique Hotel",
+        "address": "Riverside Estate, R104 (Old Belfast Rd), Middelburg, South Africa",
+        "phone": "013 813 1451",
+        "email": "admin@rustique.co.za",
+        "website": "rustiqueboutiquehotel.co.za",
+        "facebook": "https://www.facebook.com/rustiqueboutiquehotel",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-25.762614008085283, 29.515262900194173",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "Rusty Hook",
+      "excel_name": "Rusty Hook",
+      "data": {
+        "name": "Rusty Hook",
+        "address": "22 Wilge St, Honeydew, South Africa",
+        "phone": "011 795 3645",
+        "email": "",
+        "website": "",
+        "facebook": "https://www.facebook.com/pages/Rusty-Hook-Country-Pub/486728291532510",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-26.080278134768392, 27.904852023023093",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "Rusty Monkey Pub & Grill ",
+      "excel_name": "Rusty Monkey Pub &amp; Grill",
+      "data": {
+        "name": "Rusty Monkey Pub &amp; Grill",
+        "address": "402 Theuns Van Niekerk Street, Wierda Park Shopping Centre, Centurion, South Africa",
+        "phone": "072 828 3934",
+        "email": "rustymonkeysa001@gmail.com",
+        "website": "rustymonkey.co.za",
+        "facebook": "https://www.facebook.com/profile.php?id=100088620903168",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-25.869752191491134, 28.15140970290281",
+        "description": ""
+      },
+      "match_type": "fuzzy",
+      "score": 0.9230769230769231
+    },
+    {
+      "folder": "Salsa Mexican Grill, Menlyn Maine",
+      "excel_name": "Salsa Mexican Grill, Menlyn Maine",
+      "data": {
+        "name": "Salsa Mexican Grill, Menlyn Maine",
+        "address": "Extension 2, and, Menlyn Maine Central Square, Shop G54 Corner Corobay, Aramist Ave, Waterkloof Glen, Pretoria, 0181",
+        "phone": "012 682 0161",
+        "email": "",
+        "website": "salsamexicangrill.co.za",
+        "facebook": "https://www.facebook.com/SalsaMexicanGrillMenlynMaine",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-25.7858615138278, 28.281087794479106",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "Sanctuary Mandela ",
+      "excel_name": "Sanctuary Mandela",
+      "data": {
+        "name": "Sanctuary Mandela",
+        "address": "4 13th Ave, Houghton",
+        "phone": "",
+        "email": "",
+        "website": "",
+        "facebook": "",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-26.153327331945782, 28.060418101335006",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "Santis Bar & Grill, Sunninghill",
+      "excel_name": "Santis Bar &amp; Grill, Sunninghill",
+      "data": {
+        "name": "Santis Bar &amp; Grill, Sunninghill",
+        "address": "The Square, Shop No. 1, Cnr Naivasha &amp; Leeuwkop Rd, Sunninghill, Sandton, 2157",
+        "phone": "011 234 0351",
+        "email": "",
+        "website": "http://www.santis.co.za/index.php",
+        "facebook": "https://www.facebook.com/santis.bar",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-26.03230517565941, 28.063129923283608",
+        "description": ""
+      },
+      "match_type": "fuzzy",
+      "score": 0.9393939393939394
+    },
+    {
+      "folder": "Shay_s Place",
+      "excel_name": "Shay's Place",
+      "data": {
+        "name": "Shay's Place",
+        "address": "Cnr Tulip &amp; Lochner Street, Mnandi, Centurion, South Africa",
+        "phone": "074 583 1910",
+        "email": "shaysvenue@gmail.com",
+        "website": "shaysevents.co.za",
+        "facebook": "https://www.facebook.com/shaysvenue",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-25.88517861141552, 28.07535276464276",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "Sheena_s Pub",
+      "excel_name": "Sheena's Pub",
+      "data": {
+        "name": "Sheena's Pub",
+        "address": "4299 Knoppiesdoring Street, Randpark Ridge, Johannesburg, South Africa",
+        "phone": "084 519 6750",
+        "email": "sheena.ann.hall@gmail.com",
+        "website": "",
+        "facebook": "https://www.facebook.com/SheenasPub",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-26.092501805222835, 27.93842530842705",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "Shovels Pub and Grill",
+      "excel_name": "Shovels Pub and Grill",
+      "data": {
+        "name": "Shovels Pub and Grill",
+        "address": "762 Wapadrand Rd, Wapadrand, Pretoria, 0050",
+        "phone": "012 807 2319",
+        "email": "shovelspub@mweb.co.za",
+        "website": "",
+        "facebook": "https://web.facebook.com/ShovelsPubAndGrill",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-25.77537007406065, 28.33693689994464",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "Silverado Pub & Grill, Boksburg",
+      "excel_name": "Silverado Pub &amp; Grill, Boksburg",
+      "data": {
+        "name": "Silverado Pub &amp; Grill, Boksburg",
+        "address": "Cnr Gibb Rd &amp;, N Rand Rd, Hughes, Johannesburg, 1462",
+        "phone": "011 826 1988",
+        "email": "silverado@presleys.co.za",
+        "website": "",
+        "facebook": "",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-26.178879090576263, 28.23171486918655",
+        "description": ""
+      },
+      "match_type": "fuzzy",
+      "score": 0.9393939393939394
+    },
+    {
+      "folder": "Silverlakes Farm Hotel",
+      "excel_name": "Silverlakes Farm Hotel",
+      "data": {
+        "name": "Silverlakes Farm Hotel",
+        "address": "9, 11 Farm Inn Rd",
+        "phone": "064 852 6512",
+        "email": "info@silverlakesfarmhotel.com",
+        "website": "silverlakesfarmhotel.com",
+        "facebook": "https://www.facebook.com/silverlakeshotel",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-25.78346874031534, 28.37106181105371",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "Silverstar Tsogo Sun",
+      "excel_name": "Silverstar Tsogo Sun",
+      "data": {
+        "name": "Silverstar Tsogo Sun",
+        "address": "R28, Muldersdrift, 1768",
+        "phone": "011 662 7300",
+        "email": "",
+        "website": "https://www.silverstar.co.za/",
+        "facebook": "https://www.facebook.com/search/top?q=silverstar%20casino",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-26.067144819459028, 27.82892535417447",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "Smoking Kills Bar",
+      "excel_name": "Smoking Kills Bar",
+      "data": {
+        "name": "Smoking Kills Bar",
+        "address": "78a Avenue, 4th Ave, Melville, Johannesburg, 2092",
+        "phone": "081 722 5725",
+        "email": "",
+        "website": "",
+        "facebook": "https://www.facebook.com/smokingkillsbar",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-26.175511337966473, 28.009202803838416",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "Social On Main",
+      "excel_name": "Social On Main",
+      "data": {
+        "name": "Social On Main",
+        "address": "Bryanston",
+        "phone": "",
+        "email": "",
+        "website": "",
+        "facebook": "",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-26.0524507949003, 28.023851243289542",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "Sognage",
+      "excel_name": "Sognage",
+      "data": {
+        "name": "Sognage",
+        "address": "304 Tungsten Rd, Strydompark, Johannesburg, South Africa",
+        "phone": "",
+        "email": "",
+        "website": "",
+        "facebook": "",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-26.0785755328668, 27.973882125251993",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "Sowaar Bar",
+      "excel_name": "Sowaar Bar",
+      "data": {
+        "name": "Sowaar Bar",
+        "address": "Shop 1, Atterbury Boulevard Center, Atterbury Road, Pretoria, South Africa, 0043",
+        "phone": "063 743 0151",
+        "email": "",
+        "website": "",
+        "facebook": "",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-25.783162056432506, 28.301030575130618",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "Sowaar Bar, East Rand",
+      "excel_name": "Sowaar Bar, East Rand",
+      "data": {
+        "name": "Sowaar Bar, East Rand",
+        "address": "81 Pomona Road, Pomona AH, Kempton Park, South Africa",
+        "phone": "082 309 6096",
+        "email": "oosrand@sowaarbar.co.za",
+        "website": "",
+        "facebook": "",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-26.086410859658105, 28.280386819641805",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "St Stithians College",
+      "excel_name": "St Stithians College",
+      "data": {
+        "name": "St Stithians College",
+        "address": "40 Peter Place, Lyme Park, Sandton, 2060",
+        "phone": "011 577 6100",
+        "email": "marketing@stithian.com",
+        "website": "https://www.stithian.com/",
+        "facebook": "https://www.facebook.com/search/top?q=st%20stithians%20college",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-26.08211430148132, 28.019017579219",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "Streatery Lifestyle, Beyers Naude",
+      "excel_name": "Streatery Lifestyle, Beyers Naude",
+      "data": {
+        "name": "Streatery Lifestyle, Beyers Naude",
+        "address": "Lifestyle Home &amp; Garden Centre,Corner Ysterhout Dr &amp;, Beyers Naud\u00e9 Dr, Johannesburg, South Africa",
+        "phone": "010 110 7688",
+        "email": "customercare@streatery.co.za",
+        "website": "streatery.co.za",
+        "facebook": "https://www.facebook.com/StreateryLifestyle",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-26.095482626183042, 27.943225363667292",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "Streatery Lifestyle, Waterfall",
+      "excel_name": "Streatery Lifestyle, Waterfall",
+      "data": {
+        "name": "Streatery Lifestyle, Waterfall",
+        "address": "Streatery, Waterfall Ridge Centre, Pretorius Rd, Vorna Valley, Midrand, 1685",
+        "phone": "010 443 8950",
+        "email": "",
+        "website": "streatery.co.za",
+        "facebook": "",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-26.009527025878956, 28.108459340072883",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "Strydfontein Pub & Grill",
+      "excel_name": "Strydfontein Pub &amp; Grill",
+      "data": {
+        "name": "Strydfontein Pub &amp; Grill",
+        "address": "613 President St, Pretoria North, Pretoria, 0182",
+        "phone": "012 546 4523",
+        "email": "strydfonteinpta@gmail.com",
+        "website": "strydfonteinpub.business.site",
+        "facebook": "https://www.facebook.com/StrydfonteinPubandGrill",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-25.658772444977203, 28.193568949259415",
+        "description": ""
+      },
+      "match_type": "fuzzy",
+      "score": 0.9230769230769231
+    },
+    {
+      "folder": "Sunbet Arena Times Square (PTA)",
+      "excel_name": "Sunbet Arena Times Square (PTA)",
+      "data": {
+        "name": "Sunbet Arena Times Square (PTA)",
+        "address": "209 Aramist Ave, Waterkloof Glen, Pretoria, 0010",
+        "phone": "",
+        "email": "",
+        "website": "http://www.suninternational.com/time-square",
+        "facebook": "",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-25.78837624969162, 28.281966137083007",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "Sundowner, Alberton",
+      "excel_name": "Sundowner, Alberton",
+      "data": {
+        "name": "Sundowner, Alberton",
+        "address": "26 325765, 28.066302, Alberton, 1447",
+        "phone": "084 706 2494",
+        "email": "",
+        "website": "http://www.sundownerspub.co.za/",
+        "facebook": "https://www.facebook.com/Sundowners.Pub",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-26.32622962387414, 28.06561587935703",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "Sunset Mountain Bistro",
+      "excel_name": "Sunset Mountain Bistro",
+      "data": {
+        "name": "Sunset Mountain Bistro",
+        "address": "206 Sunset Drive Muldersdrift Krugersdorp, Johannesburg, South Africa",
+        "phone": "082 819 3988",
+        "email": "",
+        "website": "",
+        "facebook": "https://www.facebook.com/sunsetmountainbistro",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-26.006360740552484, 27.87495131977697",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "Swagga Breweries, Meyerton",
+      "excel_name": "Swagga Breweries, Meyerton",
+      "data": {
+        "name": "Swagga Breweries, Meyerton",
+        "address": "42 Bosbok Rd, Highbury, Meyerton, 1961",
+        "phone": "010 109 0388",
+        "email": "marketing@swaggabrewery.co.za",
+        "website": "",
+        "facebook": "https://www.facebook.com/swaggabreweries",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-26.515499828576942, 28.04062150889156",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "Syringa Park, Avianto Estate",
+      "excel_name": "Syringa Park, Avianto Estate",
+      "data": {
+        "name": "Syringa Park, Avianto Estate",
+        "address": "Portion 61, Driefontein Farm, Driefontein Rd, Muldersdrift, 1747",
+        "phone": "076 059 5212",
+        "email": "info@syringapark.co.za",
+        "website": "https://www.syringapark.co.za/",
+        "facebook": "https://www.facebook.com/syringapark",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-26.017272894006616, 27.835294043573455",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "Taste of Tennessee",
+      "excel_name": "Taste of Tennessee",
+      "data": {
+        "name": "Taste of Tennessee",
+        "address": "Cnr Akkerboom and John Voster, Retail 6 Centurion Gate, John Vorster Dr, Zwartkop, Centurion, 0051",
+        "phone": "060 783 0051",
+        "email": "info@tasteoftennessee.co.za",
+        "website": "tasteoftennessee.co.za",
+        "facebook": "https://www.facebook.com/TasteofTennesseeSA",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-25.865937984166965, 28.19057845141178",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "Texan Wing Bar Pretoria East",
+      "excel_name": "Texan Wing Bar Pretoria East",
+      "data": {
+        "name": "Texan Wing Bar Pretoria East",
+        "address": "Willows Crossing, Rossouw St, Die Wilgers, Pretoria, 0184",
+        "phone": "012 943 3686",
+        "email": "pretoriaeast@texanwingbar.com",
+        "website": "texanwingbar.com",
+        "facebook": "https://www.facebook.com/TexanWingBarPretoriaEast",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-25.758290911699135, 28.321761816407378",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "The Barnyard Theatre Emperors Palace",
+      "excel_name": "The Barnyard Theatre Emperors Palace",
+      "data": {
+        "name": "The Barnyard Theatre Emperors Palace",
+        "address": "Emperors Palace, 64 Jones Rd, Boksburg, Kempton Park, 1627",
+        "phone": "011 928 1108",
+        "email": "",
+        "website": "http://www.barnyardtheatres.co.za/",
+        "facebook": "",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-26.145455943285885, 28.221789514850364",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "The Barnyard Theatre Menlyn",
+      "excel_name": "The Barnyard Theatre Menlyn",
+      "data": {
+        "name": "The Barnyard Theatre Menlyn",
+        "address": "Menlyn Park, Menlyn Park Shopping Centre, Atterbury Rd &amp;, Lois Ave, Pretoria, 0063",
+        "phone": "012 880 2727",
+        "email": "",
+        "website": "http://www.barnyardtheatre.co.za/menlyn",
+        "facebook": "",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-25.782620056999402, 28.275904281195004",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "The Barnyard Theatre, Silverstar",
+      "excel_name": "The Barnyard Theatre, Silverstar",
+      "data": {
+        "name": "The Barnyard Theatre, Silverstar",
+        "address": "R28, Muldersdrift, Krugersdorp, South Africa",
+        "phone": "010 593 0744",
+        "email": "silverstar@barnyardtheatres.co.za",
+        "website": "barnyardtheatre.co.za",
+        "facebook": "https://www.facebook.com/SilverstarBarnyard",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-26.068429441964884, 27.828724831949064",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "The Barnyard, Vereeniging",
+      "excel_name": "The Barnyard, Vereeniging",
+      "data": {
+        "name": "The Barnyard, Vereeniging",
+        "address": "Cnr General Hertzog and Club Street, Peacehaven, Three Rivers, South Africa",
+        "phone": "016 454 8388",
+        "email": "bookings@barnyardvereeniging.co.za",
+        "website": "barnyardvereeniging.co.za",
+        "facebook": "https://www.facebook.com/BarnyardVereeniging",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-26.656410738454095, 27.956172198120505",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "The Beach, KOMMANDONEK Resort, Harties",
+      "excel_name": "The Beach, KOMMANDONEK Resort, Harties",
+      "data": {
+        "name": "The Beach, KOMMANDONEK Resort, Harties",
+        "address": "Simon Bekker Ave, Hartbeespoort, 0216",
+        "phone": "084 027 3584",
+        "email": "",
+        "website": "",
+        "facebook": "",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-25.746019797722504, 27.82515617923686",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "The Birmingham ",
+      "excel_name": "The Birmingham",
+      "data": {
+        "name": "The Birmingham",
+        "address": "13 4th Ave, Parkhurst, Randburg, 2193",
+        "phone": "076 502 6192",
+        "email": "",
+        "website": "",
+        "facebook": "https://www.facebook.com/share/1ANvCPWU5j/",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-26.141678404784923, 28.018065275253523",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "The Boma Cafe",
+      "excel_name": "The Boma Cafe",
+      "data": {
+        "name": "The Boma Cafe",
+        "address": "127b Wroxham Rd, Paulshof, Sandton, 2191",
+        "phone": "071 592 1190",
+        "email": "",
+        "website": "https://www.thebomacafe.co.za/",
+        "facebook": "https://www.facebook.com/profile.php?id=61552775920918",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-26.02801262083062, 28.03642606864",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "The Brazen Head, Edenvale",
+      "excel_name": "The Brazen Head, Edenvale",
+      "data": {
+        "name": "The Brazen Head, Edenvale",
+        "address": "Terraces Shopping Centre, Terrace Road, Eden Glen, Johannesburg, 1610",
+        "phone": "011 609 0273",
+        "email": "",
+        "website": "https://www.dining-out.co.za/md/The-Brazen-Head-Restaurant-Edenvale/3027",
+        "facebook": "https://www.facebook.com/edenvalebrazenhead",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-26.126047593819173, 28.165760927378198",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "The Club Como",
+      "excel_name": "The Club Como",
+      "data": {
+        "name": "The Club Como",
+        "address": "Shop U47, Corner Rivonia &amp;, Morningside Shopping Centre, Outspan Rd, Morningside, Sandton, 2057",
+        "phone": "",
+        "email": "",
+        "website": "https://clubcomo.co.za/",
+        "facebook": "",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-26.082406944606745, 28.05990179985836",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "The Cock & Bull, Harties",
+      "excel_name": "The Cock &amp; Bull, Harties",
+      "data": {
+        "name": "The Cock &amp; Bull, Harties",
+        "address": "Brits, 2780",
+        "phone": "",
+        "email": "",
+        "website": "",
+        "facebook": "",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-25.716628570392917, 27.78911505283985",
+        "description": ""
+      },
+      "match_type": "fuzzy",
+      "score": 0.9230769230769231
+    },
+    {
+      "folder": "The Dance Palace Restaurant - Studio 334",
+      "excel_name": "The Dance Palace Restaurant - Studio 334",
+      "data": {
+        "name": "The Dance Palace Restaurant - Studio 334",
+        "address": "334 Ontdekkers Rd, Discovery, Johannesburg, 1714",
+        "phone": "082 669 8520",
+        "email": "info@thedancepalace.co.za",
+        "website": "",
+        "facebook": "https://www.facebook.com/profile.php?id=61572180458522",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-26.147745284908076, 27.894081044164693",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "The Fat Ginger Gastrobar",
+      "excel_name": "The Fat Ginger Gastrobar",
+      "data": {
+        "name": "The Fat Ginger Gastrobar",
+        "address": "110 Linksfield Rd, Johannesburg, South Africa",
+        "phone": "066 251 9412",
+        "email": "info@thefatginger.co.za",
+        "website": "thefatginger.co.za",
+        "facebook": "https://www.facebook.com/thefatgingerZA",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-26.148027111048684, 28.129278785596842",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "The Filly, Rivonia",
+      "excel_name": "The Filly, Rivonia",
+      "data": {
+        "name": "The Filly, Rivonia",
+        "address": "Omlee Office Park, Tambach Rd, Sunninghill, Johannesburg, 2128",
+        "phone": "011 807 5589",
+        "email": "info@thefilly.co.za",
+        "website": "",
+        "facebook": "https://www.facebook.com/thefillypubandgrill",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-26.03476180165119, 28.061171894681777",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "The Gardens Cafe Bistro",
+      "excel_name": "The Gardens Cafe Bistro",
+      "data": {
+        "name": "The Gardens Cafe Bistro",
+        "address": "Winnie Mandela Drive, Pieter Wenning Road Johannesburg, Fourways, Sandton, 2191",
+        "phone": "",
+        "email": "",
+        "website": "",
+        "facebook": "",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-26.000680719950687, 28.00962951249978",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "The Garrison Pub at Lady Luck",
+      "excel_name": "The Garrison Pub at Lady Luck",
+      "data": {
+        "name": "The Garrison Pub at Lady Luck",
+        "address": "Cnr Main, 145 Main Reef Rd, Turf Rd, Anderbolt, Boksburg, 1459",
+        "phone": "069 214 8530",
+        "email": "thegarrisonpubsprings@gmail.com",
+        "website": "",
+        "facebook": "https://www.facebook.com/TheOldLadyLuckSprings",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-26.209220837229083, 28.26985498874943",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "The German Club, Edenvale",
+      "excel_name": "The German Club, Edenvale",
+      "data": {
+        "name": "The German Club, Edenvale",
+        "address": "8 Plantation Rd, Eastleigh, Edenvale, 1609",
+        "phone": "081 640 7298",
+        "email": "",
+        "website": "",
+        "facebook": "",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-26.1343412961772, 28.160184840827796",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "The German Restaurant & Pub",
+      "excel_name": "The German Restaurant &amp; Pub",
+      "data": {
+        "name": "The German Restaurant &amp; Pub",
+        "address": "212 3rd St, Fourways, Chartwell, 2055",
+        "phone": "011 511 8181",
+        "email": "",
+        "website": "",
+        "facebook": "",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-25.9947980820186, 27.98130268790097",
+        "description": ""
+      },
+      "match_type": "fuzzy",
+      "score": 0.9310344827586207
+    },
+    {
+      "folder": "The Goat and Co, Hazelwood, Pretoria",
+      "excel_name": "The Goat and Co, Hazelwood, Pretoria",
+      "data": {
+        "name": "The Goat and Co, Hazelwood, Pretoria",
+        "address": "16th St, Hazelwood, Pretoria, 0081",
+        "phone": "082 434 0141",
+        "email": "",
+        "website": "",
+        "facebook": "",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-25.775752879506932, 28.256313624093067",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "The Goat, Parkhurst",
+      "excel_name": "The Goat, Parkhurst",
+      "data": {
+        "name": "The Goat, Parkhurst",
+        "address": "38 4th Ave, Parkhurst, Johannesburg, 2193",
+        "phone": "081 862 5865",
+        "email": "",
+        "website": "http://www.goatandco.co.za/",
+        "facebook": "",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-26.13756731340259, 28.018364777288397",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "The Green Carft Bar, Benoni",
+      "excel_name": "The Green Carft Bar, Benoni",
+      "data": {
+        "name": "The Green Carft Bar, Benoni",
+        "address": "Benoni Country Club, 49 Morris Ave, Benoni, South Africa",
+        "phone": "083 608 0763",
+        "email": "",
+        "website": "http://www.thegreen.co.za/",
+        "facebook": "",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-26.168798425539183, 28.352172808581678",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "The Greenhouse Sandton",
+      "excel_name": "The Greenhouse Sandton",
+      "data": {
+        "name": "The Greenhouse Sandton",
+        "address": "6 Gwen Lane &amp;, Fredman Dr, Sandown, Johannesburg, 2031",
+        "phone": "079 179 7362",
+        "email": "reservations@greenhousejhb.co.za",
+        "website": "greenhousejhb.co.za",
+        "facebook": "https://www.facebook.com/thegreenhousejhb",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-26.101949369348183, 28.058121365613573",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "The Hangout at The Troyeville Hotel",
+      "excel_name": "The Hangout at The Troyeville Hotel",
+      "data": {
+        "name": "The Hangout at The Troyeville Hotel",
+        "address": "1403 Albertina Sisulu Road, Johannesburg, South Africa",
+        "phone": "079 612 0125",
+        "email": "events@thetroyeville.co.za",
+        "website": "thetroyeville.co.za",
+        "facebook": "https://www.facebook.com/TheTroyeville",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-26.198661832254892, 28.066611665496215",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "The Irish  Club Johannesburg",
+      "excel_name": "The Irish  Club Johannesburg",
+      "data": {
+        "name": "The Irish  Club Johannesburg",
+        "address": "Cnr 5th Ave &amp; Salerno road, Linden, Johannesburg, South Africa",
+        "phone": "011 888 0420",
+        "email": "",
+        "website": "theIrishclub.co.za",
+        "facebook": "https://www.facebook.com/profile.php?id=100057652569534&amp;_rdc=1&amp;_rdr",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-26.138833305839047, 27.985043263190228",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "The Italian Club - Gauteng",
+      "excel_name": "The Italian Club - Gauteng",
+      "data": {
+        "name": "The Italian Club - Gauteng",
+        "address": "7 Marais Road, Bedfordview, Germiston",
+        "phone": "011 453 0587",
+        "email": "marketing@icjhb.co.za",
+        "website": "italianclubjhb.co.za",
+        "facebook": "https://www.facebook.com/Italian.Club.Jhb",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-26.163548419978877, 28.14314444259719",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "The Krook & King Pub & Restaurant",
+      "excel_name": "The Krook &amp; King Pub &amp; Restaurant",
+      "data": {
+        "name": "The Krook &amp; King Pub &amp; Restaurant",
+        "address": "Beyers Naud\u00e9 Dr, Muldersdrift, 1747",
+        "phone": "082 570 7336",
+        "email": "",
+        "website": "http://www.thewedgeoutdoorpark.co.za/",
+        "facebook": "https://www.facebook.com/profile.php?id=61575584803831",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-26.03952986901351, 27.880373883639912",
+        "description": ""
+      },
+      "match_type": "fuzzy",
+      "score": 0.8918918918918919
+    },
+    {
+      "folder": "The Lapa",
+      "excel_name": "The Lapa",
+      "data": {
+        "name": "The Lapa",
+        "address": "Gardens, Shop 14, Upstairs, Fourways Gardens Shopping Centre, Uranium St, Fourways, Sandton, 2196",
+        "phone": "010 496 4509",
+        "email": "",
+        "website": "https://thelapa.co.za/",
+        "facebook": "https://www.facebook.com/Lapapubfourways",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-26.004200777424202, 28.014596727284413",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "The Local Bar and Kitchen, Kyalami",
+      "excel_name": "The Local Bar and Kitchen, Kyalami",
+      "data": {
+        "name": "The Local Bar and Kitchen, Kyalami",
+        "address": "R55 Main Road, Kyalami, South Africa",
+        "phone": "071 894 9069",
+        "email": "info@the-local.co.za",
+        "website": "the-local.co.za",
+        "facebook": "https://www.facebook.com/thelocalbarandkitchen",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-25.966884951938148, 28.079469051994142",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "The Local Kitchen, Magaliessig",
+      "excel_name": "The Local Kitchen, Magaliessig",
+      "data": {
+        "name": "The Local Kitchen, Magaliessig",
+        "address": "33 Troupant Avenue, Magaliessig, Sandton, 2067",
+        "phone": "011 463 3847",
+        "email": "orders@thelocalkitchenco.co.za",
+        "website": "http://www.thelocalkitchenco.co.za/",
+        "facebook": "https://www.facebook.com/TheLocalKitchenCo",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-26.035501996144763, 28.022182874837092",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "The Music Box",
+      "excel_name": "The Music Box",
+      "data": {
+        "name": "The Music Box",
+        "address": "191 Frances Street, Observatory, 2198, Joburg",
+        "phone": "082 478 9555",
+        "email": "info@themusicbox.co.za",
+        "website": "themusicbox.co.za",
+        "facebook": "https://www.facebook.com/TheMusicBoxZA",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-26.179395243881554, 28.07687853998564",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "The Music Kitchen",
+      "excel_name": "The Music Kitchen",
+      "data": {
+        "name": "The Music Kitchen",
+        "address": "69 Mangold Street, Newton Park, Port Elizabeth, South Africa",
+        "phone": "066 212 5549",
+        "email": "ian.mitch1977@gmail.com",
+        "website": "musickitchen.co.za",
+        "facebook": "https://www.facebook.com/TheMusicKitchen",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-33.94390772328327, 25.56234091476423",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "The Orbitt Jazz Club and Bistro",
+      "excel_name": "The Orbitt Jazz Club and Bistro",
+      "data": {
+        "name": "The Orbitt Jazz Club and Bistro",
+        "address": "Braamfontein",
+        "phone": "",
+        "email": "",
+        "website": "",
+        "facebook": "",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-26.143666386809343, 28.034849295973604",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "The Piazzo  Montecasino",
+      "excel_name": "The Piazzo  Montecasino",
+      "data": {
+        "name": "The Piazzo  Montecasino",
+        "address": "Montecasino, Montecasino Blvd 2191 Sandton, South Africa",
+        "phone": "",
+        "email": "",
+        "website": "https://www.tsogosun.com/hotel/the-piazza-hotel/dining/piazza-hotel-restaurant/?utm_source=google&amp;utm_medium=businesslisting&amp;utm_campaign=rstrnt_the-piazza-restaurant",
+        "facebook": "",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-26.023830299504063, 28.014934439711055",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "The Radium Beer Hall",
+      "excel_name": "The Radium Beer Hall",
+      "data": {
+        "name": "The Radium Beer Hall",
+        "address": "Corner Louis Botha Ave and 9th Street, Johannesburg, South Africa",
+        "phone": "066 599 9007",
+        "email": "Radiumbeerhall1929@gmail.com",
+        "website": "theradium.co.za",
+        "facebook": "https://www.facebook.com/radiumbeerhall",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-26.162478462004156, 28.08481643847634",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "The Royal Elephant Hotel & Conference Centre",
+      "excel_name": "The Royal Elephant Hotel &amp; Conference Centre",
+      "data": {
+        "name": "The Royal Elephant Hotel &amp; Conference Centre",
+        "address": "Cnr Willem Botha &amp;, Wierda Rd, Eldoraigne, Centurion, Gauteng, 0157",
+        "phone": "012 658 8000",
+        "email": "",
+        "website": "http://www.royalelephant.co.za/",
+        "facebook": "",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-25.831850641481566, 28.137615750514602",
+        "description": ""
+      },
+      "match_type": "fuzzy",
+      "score": 0.9565217391304348
+    },
+    {
+      "folder": "The Secret Garden, Fourways",
+      "excel_name": "The Secret Garden, Fourways",
+      "data": {
+        "name": "The Secret Garden, Fourways",
+        "address": "Manor Recreation Centre, 16B Penguin Drive, Norscot, Fourways, Sandton, 2055",
+        "phone": "010 880 8604",
+        "email": "",
+        "website": "https://www.thesecretteagarden.co.za/",
+        "facebook": "https://www.facebook.com/norscotsecretteagarden",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-26.035435549692707, 28.00800242767518",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "The Silver Fox Pub & Grill",
+      "excel_name": "The Silver Fox Pub &amp; Grill",
+      "data": {
+        "name": "The Silver Fox Pub &amp; Grill",
+        "address": "6 Pine Rd, Overbaakens, Gqeberha, 6065",
+        "phone": "067 878 3063",
+        "email": "",
+        "website": "",
+        "facebook": "https://www.facebook.com/thesilverfoxgq",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-33.97170257442753, 25.561170102111873",
+        "description": ""
+      },
+      "match_type": "fuzzy",
+      "score": 0.9285714285714286
+    },
+    {
+      "folder": "The Social Grill, Pretoria ",
+      "excel_name": "The Social Grill, Pretoria",
+      "data": {
+        "name": "The Social Grill, Pretoria",
+        "address": "5 Boendoe ave, Pretoria, South Africa",
+        "phone": "063 732 1058",
+        "email": "bookings@socialgrill.co.za",
+        "website": "http://www.socialgrill.co.za/",
+        "facebook": "https://www.facebook.com/thesocialgrillpta",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-25.827570800547164, 28.319587556655474",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "The Sundowner bar & Eatery",
+      "excel_name": "The Sundowner bar &amp; Eatery",
+      "data": {
+        "name": "The Sundowner bar &amp; Eatery",
+        "address": "12 Sundowner Plaza, 1 Apollo Rd, Sundowner, Randburg, 2188",
+        "phone": "011 794 1770",
+        "email": "",
+        "website": "http://www.thesundowner.co.za/",
+        "facebook": "https://www.facebook.com/pages/The%20Sundowner%20Bar%20&amp;%20Restaurant/244578362288679/",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-26.073207481857352, 27.939928019990887",
+        "description": ""
+      },
+      "match_type": "fuzzy",
+      "score": 0.9285714285714286
+    },
+    {
+      "folder": "The Tee Bar (Glendower Golf Club)",
+      "excel_name": "The Tee Bar (Glendower Golf Club)",
+      "data": {
+        "name": "The Tee Bar (Glendower Golf Club)",
+        "address": "",
+        "phone": "",
+        "email": "",
+        "website": "",
+        "facebook": "",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-26.159509309969177, 28.1421949624045",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "The Venue, Melrose Arch",
+      "excel_name": "The Venue, Melrose Arch",
+      "data": {
+        "name": "The Venue, Melrose Arch",
+        "address": "17 The High St, Melrose, Johannesburg, 2019",
+        "phone": "",
+        "email": "",
+        "website": "",
+        "facebook": "",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-26.133119766564313, 28.06797998953536",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "The View Rooftop Bar, Hazelwood, Pretoria",
+      "excel_name": "The View Rooftop Bar, Hazelwood, Pretoria",
+      "data": {
+        "name": "The View Rooftop Bar, Hazelwood, Pretoria",
+        "address": "Rooftop, 17 Dely Rd, Hazelwood, Pretoria, 0081",
+        "phone": "072 304 4617",
+        "email": "",
+        "website": "",
+        "facebook": "",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-25.775051726990732, 28.273552203339218",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "Theatre In The Park ",
+      "excel_name": "Theatre In The Park",
+      "data": {
+        "name": "Theatre In The Park",
+        "address": "Delta Park, Johannesburg, South Africa",
+        "phone": "",
+        "email": "hello@theatreinthepark.co.za",
+        "website": "theatreinthepark.co.za",
+        "facebook": "",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-26.12489322165291, 28.009699909239735",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "Thirsty Fox ",
+      "excel_name": "Thirsty Fox",
+      "data": {
+        "name": "Thirsty Fox",
+        "address": "2134 Hendrik Verwoerd Dr, Hennopspark, Centurion, 0172",
+        "phone": "081 879 4596",
+        "email": "thirstyfoxsportsbar@gmail.com",
+        "website": "",
+        "facebook": "",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-25.86250732468484, 28.16829847614844",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "Throbbing Strawberry",
+      "excel_name": "Throbbing Strawberry",
+      "data": {
+        "name": "Throbbing Strawberry",
+        "address": "Shop 1, Douglasdale Village Shopping Centre, cnr Leslie &amp; Douglas Drive, Johannesburg, South Africa",
+        "phone": "27 67 425 017",
+        "email": "strawb@throbb.co.za",
+        "website": "http://throbb.co.za/",
+        "facebook": "https://www.facebook.com/ThrobbingStrawberry",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-26.040129861003226, 27.99304438136612",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "Thunder Gun",
+      "excel_name": "Thunder Gun",
+      "data": {
+        "name": "Thunder Gun",
+        "address": "281 Beyers Naude Drive &amp; Lewisham Rd, Blackheath, Randburg, 2195",
+        "phone": "011 678 7224",
+        "email": "info@thundergun.co.za",
+        "website": "http://www.thundergun.co.za/",
+        "facebook": "https://www.facebook.com/thundergunsteakhouse",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-26.13574184459722, 27.97524825993981",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "Tigersmilk Bedfordview",
+      "excel_name": "Tigersmilk Bedfordview",
+      "data": {
+        "name": "Tigersmilk Bedfordview",
+        "address": "Shop 33, Village View Shopping Centre, Bedfordview, 2007",
+        "phone": "010 745 2228",
+        "email": "",
+        "website": "https://www.tigersmilk.co.za",
+        "facebook": "",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-26.175432299210538, 28.14996474182542",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "Tigersmilk Bryanston",
+      "excel_name": "Tigersmilk Bryanston",
+      "data": {
+        "name": "Tigersmilk Bryanston",
+        "address": "The River Road, Bryanston, South Africa",
+        "phone": "010 001 1427",
+        "email": "bryanston@tigersmilk.co.za",
+        "website": "https://www.tigersmilk.co.za/location/bryanston/",
+        "facebook": "https://www.facebook.com/pages/Tigers-Milk-Bryanston/1640617772909519",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-26.059542852400178, 28.04640859231222",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "Tigersmilk Cedar",
+      "excel_name": "Tigersmilk Cedar",
+      "data": {
+        "name": "Tigersmilk Cedar",
+        "address": "Shop U3.13, Cedar Square Shopping Centre, Cedar Road, Fourways, Gauteng, 2055, South Africa",
+        "phone": "010 001 3574",
+        "email": "cedarsquare@tigersmilk.co.za",
+        "website": "https://www.tigersmilk.co.za/location/cedar-square/",
+        "facebook": "",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-26.01736096224071, 28.00065355413167",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "Tigersmilk Irene Village",
+      "excel_name": "Tigersmilk Irene Village",
+      "data": {
+        "name": "Tigersmilk Irene Village",
+        "address": "Shop 121A, Irene Village Mall, Mezereon Cres, Irene Farm Villages, Centurion, 0133",
+        "phone": "012 001 7860",
+        "email": "",
+        "website": "https://www.tigersmilk.co.za",
+        "facebook": "",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-25.857646020122363, 28.26943813344421",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "Tigersmilk Kyalami",
+      "excel_name": "Tigersmilk Kyalami",
+      "data": {
+        "name": "Tigersmilk Kyalami",
+        "address": "Shop PRIN014, Kyalami Park, Kyalami Blvd, Khayalami Park, Midrand, 1684",
+        "phone": "011 702 1000",
+        "email": "",
+        "website": "https://www.tigersmilk.co.za",
+        "facebook": "",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-25.96323906813047, 28.0853166986826",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "Tigersmilk Melrose Arch",
+      "excel_name": "Tigersmilk Melrose Arch",
+      "data": {
+        "name": "Tigersmilk Melrose Arch",
+        "address": "Melrose Arch, Shop 004H3 4 High Street, Melrose North, Johannesburg, 2196",
+        "phone": "010 035 6707",
+        "email": "",
+        "website": "https://www.tigersmilk.co.za",
+        "facebook": "",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-26.130183473265934, 28.097646426921145",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "Tigersmilk Montecasino",
+      "excel_name": "Tigersmilk Montecasino",
+      "data": {
+        "name": "Tigersmilk Montecasino",
+        "address": "Piazza Montecasino, Montecasino Blvd, Magaliessig, Sandton, 2191",
+        "phone": "010 824 8383",
+        "email": "",
+        "website": "https://www.tigersmilk.co.za",
+        "facebook": "",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-26.023620273282884, 28.014032632058882",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "Tigersmilk Silverstar",
+      "excel_name": "Tigersmilk Silverstar",
+      "data": {
+        "name": "Tigersmilk Silverstar",
+        "address": "Shop 1, Silverstar Casino, Falls Rd, Diswilmar AH, Krugersdorp, 1740",
+        "phone": "010 001 9495",
+        "email": "",
+        "website": "https://www.tigersmilk.co.za",
+        "facebook": "",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-26.06765246064056, 27.827904505932093",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "Tipsy Cow",
+      "excel_name": "Tipsy Cow",
+      "data": {
+        "name": "Tipsy Cow",
+        "address": "Koedoespoort 456-Jr, Pretoria, 0186",
+        "phone": "012 804 5054",
+        "email": "",
+        "website": "",
+        "facebook": "https://www.facebook.com/tipsycowsilvertonbar",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-25.728102977021628, 28.276550879651122",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "Toldeira",
+      "excel_name": "Toldeira",
+      "data": {
+        "name": "Toldeira",
+        "address": "Lothair, Ermelo, 2350",
+        "phone": "082 925 7251",
+        "email": "",
+        "website": "",
+        "facebook": "",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-26.36206556984492, 30.496925799280945",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "Tonninos",
+      "excel_name": "Tonninos",
+      "data": {
+        "name": "Tonninos",
+        "address": "3 Dunottar Street, Sydenham, Johannesburg, South Africa",
+        "phone": "063 618 8091",
+        "email": "toninos@mweb.co.za",
+        "website": "toninos.co.za",
+        "facebook": "https://www.facebook.com/profile.php?id=61559883121918",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-26.15599650905033, 28.086418580717908",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "Tsunami Beach Bar",
+      "excel_name": "Tsunami Beach Bar",
+      "data": {
+        "name": "Tsunami Beach Bar",
+        "address": "3 Mercury St, Farrarmere, Benoni, 1501",
+        "phone": "079 068 6414",
+        "email": "",
+        "website": "",
+        "facebook": "https://www.facebook.com/TsunamiBeachBarBenoni",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-26.149956226253522, 28.29964332024231",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "Twig & Berries Sports Bar & Grill ",
+      "excel_name": "Twig &amp; Berries Sports Bar &amp; Grill",
+      "data": {
+        "name": "Twig &amp; Berries Sports Bar &amp; Grill",
+        "address": "President Fouche Road, Olivedale",
+        "phone": "",
+        "email": "Marketing@twigandberries.co.za",
+        "website": "twigandberriesbarandgrill.my.canva.site",
+        "facebook": "https://www.facebook.com/profile.php?id=61559799667878",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-26.061191189056373, 27.970707296876974",
+        "description": ""
+      },
+      "match_type": "fuzzy",
+      "score": 0.8918918918918919
+    },
+    {
+      "folder": "Upperdeck Restaurant",
+      "excel_name": "Upperdeck Restaurant",
+      "data": {
+        "name": "Upperdeck Restaurant",
+        "address": "Old Rustenburg Road Damdoryn, Hartbeespoort, 0216",
+        "phone": "",
+        "email": "",
+        "website": "",
+        "facebook": "",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-25.72526834994411, 27.83008418537213",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "Urban Oasis",
+      "excel_name": "Urban Oasis",
+      "data": {
+        "name": "Urban Oasis",
+        "address": "277 Church Street, Cnr of Church Street and Witkoppen Road @ The Village Green in Johannesburg North",
+        "phone": "082 568 2125",
+        "email": "Mandy@oasisvibes.co.za",
+        "website": "oasisvibes.co.za",
+        "facebook": "https://www.facebook.com/urbanoasisjhb",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-26.029991705757553, 27.975058667827206",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "Vellies",
+      "excel_name": "Vellies",
+      "data": {
+        "name": "Vellies",
+        "address": "450 Myburgh St, Pretoria, South Africa",
+        "phone": "",
+        "email": "",
+        "website": "",
+        "facebook": "",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-25.72319031682166, 28.20195156427318",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "Volle Evangelie Kerk Dinamika Gemeente Centurion",
+      "excel_name": "Volle Evangelie Kerk Dinamika Gemeente Centurion",
+      "data": {
+        "name": "Volle Evangelie Kerk Dinamika Gemeente Centurion",
+        "address": "84 Station Rd, Lyttelton Manor, Pretoria, 0154",
+        "phone": "012 664 2577",
+        "email": "",
+        "website": "",
+        "facebook": "",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-25.835947630395903, 28.209628205012965",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "Voortrekker Monument ",
+      "excel_name": "Voortrekker Monument",
+      "data": {
+        "name": "Voortrekker Monument",
+        "address": "Eeufees Rd, Groenkloof 358-Jr, Pretoria, 0027",
+        "phone": "",
+        "email": "",
+        "website": "",
+        "facebook": "",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-25.77603358953757, 28.177177107212838",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "Walter Sisulu Botanical Gardens",
+      "excel_name": "Walter Sisulu Botanical Gardens",
+      "data": {
+        "name": "Walter Sisulu Botanical Gardens",
+        "address": "Malcolm Rd, Poortview, Roodepoort, 1724",
+        "phone": "086 100 1278",
+        "email": "sisulugarden@sanbi.org.za",
+        "website": "sanbi.org/gardens/walter-sisulu",
+        "facebook": "https://www.facebook.com/wsnbg",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-26.086920153723813, 27.845582654294667",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "Wanderers Golf Club",
+      "excel_name": "Wanderers Golf Club",
+      "data": {
+        "name": "Wanderers Golf Club",
+        "address": "Rudd Rd, Illovo, Johannesburg, 2116",
+        "phone": "011 447 3311",
+        "email": "",
+        "website": "http://www.wanderersgolfclub.com/",
+        "facebook": "https://www.facebook.com/pages/Wanderers%20Golf%20Club,%20Ilovo,%20Johannesburg/627764987353289/",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-26.132537989410597, 28.053014108741305",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "Wattlespring Sports Club",
+      "excel_name": "Wattlespring Sports Club",
+      "data": {
+        "name": "Wattlespring Sports Club",
+        "address": "398 JR Onbekend Bapsfontein, Bronkhorstspruit, Pretoria, South Africa",
+        "phone": "076 256 3971",
+        "email": "Info@wattlespring.co.za",
+        "website": "http://www.wattlespring.co.za/",
+        "facebook": "https://www.facebook.com/WattlespringShootingClub",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-25.95438880786396, 28.485705717934138",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "Westview Sports Club",
+      "excel_name": "Westview Sports Club",
+      "data": {
+        "name": "Westview Sports Club",
+        "address": "158 1st Ave, Glenhurd, Gqeberha, 6045",
+        "phone": "041 365 2034",
+        "email": "",
+        "website": "https://westviewbc.weebly.com/facilities.html",
+        "facebook": "https://www.facebook.com/westviewclub",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-33.95066288168207, 25.585799413452587",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "Whisk Wine Bar",
+      "excel_name": "Whisk Wine Bar",
+      "data": {
+        "name": "Whisk Wine Bar",
+        "address": "1 Cornwood ave &amp;, Nellmapius Dr, Irene, Centurion, 0147",
+        "phone": "",
+        "email": "",
+        "website": "https://whiskwinebar.com/",
+        "facebook": "",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-25.868859991908963, 28.23646665446627",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "Wild Route Caf\u00e9",
+      "excel_name": "Wild Route Caf\u00e9",
+      "data": {
+        "name": "Wild Route Caf\u00e9",
+        "address": "Plot 92 Saints St, Zwavelpoort, 0081",
+        "phone": "082 458 5370",
+        "email": "Wildroutecafe@gmail.com",
+        "website": "",
+        "facebook": "https://www.facebook.com/6onCapellaGuesthouse",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-25.824873072901298, 28.377944464420366",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "Willow Way Shopping Centre",
+      "excel_name": "Willow Way Shopping Centre",
+      "data": {
+        "name": "Willow Way Shopping Centre",
+        "address": "CNR LYNWOOD ROAD AND POWER AVENUE 0184 Pretoria,",
+        "phone": "012 472 8920",
+        "email": "shoppingcentrewillowway@gmail.com",
+        "website": "willowway.co.za",
+        "facebook": "https://www.facebook.com/Willowwayshopping",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-25.765331035981568, 28.317248628511397",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "Zaabstad, Harties",
+      "excel_name": "Zaabstad, Harties",
+      "data": {
+        "name": "Zaabstad, Harties",
+        "address": "Old Rustenburg Road, R104, Hartbeespoort, 0216",
+        "phone": "079 943 8859",
+        "email": "",
+        "website": "",
+        "facebook": "https://www.facebook.com/groups/1786495305140632/user/61565016311021/",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-25.72143190714218, 27.825078780203484",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "Zappas Murrayfield",
+      "excel_name": "Zappas Murrayfield",
+      "data": {
+        "name": "Zappas Murrayfield",
+        "address": "Rossouw Street 378, Murrayfield, Pretoria, South Africa",
+        "phone": "074 450 3670",
+        "email": "info.zappas@gmail.com",
+        "website": "zappasza.co.za",
+        "facebook": "https://www.facebook.com/ZappasBistro",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-25.755441041563405, 28.307591165507585",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "Zuider Ster Pub & Grill",
+      "excel_name": "Zuider Ster Pub &amp; Grill",
+      "data": {
+        "name": "Zuider Ster Pub &amp; Grill",
+        "address": "43 Moloto Street, Roodeplaat, Pretoria, 0002",
+        "phone": "071 888 5813",
+        "email": "bookings@zuiderster.co.za",
+        "website": "",
+        "facebook": "https://web.facebook.com/zuidersterpubandgrill",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-25.59179310554262, 28.385130347544354",
+        "description": ""
+      },
+      "match_type": "fuzzy",
+      "score": 0.92
+    },
+    {
+      "folder": "Zwartkops Raceway",
+      "excel_name": "Zwartkops Raceway",
+      "data": {
+        "name": "Zwartkops Raceway",
+        "address": "Quagga Rd, Centurion, South Africa",
+        "phone": "012 384 2299",
+        "email": "info@zwartkops.co.za",
+        "website": "zwartkops.co.za",
+        "facebook": "https://www.facebook.com/ZwartkopsRaceway",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "-25.80998681678371, 28.110942236396433",
+        "description": ""
+      },
+      "match_type": "exact"
+    },
+    {
+      "folder": "chiesa di PAZZO LUPi",
+      "excel_name": "chiesa di PAZZO LUPi",
+      "data": {
+        "name": "chiesa di PAZZO LUPi",
+        "address": "38 4th Ave, Melville, Johannesburg, 2092",
+        "phone": "082 450 6790",
+        "email": "space@chiesadipazzolupi.co.za",
+        "website": "",
+        "facebook": "https://www.facebook.com/chiesadiPAZZOLUPi/",
+        "twitter": "",
+        "instagram": "",
+        "latlong": "",
+        "description": ""
+      },
+      "match_type": "exact"
+    }
+  ],
+  "venues_without_folders": [
+    "360 Liquid Lounge at Montecasino",
+    "Blueberry Hill Hotel",
+    "Bourbon Barrell",
+    "Budrock Cafe",
+    "Gas Monkey",
+    "Hallmark House by BON Hotels",
+    "Hunters Pub and Grill",
+    "Laerskool Protearif",
+    "Loftus D field",
+    "Malboer",
+    "Pop up market Muldersdrift",
+    "Spoorloos Pub &amp; Grill",
+    "Spring Rock Fest",
+    "Steve's Place Witbank",
+    "StrabFest 2025",
+    "The Barrel pub &amp; grill",
+    "The Block Restuarant and Wine Bar, Craighall Park",
+    "The Geek Gathering &amp; Linden Night Shop",
+    "The Irish Rock",
+    "The Place2b",
+    "YYY Festival"
+  ],
+  "venue_image_counts": {
+    "Design Quarter, Fourways": 1,
+    "Swagga Breweries, Meyerton": 1,
+    "chiesa di PAZZO LUPi": 1,
+    "Heartfelt Arena, Pretoria": 1,
+    "Picolino_s": 1,
+    "Oppistasie restaurant and pub": 1,
+    "Willow Way Shopping Centre": 1,
+    "Granadilla Cafe": 1,
+    "The Venue, Melrose Arch": 1,
+    "Hennies, Montana": 1,
+    "Dros, Edenvale": 1,
+    "The Barnyard Theatre, Silverstar": 1,
+    "Malboer, Boksburg": 1,
+    "Pepper Chair Restaurant": 1,
+    "Jitterbugz": 1,
+    "Bryanston Sports Club": 1,
+    "Gas Monkey, VDB": 1,
+    "The Lapa": 1,
+    "Pirate_s Sports Club": 1,
+    "Sognage": 1,
+    "Zaabstad, Harties": 1,
+    "Gillooly_s Farm": 1,
+    "The Dance Palace Restaurant - Studio 334": 1,
+    "The Irish Rock, Radiokop": 1,
+    "Old School Pub and Grill, Roodeplaat": 1,
+    "Pano_s Grill, Helderkruin": 1,
+    "Boscos": 1,
+    "The Silver Fox Pub & Grill": 1,
+    "Morningside Country Club": 1,
+    "@ The Beach Restaurant": 1,
+    "Club Chevelle": 1,
+    "Benoni Country Club": 1,
+    "Santis Bar & Grill, Sunninghill": 1,
+    "The Filly, Rivonia": 1,
+    "Capital Craft Beer Academy": 1,
+    "Crossroads Lounge": 1,
+    "Hogshead Douglasdale": 1,
+    "Jan Se Skuld": 1,
+    "Texan Wing Bar Pretoria East": 1,
+    "Cool Runnings, Cradle": 1,
+    "Hennies, Krugersdorp": 1,
+    "The Secret Garden, Fourways": 1,
+    "Mix 93.8": 1,
+    "Urban Oasis": 1,
+    "Chalk Craft Eatery Lakefield": 1,
+    "Broadacres Padel Club": 1,
+    "Sheena_s Pub": 1,
+    "Riversands": 1,
+    "Zuider Ster Pub & Grill": 1,
+    "Nasrex Expo Centre": 1,
+    "Tigersmilk Bedfordview": 1,
+    "Cassalinga": 1,
+    "Krugersdorp Bolwing Cliub ": 1,
+    "Bassline": 1,
+    "The Irish  Club Johannesburg": 1,
+    "Lock Stock Beer Weltevreden": 1,
+    "Quin & Bull, Pretoria": 1,
+    "Delta Cafe": 1,
+    "The Music Kitchen": 1,
+    "Vellies": 1,
+    "The Hangout at The Troyeville Hotel": 1,
+    "Fourways Action Sports": 1,
+    "Jacaranda 94.2": 1,
+    "The Orbitt Jazz Club and Bistro": 1,
+    "Fangios": 1,
+    "The Royal Elephant Hotel & Conference Centre": 1,
+    "Irene Homes, Irene": 1,
+    "Salsa Mexican Grill, Menlyn Maine": 1,
+    "Hotstix Music & Pool Bar": 1,
+    "Lisboa - Fire and Salt, Serengeti Lifestyle Estate": 1,
+    "Bailey_s": 1,
+    "The Beach, KOMMANDONEK Resort, Harties": 1,
+    "Riboville Boutique Hotel and Restaurant": 1,
+    "Jozi_s Show Bar": 1,
+    "Sanctuary Mandela ": 1,
+    "Tigersmilk Irene Village": 1,
+    "Riverglades Estate": 1,
+    "The Cock & Bull, Harties": 1,
+    "Smoking Kills Bar": 1,
+    "The Gardens Cafe Bistro": 1,
+    "Cock & Bull Pub and Grill, Vanderbijl": 1,
+    "The Piazzo  Montecasino": 1,
+    "AJ_s Pub": 1,
+    "Throbbing Strawberry": 1,
+    "Living Room Jozi": 1,
+    "Sowaar Bar": 1,
+    "Bush Wackers Pub ": 1,
+    "Chubbies Grill, Capital Park": 1,
+    "Fourways Farmer_s Market": 1,
+    "Bustop 7 Open Air Market": 1,
+    "Place2b": 1,
+    "Cowboy Town, Krugersdorp": 1,
+    "Aviator, Harties": 1,
+    "Strydfontein Pub & Grill": 1,
+    "Captains island": 1,
+    "The Greenhouse Sandton": 1,
+    "Legends Adventure Farm & MX Track _ Rhino Park": 1,
+    "Jackal_s Den, Jackal_s Creek": 1,
+    "Taste of Tennessee": 1,
+    "Barrels & Bottles": 1,
+    "Ridge Park Sports Club": 1,
+    "Bourbon Bar, Boksburg": 1,
+    "Tonninos": 1,
+    "Northwood Crusaders Sports Club": 1,
+    "Rustique Boutique Hotel": 1,
+    "La Parada Kyalami Corner": 1,
+    "The Local Bar and Kitchen, Kyalami": 1,
+    "Die Eiland Pub & Grill": 1,
+    "Clay Caf\u00e9 @ Maggies Farm": 1,
+    "Margo_s Bistro ": 1,
+    "Sunset Mountain Bistro": 1,
+    "Good Friends": 1,
+    "The Sundowner bar & Eatery": 1,
+    "Gotcha Cafe Pizzeria": 1,
+    "Agar_s Brewery": 1,
+    "The Garrison Pub at Lady Luck": 1,
+    "Newton_s Pub and Grill, Spartan": 1,
+    "Black Horse Brewery & Distillery": 1,
+    "Livys restuarant": 1,
+    "The German Restaurant & Pub": 1,
+    "Tigersmilk Silverstar": 1,
+    "Milk Bar": 1,
+    "Sowaar Bar, East Rand": 1,
+    "Coppers Craft Bar & Grill, Broadacres": 1,
+    "Dikhololo Hololo Restaurant": 1,
+    "Honeyrock Motel": 1,
+    "Railways Caf\u00e9": 1,
+    "Red Barn Cafe": 1,
+    "The Barnyard Theatre Emperors Palace": 1,
+    "Kleinkaap Boutique Hotel, Littleton": 1,
+    "Die Kantoor": 1,
+    "Kirstenbosch Gardens": 1,
+    "Rustic Barrel": 1,
+    "Cardoso Portuguese Kitchen & Bar Muldersdrift": 1,
+    "Cardoso Portuguese Kitchen & Bar, Pretoria": 1,
+    "Alberton Tennis Club": 1,
+    "Killarney Country Club": 1,
+    "The Goat, Parkhurst": 1,
+    "Boiler Room Bar, Pretoria": 1,
+    "Katzy_s Live": 1,
+    "Kapstadt Brauhaus Centurion": 1,
+    "Eagle_s Nest Pub & Grill": 1,
+    "Chameleon Village, Harties": 1,
+    "Jack Friday_s": 1,
+    "Die Blou Hond": 1,
+    "Walter Sisulu Botanical Gardens": 1,
+    "Shovels Pub and Grill": 1,
+    "Manzi Maningi Private Game Lodge": 1,
+    "Fourways Gardens Club House": 1,
+    "Streatery Lifestyle, Beyers Naude": 1,
+    "The View Rooftop Bar, Hazelwood, Pretoria": 1,
+    "The Boma Cafe": 1,
+    "Dros, Krugersdorp": 1,
+    "Die Draad": 1,
+    "Ferreira_s Restaurant and Sports Bar": 1,
+    "Hennie_s Jolly Prawn": 1,
+    "Fairtree Atterbury Theatre": 1,
+    "The Tee Bar (Glendower Golf Club)": 1,
+    "The Music Box": 1,
+    "Misty Waters": 1,
+    "Chicago_s Piano Bar": 1,
+    "Mall@Reds, Centurion": 1,
+    "Die Ysterbees, Pretoria": 1,
+    "Railways Caf\u00e9, Cullinan": 1,
+    "The Krook & King Pub & Restaurant": 1,
+    "Irish Rock Little Falls": 1,
+    "Tigersmilk Montecasino": 1,
+    "Premiermyn Hervormde Kerk": 1,
+    "Theatre In The Park ": 1,
+    "Gathering o_ the Clans": 1,
+    "Rose Tulee": 1,
+    "Thirsty Fox ": 1,
+    "The German Club, Edenvale": 1,
+    "Bossa": 1,
+    "Zappas Murrayfield": 1,
+    "Irene Country Club": 1,
+    "Lock Stock Beer Fourways": 1,
+    "The Club Como": 1,
+    "Molecule Cocktail Lounge, Emperors Palace": 1,
+    "Cedar Lakes Clubhouse": 1,
+    "Whisk Wine Bar": 1,
+    "Pretoria National Botanical Gardens": 1,
+    "Elephant and Friends - Moreleta Park, Pretoria": 1,
+    "Toldeira": 1,
+    "Blue Hills Nursery": 2,
+    "Social On Main": 1,
+    "Franco_s Portuguese Restaurant, CarletonVille": 1,
+    "3Sixty\u00b0 Liquid Lounge Montecasino": 1,
+    "Voortrekker Monument ": 1,
+    "Rumours Lounge": 1,
+    "Silverado Pub & Grill, Boksburg": 1,
+    "Bennigans": 1,
+    "Huddle Park Golf Course": 1,
+    "Silverlakes Farm Hotel": 1,
+    "Oppidam Vygeboom": 1,
+    "Twig & Berries Sports Bar & Grill ": 1,
+    "Higher Ground": 1,
+    "Benoni Northerns Sports Club": 1,
+    "Prison Break Market": 1,
+    "Hogshead Centurion": 1,
+    "Clarens Townsquare": 1,
+    "The Barnyard, Vereeniging": 1,
+    "Democracy Bar": 1,
+    "Hennies, Harties": 1,
+    "Rusty Hook": 1,
+    "Tigersmilk Kyalami": 1,
+    "86 Public Randburg": 1,
+    "Rep en Roer": 1,
+    "Tipsy Cow": 1,
+    "Papoulis": 1,
+    "Hogshead Rock Cottage": 1,
+    "Cullinan NGK Gronde": 1,
+    "Rusty Monkey Pub & Grill ": 1,
+    "Sundowner, Alberton": 1,
+    "Thunder Gun": 1,
+    "Molly Malone_s": 1,
+    "The Social Grill, Pretoria ": 1,
+    "Tigersmilk Cedar": 1,
+    "Featherbrook Estate": 1,
+    "Golf Bar": 1,
+    "Tigersmilk Bryanston": 1,
+    "Chucky_s Bar": 1,
+    "Olive Wood Lifestyle Centre, Kempton Park": 1,
+    "Streatery Lifestyle, Waterfall": 1,
+    "Tigersmilk Melrose Arch": 1,
+    "St Stithians College": 1,
+    "Nineteen69": 1,
+    "Os Tio_s Restaurant & Sky Bar": 1,
+    "Pablo_s Mexican Cantina": 1,
+    "The Brazen Head, Edenvale": 1,
+    "Irene Village Market": 1,
+    "Wanderers Golf Club": 1,
+    "Coppers Craft Bar & Grill, Bel Air": 1,
+    "Wattlespring Sports Club": 1,
+    "Mikes Sportsbar, Lephalale": 1,
+    "Moo Moos, Pineslopes": 1,
+    "The Fat Ginger Gastrobar": 1,
+    "Morrie_s Pantry": 1,
+    "Greensleeves Medieval Kingdom": 1,
+    "Syringa Park, Avianto Estate": 1,
+    "The Birmingham ": 1,
+    "Cafe Barcelona": 1,
+    "Silverstar Tsogo Sun": 1,
+    "Kyalami Country Pub & Restuarant": 1,
+    "72 Grant Ave, Norwood": 1,
+    "Ponta Malongane, Mozambique": 1,
+    "Pete_s Diner": 1,
+    "Grondpad Harties": 1,
+    "Zwartkops Raceway": 1,
+    "Hogshead Illovo": 1,
+    "Westview Sports Club": 1,
+    "Foxwood Theatre": 1,
+    "Nokuphila School": 1,
+    "The Barnyard Theatre Menlyn": 1,
+    "Panorama Flea Market": 1,
+    "The Goat and Co, Hazelwood, Pretoria": 1,
+    "Tsunami Beach Bar": 1,
+    "The Local Kitchen, Magaliessig": 1,
+    "Volle Evangelie Kerk Dinamika Gemeente Centurion": 1,
+    "The Radium Beer Hall": 1,
+    "The Green Carft Bar, Benoni": 1,
+    "Gilroy_s Brewery (Pty) Ltd": 1,
+    "Marks Park": 1,
+    "In Shere": 1,
+    "Ngwenya Glass Village Muldersdrift ": 1,
+    "Eduplex Oppitrack ": 1,
+    "Riverstone Mall, Meyerton": 1,
+    "Lakeside Bistro, Cedar Lakes": 1,
+    "Mount Rock Pub & Grill": 1,
+    "The Italian Club - Gauteng": 1,
+    "Hooters Fourways": 1,
+    "Mad Giant Taproom": 1,
+    "Hennies, Silver Lakes": 1,
+    "The Block Restaurant & Wine Bar": 1,
+    "Black Labone": 1,
+    "Jock Pub & Grill": 1,
+    "Heito Potato Function Venue": 1,
+    "Fu-Bar": 1,
+    "Cors Diner": 1,
+    "Upperdeck Restaurant": 1,
+    "Jubilee Showbar": 1,
+    "Alberton Rugby Club": 1,
+    "Wild Route Caf\u00e9": 1,
+    "Shay_s Place": 1,
+    "Sunbet Arena Times Square (PTA)": 1,
+    "The Bourbon Barrel ": 1,
+    "Moo Moos, Brooklyn": 1,
+    "Bosvelder Pub & Restaurant": 1,
+    "Coca Restaurant And Lounge": 1,
+    "Hangklip Hotel": 1
+  }
+}

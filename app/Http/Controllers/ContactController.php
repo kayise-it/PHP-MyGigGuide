@@ -1,0 +1,81 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Validator;
+use App\Mail\ContactFormMail;
+
+class ContactController extends Controller
+{
+    /**
+     * Show the contact form.
+     */
+    public function index()
+    {
+        return view('contact');
+    }
+
+    /**
+     * Handle contact form submission.
+     */
+    public function submit(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|max:255',
+            'subject' => 'required|string|max:255',
+            'message' => 'required|string|max:5000',
+            'newsletter' => 'nullable|boolean',
+        ]);
+
+        if ($validator->fails()) {
+            return redirect()->back()
+                ->withErrors($validator)
+                ->withInput();
+        }
+
+        try {
+            $contactData = $request->only(['name', 'email', 'subject', 'message', 'newsletter']);
+            $newsletter = $request->has('newsletter');
+
+            // Log the contact form submission
+            \Log::info('Contact form submitted', array_merge($contactData, ['newsletter' => $newsletter]));
+
+            // Send email to admin using Mailable class
+            try {
+                Mail::to('admin@mygigguide.co.za')
+                    ->send(new ContactFormMail(
+                        $contactData['name'],
+                        $contactData['email'],
+                        $contactData['subject'],
+                        $contactData['message'],
+                        $newsletter
+                    ));
+            } catch (\Throwable $mailErr) {
+                \Log::error('Failed to send contact email', [
+                    'error' => $mailErr->getMessage(),
+                    'trace' => $mailErr->getTraceAsString()
+                ]);
+                
+                return redirect()->back()
+                    ->with('error', 'Sorry, there was an error sending your message. Please try again or contact us directly at admin@mygigguide.co.za.')
+                    ->withInput();
+            }
+
+            return redirect()->route('contact.index')
+                ->with('success', 'Thank you for contacting us! We will get back to you within 24 hours.');
+
+        } catch (\Exception $e) {
+            \Log::error('Contact form submission failed', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            return redirect()->back()
+                ->with('error', 'Sorry, there was an error sending your message. Please try again or contact us directly at admin@mygigguide.co.za.')
+                ->withInput();
+        }
+    }
+}

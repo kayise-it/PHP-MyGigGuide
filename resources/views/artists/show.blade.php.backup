@@ -1,0 +1,501 @@
+@extends('layouts.app')
+
+@section('title', ($artist->stage_name ?? $artist->user->name) . ' - Artist')
+
+@section('content')
+<div class="min-h-screen bg-gradient-to-br from-purple-50 via-white to-blue-50">
+    <div class="hero-section relative h-96 md:h-[500px] overflow-hidden">
+        @php
+        // Build gallery images from normalized $gallery passed by controller
+        $galleryImages = [];
+        if (isset($gallery) && is_array($gallery)) {
+            $galleryImages = array_values(array_filter($gallery, function($path) {
+                return $path && !str_contains($path, '/tmp/php') && !str_contains($path, 'tmp.php');
+            }));
+        }
+
+        // Fallback to artist or user profile picture if no gallery
+        $profileFallback = ($artist->profile_picture ?? null) ?: (optional($artist->user)->profile_picture ?? null);
+        $mainImage = ($galleryImages[0] ?? null) ?: $profileFallback;
+        if ($mainImage && (str_contains($mainImage, '/tmp/php') || str_contains($mainImage, 'tmp.php'))) {
+            $mainImage = null;
+        }
+        @endphp
+
+        @if(count($galleryImages) > 1)
+        <!-- Owl Carousel for multiple gallery images -->
+        <div class="owl-carousel owl-theme artist-hero-carousel w-full h-full">
+            @foreach($galleryImages as $index => $image)
+            <div class="item relative w-full h-full">
+                <img src="{{ Storage::url($image) }}" alt="{{ $artist->stage_name ?? $artist->user->name }} - Image {{ $index + 1 }}"
+                    class="w-full h-full object-cover">
+                <div class="absolute inset-0 bg-black/40"></div>
+            </div>
+            @endforeach
+        </div>
+        @elseif($mainImage)
+        <!-- Single image background -->
+        <div class="relative w-full h-full">
+            <img src="{{ Storage::url($mainImage) }}" alt="{{ $artist->stage_name ?? $artist->user->name }}" class="w-full h-full object-cover">
+            <div class="absolute inset-0 bg-black/40"></div>
+        </div>
+        @else
+        <!-- Fallback gradient background -->
+        <div class="w-full h-full bg-gradient-to-br from-purple-600 to-blue-600"></div>
+        @endif
+
+        <!-- Custom Navigation Controls (only for carousel) -->
+        @if(count($galleryImages) > 1)
+        <div class="absolute inset-0 pointer-events-none">
+            <button
+                class="owl-prev absolute left-4 top-1/2 -translate-y-1/2 p-2 bg-white/20 hover:bg-white/30 rounded-full transition-all pointer-events-auto">
+                <svg class="h-6 w-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                </svg>
+            </button>
+            <button
+                class="owl-next absolute right-4 top-1/2 -translate-y-1/2 p-2 bg-white/20 hover:bg-white/30 rounded-full transition-all pointer-events-auto">
+                <svg class="h-6 w-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                </svg>
+            </button>
+
+            <!-- Dots Container -->
+            <div class="owl-dots absolute bottom-4 left-1/2 -translate-x-1/2 flex space-x-2"></div>
+        </div>
+        @endif
+
+        <style>
+            #hello {
+                z-index: 30 !important;
+                position: absolute !important;
+            }
+
+            /* Prevent carousel animations from affecting overlay */
+            .artist-hero-carousel {
+                z-index: 1;
+            }
+
+            .artist-hero-carousel .owl-item {
+                z-index: 1;
+            }
+
+            /* Ensure overlay stays on top and doesn't inherit carousel animations */
+            #hello * {
+                animation: none !important;
+                transition: none !important;
+            }
+
+        </style>
+        
+        @auth
+            @php($isOwner = auth()->id() === optional($artist->user)->id)
+            @if($isOwner || auth()->user()->hasRole(['admin','superuser']))
+            <div class="mt-4 flex justify-end">
+                <form action="{{ route('features.checkout') }}" method="GET">
+                    <input type="hidden" name="featureable_type" value="artist" />
+                    <input type="hidden" name="featureable_id" value="{{ $artist->id }}" />
+                    <select name="feature_id" class="border rounded px-2 py-1">
+                        @foreach(\App\Models\PaidFeature::where('applies_to','artist')->where('is_active', true)->get() as $feature)
+                            <option value="{{ $feature->id }}">Boost: {{ $feature->name }} ({{ $feature->currency }} {{ number_format($feature->price_cents/100, 2) }})</option>
+                        @endforeach
+                    </select>
+                    <button class="ml-2 btn btn-primary">Boost Artist</button>
+                </form>
+            </div>
+            @endif
+        @endauth
+
+        @if(session('show_boost_modal'))
+            <div x-data="{ open: true }" x-show="open" class="fixed inset-0 z-50 flex items-center justify-center">
+                <div class="absolute inset-0 bg-black bg-opacity-50" @click="open=false"></div>
+                <div class="relative bg-white rounded-xl shadow-xl p-6 w-full max-w-md">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-2">Boost Activated</h3>
+                    <p class="text-sm text-gray-600 mb-4">Your paid feature is now active for this artist. Visibility will be increased until the expiry date.</p>
+                    @php($activeBoosts = \App\Models\FeaturePurchase::where('featureable_type','artist')->where('featureable_id',$artist->id)->where('status','active')->orderByDesc('ends_at')->get())
+                    @if($activeBoosts->count())
+                        <div class="border rounded-lg divide-y">
+                            @foreach($activeBoosts as $b)
+                                <div class="p-3 text-sm flex items-center justify-between">
+                                    <div>
+                                        <div class="font-medium">{{ $b->feature->name }}</div>
+                                        <div class="text-gray-500">Ends {{ optional($b->ends_at)->diffForHumans() }}</div>
+                                    </div>
+                                    <span class="inline-block px-2 py-1 text-xs rounded bg-purple-100 text-purple-700">Active</span>
+                                </div>
+                            @endforeach
+                        </div>
+                    @else
+                        <p class="text-sm text-gray-500">No active boosts found.</p>
+                    @endif
+                    <div class="mt-4 text-right">
+                        <button class="btn btn-primary" @click="open=false">Close</button>
+                    </div>
+                </div>
+            </div>
+        @endif
+        <!-- Breadcrumb inside hero, top-left -->
+        <div class="absolute top-4 left-4 z-20">
+            <x-hero-breadcrumb type="artist" :item="$artist" />
+        </div>
+        <!-- Hero Content - Now positioned outside carousel to prevent fading -->
+        <div class="absolute inset-0 flex items-end pointer-events-none" id="hello">
+            <div class="w-full bg-gradient-to-t from-black/80 to-transparent px-6 md:px-8 pt-6 md:pt-8 pb-28 md:pb-40 pointer-events-auto">
+                <div class="max-w-7xl mx-auto hero-content transform -translate-y-6 md:-translate-y-10">
+                    <div class="flex items-end justify-between">
+                        <div class="text-white">
+                            <h1 class="text-4xl md:text-6xl font-bold mb-2">{{ $artist->stage_name ?? $artist->user->name }}</h1>
+                            @if($artist->genre)
+                            <div class="flex items-center space-x-3 text-lg">
+                                <span class="inline-flex items-center px-3 py-1 rounded-full bg-white/20 text-white">{{ $artist->genre }}</span>
+                            </div>
+                            @endif
+                        </div>
+
+                        <div class="flex items-center space-x-4">
+                            @auth
+                            <x-favorite-button :model="$artist" type="artist" />
+                            @else
+                            <button onclick="window.location.href='/login'"
+                                class="p-3 bg-white/20 hover:bg-white/30 rounded-full transition-all"
+                                title="Login to add favorites">
+                                <svg class="h-6 w-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z">
+                                    </path>
+                                </svg>
+                            </button>
+                            @endauth
+                            <button class="p-3 bg-white/20 hover:bg-white/30 rounded-full transition-all">
+                                <svg class="h-6 w-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z">
+                                    </path>
+                                </svg>
+                            </button>
+                            <!-- Artist page has no event edit action here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="artistBody max-w-7xl mx-auto relative -mt-20 mb-8 bg-white rounded-2xl shadow-2xl overflow-hidden border border-purple-100 z-20">
+        <div class="p-8 border-b border-gray-100 bg-gradient-to-r from-purple-50 to-blue-50">
+            <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between">
+                <div class="flex-1">
+                    <div class="flex items-center gap-4 mb-4">
+                        <!-- Profile Picture -->
+                        <div class="flex-shrink-0">
+                            @php
+                            $profileImage = 'https://placehold.co/150x150/png';
+                            $profilePicture = $artist->profile_picture ?? $artist->user->profile_picture ?? null;
+                            if ($profilePicture && !str_contains($profilePicture, '/tmp/php') &&
+                            !str_contains($profilePicture, 'tmp.php')) {
+                            $profileImage = \Illuminate\Support\Facades\Storage::url($profilePicture);
+                            }
+                            @endphp
+                            <img src="{{ $profileImage }}" alt="{{ $artist->stage_name ?? $artist->user->name }}"
+                                class="h-20 w-20 rounded-full object-cover border-4 border-white shadow-lg">
+                        </div>
+
+                        <div class="flex-1">
+                            <h1 class="text-4xl font-bold text-gray-900">
+                                {{ $artist->stage_name ?? $artist->user->name }}</h1>
+                            <span class="px-3 py-1 rounded-full bg-yellow-100 text-yellow-700 text-sm font-semibold">★
+                                {{ number_format($ratingAvg, 1) }}</span>
+                        </div>
+                    </div>
+                    <div class="flex flex-wrap items-center gap-6 text-gray-600 mb-4">
+                        <div class="font-medium">{{ $artist->genre ?? 'Artist' }}</div>
+                        <div class="font-medium">{{ count($upcoming) }} Upcoming Events</div>
+                    </div>
+                    @if($artist->genre)
+                    <span
+                        class="inline-flex items-center bg-gradient-to-r from-purple-600 to-blue-600 text-white text-sm font-medium px-4 py-2 rounded-full shadow-md">{{ $artist->genre }}</span>
+                    @endif
+                </div>
+                <div class="mt-6 lg:mt-0 lg:ml-8">
+                    <div
+                        class="bg-gradient-to-br from-purple-50 to-blue-50 border border-purple-200 p-6 rounded-2xl min-w-[250px] shadow-lg text-center">
+                        <div class="mb-4 text-2xl font-semibold">Book this artist</div>
+                        <button id="open-booking-modal"
+                            class="w-full inline-flex items-center justify-center bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-bold py-3 px-6 rounded-xl transition-all duration-300"
+                            type="button">
+                            Book {{ $artist->stage_name }}
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 p-8">
+            <!-- Main content -->
+            <div class="lg:col-span-2 space-y-8">
+                @if($artist->bio)
+                <div>
+                    <h2 class="text-2xl font-semibold text-gray-900 mb-4">About the Artist</h2>
+                    <p class="text-gray-700 leading-relaxed">{{ $artist->bio }}</p>
+                </div>
+                @endif
+
+                <!-- Gallery -->
+                <div>
+                    <div class="flex items-center justify-between mb-4">
+                        <h2 class="text-xl font-semibold">Gallery</h2>
+                        <span
+                            class="bg-purple-100 text-purple-700 px-3 py-1 rounded-full text-sm font-medium">{{ count($gallery) }}
+                            photos</span>
+                    </div>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        @forelse($gallery as $img)
+                        <img src="{{ Str::startsWith($img, ['http://','https://']) ? $img : Storage::url($img) }}"
+                            class="w-full h-40 object-cover rounded-xl" alt="Gallery image">
+                        @empty
+                        <div class="text-gray-500">No images yet.</div>
+                        @endforelse
+                    </div>
+                </div>
+
+                <!-- Upcoming events -->
+                <div>
+                    <h2 class="text-xl font-semibold mb-4">Upcoming Events</h2>
+                    @if(count($upcoming))
+                    <div class="space-y-3">
+                        @foreach($upcoming as $event)
+                        <a href="{{ route('events.show', $event) }}"
+                            class="flex items-center justify-between p-4 border rounded-xl hover:bg-gray-50">
+                            <div>
+                                <div class="font-medium">{{ $event->name }}</div>
+                                <div class="text-sm text-gray-600">{{ $event->date?->format('M d, Y') }} ·
+                                    {{ $event->time?->format('H:i') }} @ {{ $event->venue->name ?? 'TBA' }}</div>
+                            </div>
+                            <span class="text-indigo-600">View</span>
+                        </a>
+                        @endforeach
+                    </div>
+                    @else
+                    <div class="text-gray-500">No upcoming events.</div>
+                    @endif
+                </div>
+            </div>
+
+            <!-- Sidebar -->
+            <div class="space-y-6">
+                <div class="bg-gradient-to-br from-purple-50 to-blue-50 border border-purple-200 p-6 rounded-xl">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-4">Artist Info</h3>
+                    <div class="space-y-3 text-gray-800">
+                        <div><span class="text-sm text-gray-600">Genre</span>
+                            <div class="font-medium">{{ $artist->genre ?? 'Not specified' }}</div>
+                        </div>
+                        <div><span class="text-sm text-gray-600">Total Events</span>
+                            <div class="font-medium">{{ count($upcoming) }}</div>
+                        </div>
+                        <div><span class="text-sm text-gray-600">Rating</span>
+                            <div class="font-medium">★ {{ number_format($ratingAvg, 1) }}</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Rating Form -->
+                <x-rating-form :model="$artist" type="artist" />
+            </div>
+        </div>
+    </div>
+
+
+<!-- Booking Modal -->
+<div id="booking-modal"
+    class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40 transition-opacity duration-200 hidden"
+    aria-modal="true" role="dialog" tabindex="-1">
+    <div class="relative bg-white rounded-2xl shadow-xl border border-purple-100 max-w-2xl w-full mx-4 p-8">
+        <button id="close-booking-modal"
+            class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 focus:outline-none" aria-label="Close"
+            type="button">
+            <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+        </button>
+        <h2 class="text-2xl font-bold text-gray-900 mb-6">Book {{ $artist->stage_name }}</h2>
+
+        @auth
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <!-- Contact Form -->
+            <div>
+                <h3 class="text-lg font-semibold text-gray-900 mb-4">Send Booking Request</h3>
+                <form id="booking-form" class="space-y-4">
+                    @csrf
+                    <input type="hidden" name="artist_id" value="{{ $artist->id }}">
+
+                    <div>
+                        <label for="event_name" class="block text-sm font-medium text-gray-700 mb-2">Event Name</label>
+                        <input type="text" id="event_name" name="event_name" required
+                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                    </div>
+
+                    <div>
+                        <label for="event_date" class="block text-sm font-medium text-gray-700 mb-2">Event Date</label>
+                        <input type="date" id="event_date" name="event_date" required
+                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                    </div>
+
+                    <div>
+                        <label for="venue" class="block text-sm font-medium text-gray-700 mb-2">Venue</label>
+                        <input type="text" id="venue" name="venue" required
+                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                    </div>
+
+                    <div>
+                        <label for="budget" class="block text-sm font-medium text-gray-700 mb-2">Budget Range</label>
+                        <select id="budget" name="budget" required
+                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                            <option value="">Select budget range</option>
+                            <option value="under-500">Under R500</option>
+                            <option value="500-1000">R500 - R1,000</option>
+                            <option value="1000-2500">R1,000 - R2,500</option>
+                            <option value="2500-5000">R2,500 - R5,000</option>
+                            <option value="5000-plus">R5,000+</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label for="message" class="block text-sm font-medium text-gray-700 mb-2">Additional
+                            Details</label>
+                        <textarea id="message" name="message" rows="4"
+                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                            placeholder="Tell us more about your event..."></textarea>
+                    </div>
+
+                    <button type="submit"
+                        class="w-full bg-purple-600 text-white py-3 px-6 rounded-lg hover:bg-purple-700 focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 transition-colors duration-200 font-medium">
+                        Send Booking Request
+                    </button>
+                </form>
+            </div>
+
+            <!-- Artist Info -->
+            <div class="bg-gradient-to-br from-purple-50 to-blue-50 rounded-xl p-6">
+                <h3 class="text-lg font-semibold text-gray-900 mb-4">Booking Information</h3>
+
+                <div class="space-y-4">
+                    <div>
+                        <h4 class="font-medium text-gray-900">Contact Information</h4>
+                        @if($artist->user->email)
+                        <p class="text-sm text-gray-600">Email: {{ $artist->user->email }}</p>
+                        @endif
+                        @if($artist->phone_number)
+                        <p class="text-sm text-gray-600">Phone: {{ $artist->phone_number }}</p>
+                        @endif
+                    </div>
+
+                    <div>
+                        <h4 class="font-medium text-gray-900">Genre</h4>
+                        <p class="text-sm text-gray-600">{{ $artist->genre ?? 'Not specified' }}</p>
+                    </div>
+
+                    @if($artist->bio)
+                    <div>
+                        <h4 class="font-medium text-gray-900">About</h4>
+                        <p class="text-sm text-gray-600">{{ Str::limit($artist->bio, 150) }}</p>
+                    </div>
+                    @endif
+
+                    <div class="pt-4 border-t border-purple-200">
+                        <p class="text-xs text-gray-500">
+                            <strong>Note:</strong> This will send a booking request to the artist.
+                            They will contact you directly to discuss details and pricing.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        @else
+        <div class="text-center py-8">
+            <div class="mb-6">
+                <svg class="h-16 w-16 text-purple-400 mx-auto mb-4" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                </svg>
+                <h3 class="text-lg font-semibold text-gray-900 mb-2">Login Required</h3>
+                <p class="text-gray-600 mb-6">Please log in to send a booking request to this artist.</p>
+            </div>
+
+            <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                <a href="{{ route('login') }}"
+                    class="bg-purple-600 text-white px-6 py-3 rounded-lg hover:bg-purple-700 transition-colors duration-200 font-medium">
+                    Login
+                </a>
+                <a href="{{ route('register') }}"
+                    class="bg-white text-purple-600 border border-purple-600 px-6 py-3 rounded-lg hover:bg-purple-50 transition-colors duration-200 font-medium">
+                    Sign Up
+                </a>
+            </div>
+        </div>
+        @endauth
+    </div>
+</div>
+@endsection
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Initialize Owl Carousel for artist hero if present
+        if (document.querySelector('.artist-hero-carousel') && typeof jQuery !== 'undefined' && typeof jQuery.fn !== 'undefined' && typeof jQuery.fn.owlCarousel !== 'undefined') {
+            jQuery('.artist-hero-carousel').owlCarousel({
+                items: 1,
+                loop: true,
+                autoplay: true,
+                autoplayTimeout: 6000,
+                autoplayHoverPause: true,
+                nav: false,
+                dots: true,
+                dotsContainer: '.owl-dots',
+                smartSpeed: 1000
+            });
+
+            // Custom navigation
+            jQuery('.owl-prev').on('click', function () {
+                jQuery('.artist-hero-carousel').trigger('prev.owl.carousel');
+            });
+            jQuery('.owl-next').on('click', function () {
+                jQuery('.artist-hero-carousel').trigger('next.owl.carousel');
+            });
+        }
+    });
+
+</script>
+@endsection
+
+@push('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const bookingForm = document.getElementById('booking-form');
+        if (bookingForm) {
+            bookingForm.addEventListener('submit', function (e) {
+                e.preventDefault();
+
+                const formData = new FormData(bookingForm);
+                const submitButton = bookingForm.querySelector('button[type="submit"]');
+                const originalText = submitButton.textContent;
+
+                // Show loading state
+                submitButton.disabled = true;
+                submitButton.textContent = 'Sending...';
+
+                // For now, just show success message (you can implement actual booking logic later)
+                setTimeout(() => {
+                    alert(
+                        'Booking request sent successfully! The artist will contact you soon.');
+                    bookingForm.reset();
+                    submitButton.disabled = false;
+                    submitButton.textContent = originalText;
+                }, 1500);
+            });
+        }
+    });
+
+</script>
+@endpush
+@endsection
