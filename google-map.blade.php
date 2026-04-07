@@ -269,7 +269,7 @@ document.addEventListener('DOMContentLoaded', function() {
         showLegend: {{ $showLegend ? 'true' : 'false' }},
         compact: {{ $compact ? 'true' : 'false' }},
         zoomDelta: {{ $zoomDelta }},
-        apiKey: '{{ config('services.google_maps.api_key') }}',
+        apiKey: '{{ config('services.google_maps.api_key', 'YOUR_API_KEY_HERE') }}',
         radiusKm: {{ (int) $radiusKm }}
     };
 

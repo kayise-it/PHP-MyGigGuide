@@ -50,31 +50,7 @@ class ProfileController extends Controller
         if (! $user) {
             return redirect()->route('login');
         }
-
-        // #region agent log
-        @file_put_contents(
-            '/var/www/mygigguide/.cursor/debug.log',
-            json_encode([
-                'sessionId' => 'debug-session',
-                'runId' => 'run1',
-                'hypothesisId' => 'H1',
-                'location' => 'ProfileController.php:edit',
-                'message' => 'Profile edit accessed',
-                'data' => [
-                    'user_id' => $user->id ?? null,
-                    'roles' => $user->roles->pluck('name')->all() ?? [],
-                    'has_artist_profile' => (bool) $user->artist,
-                    'artist_id' => $user->artist->id ?? null,
-                    'has_organiser_profile' => (bool) $user->organiser,
-                    'organiser_id' => $user->organiser->id ?? null,
-                ],
-                'timestamp' => (int) round(microtime(true) * 1000),
-            ])."\n",
-            FILE_APPEND | LOCK_EX
-        );
-        // #endregion
-
-        // Get role-specific profile data
+// Get role-specific profile data
         $profile = null;
         if ($user->hasRole('artist')) {
             $profile = $user->artist;

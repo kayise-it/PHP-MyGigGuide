@@ -56,8 +56,24 @@ class MailAccount extends Model
      */
     public static function hashPassword($password)
     {
-        $command = "doveadm pw -s SHA512-CRYPT -p " . escapeshellarg($password) . " 2>/dev/null";
-        $hashed = shell_exec($command);
-        return trim($hashed);
+        $password = (string) $password;
+
+        // Primary: native PHP SHA512-CRYPT, fully compatible with Dovecot.
+        $saltChars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789./';
+        $salt = '';
+        for ($i = 0; $i < 16; $i++) {
+            $salt .= $saltChars[random_int(0, strlen($saltChars) - 1)];
+        }
+
+        $hash = crypt($password, '$6$' . $salt . '$');
+        if (is_string($hash) && str_starts_with($hash, '$6$')) {
+            return '{SHA512-CRYPT}' . $hash;
+        }
+
+        // Fallback: doveadm command (if available).
+        $command = 'doveadm pw -s SHA512-CRYPT -p ' . escapeshellarg($password) . ' 2>/dev/null';
+        $hashed = trim((string) shell_exec($command));
+
+        return $hashed !== '' ? $hashed : null;
     }
 }

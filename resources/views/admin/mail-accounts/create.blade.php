@@ -21,23 +21,13 @@
         <form action="{{ route('admin.mail-accounts.store') }}" method="POST">
             @csrf
 
-            <!-- Domain Selection -->
+            <!-- Domain -->
             <div class="mb-6">
-                <label for="domain_id" class="block text-sm font-medium text-gray-700 mb-2">
-                    Domain <span class="text-red-500">*</span>
+                <label class="block text-sm font-medium text-gray-700 mb-2">
+                    Domain
                 </label>
-                <select name="domain_id" id="domain_id" required
-                        class="form-input @error('domain_id') border-red-500 @enderror">
-                    <option value="">Select a domain</option>
-                    @foreach($domains as $id => $name)
-                        <option value="{{ $id }}" {{ old('domain_id') == $id ? 'selected' : '' }}>
-                            {{ $name }}
-                        </option>
-                    @endforeach
-                </select>
-                @error('domain_id')
-                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                @enderror
+                <input type="hidden" name="domain_id" value="{{ $defaultDomain->id }}">
+                <div class="form-input bg-gray-50 text-gray-700">{{ $defaultDomain->name }}</div>
             </div>
 
             <!-- Email Address -->
@@ -111,17 +101,4 @@
         </form>
     </div>
 </div>
-
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    const emailInput = document.getElementById('email');
-    const domainSelect = document.getElementById('domain_id');
-    
-    // Auto-update email when domain changes
-    domainSelect.addEventListener('change', function() {
-        const domain = this.options[this.selectedIndex].text;
-        // You can add logic here if needed
-    });
-});
-</script>
 @endsection

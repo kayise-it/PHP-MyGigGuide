@@ -4,6 +4,11 @@
 @section('description', 'Add a new venue to your profile.')
 
 @section('content')
+<style>
+    .pac-container {
+        z-index: 10000 !important;
+    }
+</style>
 <div class="min-h-screen bg-gradient-to-br from-purple-50 via-white to-blue-50 py-8">
     <div class="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="bg-white rounded-2xl shadow-sm border border-purple-100 p-8">
@@ -290,7 +295,7 @@ function initAutocomplete() {
 // Load Google Maps API
 function loadGoogleMaps() {
     const script = document.createElement('script');
-    script.src = `https://maps.googleapis.com/maps/api/js?key={{ env('GOOGLE_MAPS_API_KEY') }}&libraries=places&callback=initAutocomplete`;
+    script.src = `https://maps.googleapis.com/maps/api/js?key={{ config('services.google_maps.api_key') }}&libraries=places&callback=initAutocomplete`;
     script.async = true;
     script.defer = true;
     document.head.appendChild(script);

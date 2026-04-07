@@ -27,22 +27,13 @@
             @csrf
             @method('PUT')
 
-            <!-- Domain Selection -->
+            <!-- Domain -->
             <div class="mb-6">
-                <label for="domain_id" class="block text-sm font-medium text-gray-700 mb-2">
-                    Domain <span class="text-red-500">*</span>
+                <label class="block text-sm font-medium text-gray-700 mb-2">
+                    Domain
                 </label>
-                <select name="domain_id" id="domain_id" required
-                        class="form-input @error('domain_id') border-red-500 @enderror">
-                    @foreach($domains as $id => $name)
-                        <option value="{{ $id }}" {{ old('domain_id', $account->domain_id) == $id ? 'selected' : '' }}>
-                            {{ $name }}
-                        </option>
-                    @endforeach
-                </select>
-                @error('domain_id')
-                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                @enderror
+                <input type="hidden" name="domain_id" value="{{ $account->domain_id }}">
+                <div class="form-input bg-gray-50 text-gray-700">{{ $domainName }}</div>
             </div>
 
             <!-- Email Address -->

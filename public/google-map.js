@@ -1,3 +1,6 @@
+// Copy of resources/js/google-map.js adapted for direct browser module usage
+// (no changes needed other than ensuring it's available in /public/js)
+
 // Google Maps functionality
 function initGoogleMap(mapId, mapConfig) {
     console.log('initGoogleMap called with:', mapId, mapConfig);
@@ -303,4 +306,5 @@ function initGoogleMap(mapId, mapConfig) {
 
 // Export for use in other files
 window.initGoogleMap = initGoogleMap;
+
 

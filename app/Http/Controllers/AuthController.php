@@ -54,23 +54,13 @@ class AuthController extends Controller
 
         $input = trim($request->input('username'));
         $user = User::whereRaw('LOWER(username) = ?', [strtolower($input)])->first();
-
-        // #region agent log
-        $logPath = base_path('.cursor/debug.log');
-        @file_put_contents($logPath, json_encode(['timestamp' => time() * 1000, 'location' => 'AuthController::login:user_lookup', 'message' => 'user lookup', 'data' => ['input_length' => strlen((string) $input), 'user_found' => $user !== null, 'user_id' => $user?->id, 'username' => $user?->username, 'email' => $user ? substr($user->email ?? '', 0, 5) . '...' : null], 'sessionId' => 'debug-session', 'runId' => 'reset-login', 'hypothesisId' => 'D']) . "\n", FILE_APPEND | LOCK_EX);
-        // #endregion
-        $credentials = $user
+$credentials = $user
             ? ['username' => $user->username, 'password' => $request->password]
             : $request->only('username', 'password');
         $remember = $request->boolean('remember');
 
         $attemptOk = Auth::attempt($credentials, $remember);
-        // #region agent log
-        $storedHash = $user ? $user->getRawOriginal('password') : null;
-        $hashCheck = $user && $storedHash ? Hash::check($request->password, $storedHash) : false;
-        @file_put_contents($logPath, json_encode(['timestamp' => time() * 1000, 'location' => 'AuthController::login:attempt', 'message' => 'attempt result', 'data' => ['attempt_ok' => $attemptOk, 'Hash_check_typed_vs_stored' => $hashCheck], 'sessionId' => 'debug-session', 'runId' => 'reset-login', 'hypothesisId' => 'B']) . "\n", FILE_APPEND | LOCK_EX);
-        // #endregion
-        if ($attemptOk) {
+if ($attemptOk) {
             $request->session()->regenerate();
 
             $user = Auth::user();
@@ -130,11 +120,7 @@ class AuthController extends Controller
      */
     public function register(Request $request)
     {
-        // #region agent log
-        @file_put_contents('/var/www/mygigguide/.cursor/debug.log', json_encode(['location'=>'AuthController.php:register:entry','message'=>'User registration entry','data'=>['request_email'=>$request->input('email'),'request_role'=>$request->input('role'),'has_continue'=>$request->has('continue')],'timestamp'=>now()->timestamp*1000,'sessionId'=>'debug-session','runId'=>'run1','hypothesisId'=>'G'])."\n", FILE_APPEND | LOCK_EX);
-        // #endregion
-
-        // If this is coming from auth modal, we have simplified fields
+// If this is coming from auth modal, we have simplified fields
         if ($request->has('continue')) {
             $request->validate([
                 'name' => ['required', 'string', 'max:255', UniqueNormalizedName::forUser()],
@@ -191,8 +177,19 @@ class AuthController extends Controller
             // Store email in session for resend functionality
             session(['pending_verification_email' => $user->email]);
             
-            // Send verification email with artist info
-            Mail::to($user->email)->send(new EmailVerificationMail($user, $unclaimedArtist));
+            // Send verification email with artist info (graceful failure if mail server rejects)
+            try {
+                Mail::to($user->email)->send(new EmailVerificationMail($user, $unclaimedArtist));
+            } catch (\Throwable $e) {
+                Log::warning('Verification email failed during registration (auth modal)', [
+                    'user_id' => $user->id,
+                    'email' => $user->email,
+                    'error' => $e->getMessage(),
+                ]);
+                return redirect()->route('verification.notice')
+                    ->with('success', $successMessage)
+                    ->with('warning', 'Account created, but we could not send the verification email. Please use the form below to request a new one.');
+            }
 
             // Redirect to verification notice
             return redirect()->route('verification.notice')->with('success', $successMessage);
@@ -231,8 +228,19 @@ class AuthController extends Controller
         // Store email in session for resend functionality
         session(['pending_verification_email' => $user->email]);
         
-        // Send verification email with artist info
-        Mail::to($user->email)->send(new EmailVerificationMail($user, $unclaimedArtist));
+        // Send verification email with artist info (graceful failure if mail server rejects)
+        try {
+            Mail::to($user->email)->send(new EmailVerificationMail($user, $unclaimedArtist));
+        } catch (\Throwable $e) {
+            Log::warning('Verification email failed during registration', [
+                'user_id' => $user->id,
+                'email' => $user->email,
+                'error' => $e->getMessage(),
+            ]);
+            return redirect()->route('verification.notice')
+                ->with('success', $successMessage ?? 'Account created successfully! Please verify your email.')
+                ->with('warning', 'We could not send the verification email. Please use the form below to request a new one.');
+        }
 
         $roleName = ucfirst(str_replace('_', ' ', $request->role));
         

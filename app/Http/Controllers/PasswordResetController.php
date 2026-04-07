@@ -82,11 +82,7 @@ class PasswordResetController extends Controller
      */
     public function reset(Request $request)
     {
-        // #region agent log
-        $logPath = base_path('.cursor/debug.log');
-        @file_put_contents($logPath, json_encode(['timestamp' => time() * 1000, 'location' => 'PasswordResetController::reset:entry', 'message' => 'reset entry', 'data' => ['email' => $request->email, 'token_length' => strlen((string) $request->token), 'password_length' => strlen((string) $request->password)], 'sessionId' => 'debug-session', 'runId' => 'reset-login', 'hypothesisId' => 'C']) . "\n", FILE_APPEND | LOCK_EX);
-        // #endregion
-        $request->validate([
+$request->validate([
             'token' => 'required',
             'email' => 'required|email|exists:users,email',
             'password' => 'required|string|min:8|confirmed',
@@ -98,18 +94,12 @@ class PasswordResetController extends Controller
             ->first();
 
         if (!$resetRecord) {
-            // #region agent log
-            @file_put_contents($logPath, json_encode(['timestamp' => time() * 1000, 'location' => 'PasswordResetController::reset:no_record', 'message' => 'no reset record', 'data' => [], 'sessionId' => 'debug-session', 'runId' => 'reset-login', 'hypothesisId' => 'C']) . "\n", FILE_APPEND | LOCK_EX);
-            // #endregion
-            return back()->withErrors(['email' => 'Invalid or expired reset token.']);
+return back()->withErrors(['email' => 'Invalid or expired reset token.']);
         }
 
         // Check if token matches (hashed)
         if (!Hash::check($request->token, $resetRecord->token)) {
-            // #region agent log
-            @file_put_contents($logPath, json_encode(['timestamp' => time() * 1000, 'location' => 'PasswordResetController::reset:token_mismatch', 'message' => 'token mismatch', 'data' => [], 'sessionId' => 'debug-session', 'runId' => 'reset-login', 'hypothesisId' => 'C']) . "\n", FILE_APPEND | LOCK_EX);
-            // #endregion
-            return back()->withErrors(['email' => 'Invalid or expired reset token.']);
+return back()->withErrors(['email' => 'Invalid or expired reset token.']);
         }
 
         // Check if token is expired (24 hours)
@@ -118,26 +108,14 @@ class PasswordResetController extends Controller
             DB::table('password_reset_tokens')
                 ->where('email', $request->email)
                 ->delete();
-            // #region agent log
-            @file_put_contents($logPath, json_encode(['timestamp' => time() * 1000, 'location' => 'PasswordResetController::reset:token_expired', 'message' => 'token expired', 'data' => ['tokenAge_hours' => $tokenAge], 'sessionId' => 'debug-session', 'runId' => 'reset-login', 'hypothesisId' => 'C']) . "\n", FILE_APPEND | LOCK_EX);
-            // #endregion
-            return back()->withErrors(['email' => 'This password reset link has expired. Please request a new one.']);
+return back()->withErrors(['email' => 'This password reset link has expired. Please request a new one.']);
         }
 
         // Update user password (User model has 'password' => 'hashed' cast, so assign plain password)
         $user = User::where('email', $request->email)->first();
-        // #region agent log
-        @file_put_contents($logPath, json_encode(['timestamp' => time() * 1000, 'location' => 'PasswordResetController::reset:before_save', 'message' => 'before save', 'data' => ['user_id' => $user->id, 'username' => $user->username], 'sessionId' => 'debug-session', 'runId' => 'reset-login', 'hypothesisId' => 'A']) . "\n", FILE_APPEND | LOCK_EX);
-        // #endregion
-        $user->password = $request->password;
+$user->password = $request->password;
         $user->save();
-        // #region agent log
-        $stored = $user->fresh()->getRawOriginal('password');
-        $verify = Hash::check($request->password, $stored);
-        @file_put_contents($logPath, json_encode(['timestamp' => time() * 1000, 'location' => 'PasswordResetController::reset:after_save', 'message' => 'after save', 'data' => ['user_id' => $user->id, 'stored_hash_prefix' => substr($stored ?? '', 0, 7), 'Hash_check_plain_vs_stored' => $verify], 'sessionId' => 'debug-session', 'runId' => 'reset-login', 'hypothesisId' => 'A']) . "\n", FILE_APPEND | LOCK_EX);
-        // #endregion
-
-        // Delete the reset token
+// Delete the reset token
         DB::table('password_reset_tokens')
             ->where('email', $request->email)
             ->delete();
@@ -145,5 +123,4 @@ class PasswordResetController extends Controller
         return redirect()->route('login')->with('status', 'Your password has been reset! You can now login with your new password.');
     }
 }
-
 

@@ -133,32 +133,7 @@ class ArtistController extends Controller
      */
     public function edit(string $id)
     {
-        // #region agent log
-        $user = Auth::user();
-        $artist = Artist::find($id);
-
-        @file_put_contents(
-            '/var/www/mygigguide/.cursor/debug.log',
-            json_encode([
-                'sessionId' => 'debug-session',
-                'runId' => 'run1',
-                'hypothesisId' => 'H3',
-                'location' => 'ArtistController.php:edit',
-                'message' => 'Artist edit accessed',
-                'data' => [
-                    'route_artist_id' => $id,
-                    'resolved_artist_id' => $artist->id ?? null,
-                    'resolved_artist_user_id' => $artist->user_id ?? null,
-                    'auth_user_id' => $user->id ?? null,
-                    'auth_user_is_owner' => $artist && $user ? $artist->user_id === $user->id : null,
-                ],
-                'timestamp' => (int) round(microtime(true) * 1000),
-            ])."\n",
-            FILE_APPEND | LOCK_EX
-        );
-        // #endregion
-
-        // TODO: implement artist edit form
+// TODO: implement artist edit form
     }
 
     /**

@@ -37,11 +37,7 @@ class VerificationController extends Controller
      */
     public function verify(Request $request, $id, $hash)
     {
-        // #region agent log
-        @file_put_contents('/var/www/mygigguide/.cursor/debug.log', json_encode(['location'=>'VerificationController.php:verify:entry','message'=>'Email verification entry','data'=>['user_id'=>$id],'timestamp'=>now()->timestamp*1000,'sessionId'=>'debug-session','runId'=>'run1','hypothesisId'=>'H'])."\n", FILE_APPEND | LOCK_EX);
-        // #endregion
-
-        $user = User::findOrFail($id);
+$user = User::findOrFail($id);
 
         if (!hash_equals((string) $hash, sha1($user->getEmailForVerification()))) {
             return redirect()->route('verification.notice')->with('error', 'Invalid verification link.');
@@ -147,7 +143,16 @@ class VerificationController extends Controller
 
         // Send verification email for the user account only (no artist-claim framing).
         // Claiming of artist/venue profiles still happens when they click the link (verify() -> autoClaimOnVerification).
-        Mail::to($user->email)->send(new EmailVerificationMail($user, null));
+        try {
+            Mail::to($user->email)->send(new EmailVerificationMail($user, null));
+        } catch (\Throwable $e) {
+            Log::warning('Verification email resend failed', [
+                'user_id' => $user->id,
+                'email' => $user->email,
+                'error' => $e->getMessage(),
+            ]);
+            return back()->with('error', 'We could not send the verification email. Please try again later or contact support.');
+        }
 
         return back()->with('success', 'Verification email sent to ' . $user->email);
     }

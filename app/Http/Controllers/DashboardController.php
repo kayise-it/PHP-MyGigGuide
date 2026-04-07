@@ -22,31 +22,7 @@ class DashboardController extends Controller
         if (! $user) {
             return redirect()->route('login');
         }
-
-        // #region agent log
-        @file_put_contents(
-            '/var/www/mygigguide/.cursor/debug.log',
-            json_encode([
-                'sessionId' => 'debug-session',
-                'runId' => 'run1',
-                'hypothesisId' => 'H1',
-                'location' => 'DashboardController.php:index',
-                'message' => 'Dashboard index accessed',
-                'data' => [
-                    'user_id' => $user->id ?? null,
-                    'roles' => $user->roles->pluck('name')->all() ?? [],
-                    'is_artist' => $user->hasRole('artist'),
-                    'is_organiser' => $user->hasRole('organiser'),
-                    'is_venue_owner' => $user->hasRole('venue_owner'),
-                    'is_admin' => $user->hasRole('admin') || $user->hasRole('superuser'),
-                ],
-                'timestamp' => (int) round(microtime(true) * 1000),
-            ])."\n",
-            FILE_APPEND | LOCK_EX
-        );
-        // #endregion
-
-        // Redirect to role-specific dashboard
+// Redirect to role-specific dashboard
         if ($user->hasRole('artist')) {
             return $this->artistDashboard();
         } elseif ($user->hasRole('organiser')) {
@@ -70,28 +46,7 @@ class DashboardController extends Controller
         if (! $user) {
             return redirect()->route('login');
         }
-
-        // #region agent log
-        @file_put_contents(
-            '/var/www/mygigguide/.cursor/debug.log',
-            json_encode([
-                'sessionId' => 'debug-session',
-                'runId' => 'run1',
-                'hypothesisId' => 'H2',
-                'location' => 'DashboardController.php:artistDashboard:before',
-                'message' => 'Artist dashboard accessed (before artist resolve)',
-                'data' => [
-                    'user_id' => $user->id ?? null,
-                    'has_artist_relation' => (bool) $user->artist,
-                    'existing_artist_id' => $user->artist->id ?? null,
-                ],
-                'timestamp' => (int) round(microtime(true) * 1000),
-            ])."\n",
-            FILE_APPEND | LOCK_EX
-        );
-        // #endregion
-
-        $artist = $user->artist;
+$artist = $user->artist;
 
         if (! $artist) {
             // Create artist profile if it doesn't exist
@@ -103,28 +58,7 @@ class DashboardController extends Controller
                 'bio' => 'Artist bio coming soon...',
             ]);
         }
-
-        // #region agent log
-        @file_put_contents(
-            '/var/www/mygigguide/.cursor/debug.log',
-            json_encode([
-                'sessionId' => 'debug-session',
-                'runId' => 'run1',
-                'hypothesisId' => 'H2',
-                'location' => 'DashboardController.php:artistDashboard:after',
-                'message' => 'Artist dashboard artist resolved',
-                'data' => [
-                    'user_id' => $user->id ?? null,
-                    'artist_id' => $artist->id ?? null,
-                    'artist_user_id' => $artist->user_id ?? null,
-                ],
-                'timestamp' => (int) round(microtime(true) * 1000),
-            ])."\n",
-            FILE_APPEND | LOCK_EX
-        );
-        // #endregion
-
-        // Get all events where artist is involved (either as owner or performer)
+// Get all events where artist is involved (either as owner or performer)
         $allEvents = Event::where(function ($query) use ($artist) {
             // Events owned by the artist
             $query->where(function ($subQuery) use ($artist) {

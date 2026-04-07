@@ -419,25 +419,7 @@
                         if (!$youtubeVideos || !is_object($youtubeVideos)) {
                             $youtubeVideos = $event->youtubeVideos()->get();
                         }
-                        // #region agent log
-                        $logData = [
-                            'sessionId' => 'debug-session',
-                            'runId' => 'run1',
-                            'hypothesisId' => 'D',
-                            'location' => 'events/show.blade.php:youtube_videos',
-                            'message' => 'YouTube videos in view',
-                            'data' => [
-                                'event_id' => $event->id,
-                                'videos_count' => $youtubeVideos->count(),
-                                'videos_data' => $youtubeVideos->map(function($v) {
-                                    return ['id' => $v->id, 'youtube_video_id' => $v->youtube_video_id];
-                                })->toArray(),
-                            ],
-                            'timestamp' => now()->timestamp * 1000,
-                        ];
-                        @file_put_contents('/var/www/mygigguide/.cursor/debug.log', json_encode($logData) . "\n", FILE_APPEND | LOCK_EX);
-                        // #endregion
-                    } catch (\Exception $e) {
+} catch (\Exception $e) {
                         $youtubeVideos = collect();
                         \Log::error('Error loading youtube videos: ' . $e->getMessage());
                     }
@@ -448,24 +430,7 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         @foreach($youtubeVideos as $video)
                         @php
-                            // #region agent log
-                            $logData = [
-                                'sessionId' => 'debug-session',
-                                'runId' => 'run1',
-                                'hypothesisId' => 'D',
-                                'location' => 'events/show.blade.php:video_loop',
-                                'message' => 'Rendering video component',
-                                'data' => [
-                                    'video_id' => $video->id,
-                                    'youtube_video_id' => $video->youtube_video_id,
-                                    'embed_url' => $video->embed_url,
-                                    'has_video_id' => !empty($video->youtube_video_id),
-                                ],
-                                'timestamp' => now()->timestamp * 1000,
-                            ];
-                            @file_put_contents('/var/www/mygigguide/.cursor/debug.log', json_encode($logData) . "\n", FILE_APPEND | LOCK_EX);
-                            // #endregion
-                        @endphp
+@endphp
                         <x-youtube-video :video="$video" />
                         @endforeach
                     </div>

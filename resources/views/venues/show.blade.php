@@ -4,24 +4,7 @@
 
 @push('head')
 @php
-    // #region agent log
-    $logData = [
-        'sessionId' => 'debug-session',
-        'runId' => 'run1',
-        'hypothesisId' => 'C',
-        'location' => 'venues/show.blade.php:8',
-        'message' => 'OG image URL generation start',
-        'data' => [
-            'venue_id' => $venue->id,
-            'main_picture' => $venue->main_picture,
-            'gallery_count' => isset($gallery) ? count($gallery) : 0,
-        ],
-        'timestamp' => now()->timestamp * 1000,
-    ];
-    @file_put_contents('/var/www/mygigguide/.cursor/debug.log', json_encode($logData) . "\n", FILE_APPEND | LOCK_EX);
-    // #endregion
-
-    $description = \Illuminate\Support\Str::limit(strip_tags($venue->description ?? 'Discover this amazing venue on My Gig Guide.'), 160);
+$description = \Illuminate\Support\Str::limit(strip_tags($venue->description ?? 'Discover this amazing venue on My Gig Guide.'), 160);
     $imageUrl = null;
     
     if ($venue->main_picture && \Illuminate\Support\Facades\Storage::disk('public')->exists($venue->main_picture)) {
@@ -30,25 +13,7 @@
         $imageUrl = (str_starts_with($storageUrl, 'http://') || str_starts_with($storageUrl, 'https://')) 
             ? $storageUrl 
             : url($storageUrl);
-        
-        // #region agent log
-        $logData = [
-            'sessionId' => 'debug-session',
-            'runId' => 'run1',
-            'hypothesisId' => 'A',
-            'location' => 'venues/show.blade.php:20',
-            'message' => 'Main picture URL generated',
-            'data' => [
-                'storage_url' => $storageUrl,
-                'final_url' => $imageUrl,
-                'is_absolute' => str_starts_with($imageUrl, 'http'),
-                'url_length' => strlen($imageUrl),
-            ],
-            'timestamp' => now()->timestamp * 1000,
-        ];
-        @file_put_contents('/var/www/mygigguide/.cursor/debug.log', json_encode($logData) . "\n", FILE_APPEND | LOCK_EX);
-        // #endregion
-    } elseif (isset($gallery) && is_array($gallery) && count($gallery) > 0) {
+} elseif (isset($gallery) && is_array($gallery) && count($gallery) > 0) {
         $firstImage = $gallery[0];
         if (\Illuminate\Support\Facades\Storage::disk('public')->exists($firstImage)) {
             $storageUrl = \Illuminate\Support\Facades\Storage::disk('public')->url($firstImage);
@@ -56,62 +21,12 @@
             $imageUrl = (str_starts_with($storageUrl, 'http://') || str_starts_with($storageUrl, 'https://')) 
                 ? $storageUrl 
                 : url($storageUrl);
-            
-            // #region agent log
-            $logData = [
-                'sessionId' => 'debug-session',
-                'runId' => 'run1',
-                'hypothesisId' => 'A',
-                'location' => 'venues/show.blade.php:32',
-                'message' => 'Gallery image URL generated',
-                'data' => [
-                    'storage_url' => $storageUrl,
-                    'final_url' => $imageUrl,
-                    'is_absolute' => str_starts_with($imageUrl, 'http'),
-                ],
-                'timestamp' => now()->timestamp * 1000,
-            ];
-            @file_put_contents('/var/www/mygigguide/.cursor/debug.log', json_encode($logData) . "\n", FILE_APPEND | LOCK_EX);
-            // #endregion
-        }
+}
     }
     if (!$imageUrl) {
         $fallbackUrl = asset('logos/logo1.jpeg');
         $imageUrl = url($fallbackUrl);
-        
-        // #region agent log
-        $logData = [
-            'sessionId' => 'debug-session',
-            'runId' => 'run1',
-            'hypothesisId' => 'D',
-            'location' => 'venues/show.blade.php:45',
-            'message' => 'Using fallback logo',
-            'data' => [
-                'fallback_url' => $fallbackUrl,
-                'final_url' => $imageUrl,
-            ],
-            'timestamp' => now()->timestamp * 1000,
-        ];
-        @file_put_contents('/var/www/mygigguide/.cursor/debug.log', json_encode($logData) . "\n", FILE_APPEND | LOCK_EX);
-        // #endregion
-    }
-    
-    // #region agent log
-    $logData = [
-        'sessionId' => 'debug-session',
-        'runId' => 'run1',
-        'hypothesisId' => 'E',
-        'location' => 'venues/show.blade.php:55',
-        'message' => 'Final OG image URL before meta tag',
-        'data' => [
-            'final_image_url' => $imageUrl,
-            'is_absolute' => str_starts_with($imageUrl, 'http'),
-            'has_protocol' => str_starts_with($imageUrl, 'http://') || str_starts_with($imageUrl, 'https://'),
-        ],
-        'timestamp' => now()->timestamp * 1000,
-    ];
-    @file_put_contents('/var/www/mygigguide/.cursor/debug.log', json_encode($logData) . "\n", FILE_APPEND | LOCK_EX);
-    // #endregion
+}
 @endphp
 <!-- Open Graph / Facebook -->
 <meta property="og:type" content="website">
@@ -886,7 +801,6 @@
         </div>
     </div>
 </div>
-
 
 <!-- Image Modal -->
 <div id="imageModal" class="fixed inset-0 bg-black bg-opacity-75 z-50 hidden flex items-center justify-center p-4" onclick="closeImageModal()">

@@ -115,24 +115,7 @@ class EventController extends Controller
      */
     public function store(Request $request)
     {
-        // #region agent log
-        $logData = [
-            'sessionId' => 'debug-session',
-            'runId' => 'run1',
-            'hypothesisId' => 'A',
-            'location' => 'EventController.php:store',
-            'message' => 'EventController store method entry',
-            'data' => [
-                'has_youtube_videos' => $request->has('youtube_videos'),
-                'youtube_videos_input' => $request->input('youtube_videos'),
-                'table_exists' => \Illuminate\Support\Facades\Schema::hasTable('youtube_videos'),
-            ],
-            'timestamp' => now()->timestamp * 1000,
-        ];
-        @file_put_contents('/var/www/mygigguide/.cursor/debug.log', json_encode($logData) . "\n", FILE_APPEND | LOCK_EX);
-        // #endregion
-        
-        $validated = $request->validate([
+$validated = $request->validate([
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
             'date' => 'required|date|after_or_equal:today',
@@ -151,6 +134,11 @@ class EventController extends Controller
             'categories.*' => 'exists:categories,id',
             'youtube_videos' => 'nullable|array',
             'youtube_videos.*' => ['nullable', new YoutubeUrl()],
+        ], [
+            'venue_id.required' => 'Please select or add a venue for your event.',
+            'venue_id.exists' => 'The selected venue is invalid.',
+        ], [
+            'venue_id' => 'venue',
         ]);
 
         // Get user's folder path
@@ -181,40 +169,8 @@ class EventController extends Controller
         $validated['owner_id'] = auth()->id();
         $validated['owner_type'] = auth()->user()->hasRole('artist') ? 'artist' : 'organiser';
         $validated['status'] = 'upcoming';
-
-        // #region agent log
-        $logData = [
-            'sessionId' => 'debug-session',
-            'runId' => 'run1',
-            'hypothesisId' => 'A',
-            'location' => 'EventController.php:168',
-            'message' => 'Before creating Event',
-            'data' => [
-                'table_exists' => \Illuminate\Support\Facades\Schema::hasTable('youtube_videos'),
-            ],
-            'timestamp' => now()->timestamp * 1000,
-        ];
-        @file_put_contents('/var/www/mygigguide/.cursor/debug.log', json_encode($logData) . "\n", FILE_APPEND | LOCK_EX);
-        // #endregion
-
-        $event = Event::create($validated);
-        
-        // #region agent log
-        $logData = [
-            'sessionId' => 'debug-session',
-            'runId' => 'run1',
-            'hypothesisId' => 'A',
-            'location' => 'EventController.php:175',
-            'message' => 'Event created successfully',
-            'data' => [
-                'event_id' => $event->id,
-            ],
-            'timestamp' => now()->timestamp * 1000,
-        ];
-        @file_put_contents('/var/www/mygigguide/.cursor/debug.log', json_encode($logData) . "\n", FILE_APPEND | LOCK_EX);
-        // #endregion
-
-        // Attach artists
+$event = Event::create($validated);
+// Attach artists
         if ($request->has('artists')) {
             $event->artists()->attach($request->artists);
         }
@@ -226,46 +182,10 @@ class EventController extends Controller
 
         // Handle YouTube videos
         if ($request->has('youtube_videos') && is_array($request->youtube_videos)) {
-            // #region agent log
-            $logData = [
-                'sessionId' => 'debug-session',
-                'runId' => 'run1',
-                'hypothesisId' => 'A',
-                'location' => 'EventController.php:181',
-                'message' => 'Checking if youtube_videos table exists before creating records',
-                'data' => [
-                    'has_youtube_videos' => $request->has('youtube_videos'),
-                    'youtube_videos_count' => is_array($request->youtube_videos) ? count($request->youtube_videos) : 0,
-                    'table_exists' => \Illuminate\Support\Facades\Schema::hasTable('youtube_videos'),
-                    'database_name' => \DB::connection()->getDatabaseName(),
-                ],
-                'timestamp' => now()->timestamp * 1000,
-            ];
-            @file_put_contents('/var/www/mygigguide/.cursor/debug.log', json_encode($logData) . "\n", FILE_APPEND | LOCK_EX);
-            // #endregion
-            
-            foreach ($request->youtube_videos as $index => $url) {
+foreach ($request->youtube_videos as $index => $url) {
                 if (!empty($url)) {
                     $videoId = YoutubeVideo::extractVideoId($url);
-                    // #region agent log
-                    $logData = [
-                        'sessionId' => 'debug-session',
-                        'runId' => 'run1',
-                        'hypothesisId' => 'C',
-                        'location' => 'EventController.php:195',
-                        'message' => 'Before creating YoutubeVideo record',
-                        'data' => [
-                            'url' => $url,
-                            'video_id' => $videoId,
-                            'event_id' => $event->id,
-                            'index' => $index,
-                        ],
-                        'timestamp' => now()->timestamp * 1000,
-                    ];
-                    @file_put_contents('/var/www/mygigguide/.cursor/debug.log', json_encode($logData) . "\n", FILE_APPEND | LOCK_EX);
-                    // #endregion
-                    
-                    if ($videoId) {
+if ($videoId) {
                         try {
                             YoutubeVideo::create([
                                 'videoable_type' => Event::class,
@@ -274,38 +194,8 @@ class EventController extends Controller
                                 'youtube_video_id' => $videoId,
                                 'order' => $index,
                             ]);
-                            // #region agent log
-                            $logData = [
-                                'sessionId' => 'debug-session',
-                                'runId' => 'run1',
-                                'hypothesisId' => 'C',
-                                'location' => 'EventController.php:210',
-                                'message' => 'YoutubeVideo record created successfully',
-                                'data' => [
-                                    'video_id' => $videoId,
-                                ],
-                                'timestamp' => now()->timestamp * 1000,
-                            ];
-                            @file_put_contents('/var/www/mygigguide/.cursor/debug.log', json_encode($logData) . "\n", FILE_APPEND | LOCK_EX);
-                            // #endregion
-                        } catch (\Exception $e) {
-                            // #region agent log
-                            $logData = [
-                                'sessionId' => 'debug-session',
-                                'runId' => 'run1',
-                                'hypothesisId' => 'C',
-                                'location' => 'EventController.php:220',
-                                'message' => 'Exception when creating YoutubeVideo',
-                                'data' => [
-                                    'exception_message' => $e->getMessage(),
-                                    'exception_code' => $e->getCode(),
-                                    'table_exists_check' => \Illuminate\Support\Facades\Schema::hasTable('youtube_videos'),
-                                ],
-                                'timestamp' => now()->timestamp * 1000,
-                            ];
-                            @file_put_contents('/var/www/mygigguide/.cursor/debug.log', json_encode($logData) . "\n", FILE_APPEND | LOCK_EX);
-                            // #endregion
-                            throw $e;
+} catch (\Exception $e) {
+throw $e;
                         }
                     }
                 }
@@ -321,50 +211,13 @@ class EventController extends Controller
      */
     public function show(Request $request, Event $event)
     {
-        // #region agent log
-        $logData = [
-            'sessionId' => 'debug-session',
-            'runId' => 'run1',
-            'hypothesisId' => 'D',
-            'location' => 'EventController.php:show',
-            'message' => 'EventController show method entry',
-            'data' => [
-                'event_id' => $event->id,
-                'youtube_videos_count_before_load' => $event->youtubeVideos()->count(),
-            ],
-            'timestamp' => now()->timestamp * 1000,
-        ];
-        @file_put_contents('/var/www/mygigguide/.cursor/debug.log', json_encode($logData) . "\n", FILE_APPEND | LOCK_EX);
-        // #endregion
-        
-        $event->load(['venue', 'artists', 'owner', 'ratings.user', 'youtubeVideos']);
+$event->load(['venue', 'artists', 'owner', 'ratings.user', 'youtubeVideos']);
         
         // Ensure youtubeVideos relationship is loaded even if not eager loaded
         if (!$event->relationLoaded('youtubeVideos')) {
             $event->load('youtubeVideos');
         }
-        
-        // #region agent log
-        $logData = [
-            'sessionId' => 'debug-session',
-            'runId' => 'run1',
-            'hypothesisId' => 'D',
-            'location' => 'EventController.php:show',
-            'message' => 'After loading relationships',
-            'data' => [
-                'event_id' => $event->id,
-                'youtube_videos_count_after_load' => $event->youtubeVideos->count(),
-                'relation_loaded' => $event->relationLoaded('youtubeVideos'),
-                'youtube_videos_data' => $event->youtubeVideos->map(function($v) {
-                    return ['id' => $v->id, 'youtube_video_id' => $v->youtube_video_id, 'youtube_url' => $v->youtube_url];
-                })->toArray(),
-            ],
-            'timestamp' => now()->timestamp * 1000,
-        ];
-        @file_put_contents('/var/www/mygigguide/.cursor/debug.log', json_encode($logData) . "\n", FILE_APPEND | LOCK_EX);
-        // #endregion
-
-        // Check for social media crawlers FIRST, before auth check
+// Check for social media crawlers FIRST, before auth check
         if ($this->isSocialPreviewRequest($request)) {
             $shareData = $this->buildSocialPreviewData($event);
 

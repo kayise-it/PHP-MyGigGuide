@@ -319,7 +319,6 @@ function linkUserSection() {
                 return false;
             }
             
-            // #region agent log
             
             this.selectedUserId = userId;
             this.loading = true;
@@ -329,13 +328,11 @@ function linkUserSection() {
                 // Get CSRF token with fallback
                 const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content || '{{ csrf_token() }}';
                 
-                // #region agent log
                 
                 // Log request details before sending
                 const requestUrl = '{{ route("admin.unclaimed.link-user", ["type" => "artist", "id" => $entity->id]) }}';
                 const requestBody = { user_id: userId };
                 
-                // #region agent log
                 
                 const response = await fetch(requestUrl, {
                     method: 'POST',
@@ -348,7 +345,6 @@ function linkUserSection() {
                 });
                 
                 // Log response details before parsing
-                // #region agent log
                 
                 // Check if response is actually JSON before parsing
                 let data;
@@ -360,7 +356,6 @@ function linkUserSection() {
                         data = await response.json();
                     } catch (parseError) {
                         // Log JSON parse error
-                        // #region agent log
                         
                         const text = await response.text();
                         this.errorMessage = `Server error (${response.status}): ${text.substring(0, 200)}`;
@@ -371,7 +366,6 @@ function linkUserSection() {
                     const text = await response.text();
                     
                     // Log non-JSON response
-                    // #region agent log
                     
                     // Try to extract error message from HTML if possible
                     const errorMatch = text.match(/<title[^>]*>([^<]+)<\/title>/i) || text.match(/<h1[^>]*>([^<]+)<\/h1>/i);
@@ -381,7 +375,6 @@ function linkUserSection() {
                     return;
                 }
                 
-                // #region agent log
                 
                 if (response.status === 409 && data.conflict) {
                     this.conflictData = data.data;
@@ -390,16 +383,13 @@ function linkUserSection() {
                     // Validate success response structure
                     if (!data || (data.success === undefined && !data.conflict)) {
                         // Log unexpected success response structure
-                        // #region agent log
                     }
                     
                     // Log successful link
-                    // #region agent log
                     
                     window.location.href = '{{ route("admin.unclaimed.index", ["type" => "artist"]) }}';
                 } else {
                     this.errorMessage = data.message || data.error || 'An error occurred';
-                    // #region agent log
                 }
             } catch (error) {
                 console.error('Error:', error);
@@ -410,7 +400,6 @@ function linkUserSection() {
                 const isTimeoutError = error.message.includes('timeout');
                 
                 // Log detailed error information
-                // #region agent log
                 
                 // Provide user-friendly error messages
                 if (isNetworkError) {

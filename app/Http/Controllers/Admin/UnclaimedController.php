@@ -31,11 +31,7 @@ class UnclaimedController extends Controller
      */
     public function index(Request $request)
     {
-        // #region agent log
-        file_put_contents('/var/www/mygigguide/.cursor/debug.log', json_encode(['location'=>'UnclaimedController:index:entry','message'=>'index method called','data'=>['type'=>$request->get('type','all'),'search'=>$request->get('search'),'isAjax'=>$request->ajax()],'timestamp'=>round(microtime(true)*1000),'sessionId'=>'debug-session','hypothesisId'=>'H1,H2'])."\n", FILE_APPEND);
-        // #endregion
-        
-        // Validate and sanitize inputs
+// Validate and sanitize inputs
         $request->validate([
             'type' => 'nullable|in:all,artist,venue,event,organiser',
             'search' => 'nullable|string|max:255',
@@ -53,30 +49,13 @@ class UnclaimedController extends Controller
         // Get counts for all types
         $counts = $this->claimService->getUnclaimedCounts();
         $counts['all'] = array_sum($counts);
-        
-        // #region agent log
-        file_put_contents('/var/www/mygigguide/.cursor/debug.log', json_encode(['location'=>'UnclaimedController:index:counts','message'=>'Got unclaimed counts','data'=>['counts'=>$counts],'timestamp'=>round(microtime(true)*1000),'sessionId'=>'debug-session','hypothesisId'=>'H4'])."\n", FILE_APPEND);
-        // #endregion
-
-        // Build query based on type
+// Build query based on type
         $unclaimed = $this->getUnclaimedQuery($type, $search);
-        
-        // #region agent log
-        file_put_contents('/var/www/mygigguide/.cursor/debug.log', json_encode(['location'=>'UnclaimedController:index:queryResult','message'=>'Query executed','data'=>['totalItems'=>$unclaimed->total(),'currentPage'=>$unclaimed->currentPage(),'perPage'=>$unclaimed->perPage()],'timestamp'=>round(microtime(true)*1000),'sessionId'=>'debug-session','hypothesisId'=>'H4'])."\n", FILE_APPEND);
-        // #endregion
-
-        // For AJAX requests (search), return partial
+// For AJAX requests (search), return partial
         if ($request->ajax()) {
-            // #region agent log
-            file_put_contents('/var/www/mygigguide/.cursor/debug.log', json_encode(['location'=>'UnclaimedController:index:ajaxReturn','message'=>'Returning AJAX partial view','data'=>[],'timestamp'=>round(microtime(true)*1000),'sessionId'=>'debug-session','hypothesisId'=>'H2'])."\n", FILE_APPEND);
-            // #endregion
-            return view('admin.unclaimed._table', compact('unclaimed', 'type'));
+return view('admin.unclaimed._table', compact('unclaimed', 'type'));
         }
-
-        // #region agent log
-        file_put_contents('/var/www/mygigguide/.cursor/debug.log', json_encode(['location'=>'UnclaimedController:index:fullReturn','message'=>'Returning full view','data'=>[],'timestamp'=>round(microtime(true)*1000),'sessionId'=>'debug-session','hypothesisId'=>'H2'])."\n", FILE_APPEND);
-        // #endregion
-        return view('admin.unclaimed.index', compact('unclaimed', 'counts', 'type'));
+return view('admin.unclaimed.index', compact('unclaimed', 'counts', 'type'));
     }
 
     /**
@@ -403,27 +382,11 @@ class UnclaimedController extends Controller
      */
     public function edit(string $type, int $id)
     {
-        // #region agent log
-        file_put_contents('/var/www/mygigguide/.cursor/debug.log', json_encode(['location'=>'UnclaimedController:edit:entry','message'=>'edit method called','data'=>['type'=>$type,'id'=>$id],'timestamp'=>round(microtime(true)*1000),'sessionId'=>'debug-session','hypothesisId'=>'H1,H2'])."\n", FILE_APPEND);
-        // #endregion
-        
-        $entity = $this->findEntity($type, $id);
-        
-        // #region agent log
-        file_put_contents('/var/www/mygigguide/.cursor/debug.log', json_encode(['location'=>'UnclaimedController:edit:entityFound','message'=>'Entity lookup result','data'=>['found'=>$entity !== null,'isUnclaimed'=>$entity?->isUnclaimed(),'entityId'=>$entity?->id],'timestamp'=>round(microtime(true)*1000),'sessionId'=>'debug-session','hypothesisId'=>'H4'])."\n", FILE_APPEND);
-        // #endregion
-
-        if (!$entity || !$entity->isUnclaimed()) {
-            // #region agent log
-            file_put_contents('/var/www/mygigguide/.cursor/debug.log', json_encode(['location'=>'UnclaimedController:edit:abort','message'=>'Aborting 404 - entity not found or not unclaimed','data'=>[],'timestamp'=>round(microtime(true)*1000),'sessionId'=>'debug-session','hypothesisId'=>'H2'])."\n", FILE_APPEND);
-            // #endregion
-            abort(404, 'Unclaimed item not found');
+$entity = $this->findEntity($type, $id);
+if (!$entity || !$entity->isUnclaimed()) {
+abort(404, 'Unclaimed item not found');
         }
-
-        // #region agent log
-        file_put_contents('/var/www/mygigguide/.cursor/debug.log', json_encode(['location'=>'UnclaimedController:edit:returnView','message'=>'Returning edit view','data'=>['viewName'=>"admin.unclaimed.edit-{$type}"],'timestamp'=>round(microtime(true)*1000),'sessionId'=>'debug-session','hypothesisId'=>'H2'])."\n", FILE_APPEND);
-        // #endregion
-        return view("admin.unclaimed.edit-{$type}", [
+return view("admin.unclaimed.edit-{$type}", [
             'entity' => $entity,
             'type' => $type,
         ]);
@@ -434,54 +397,22 @@ class UnclaimedController extends Controller
      */
     public function update(Request $request, string $type, int $id)
     {
-        // #region agent log
-        file_put_contents('/var/www/mygigguide/.cursor/debug.log', json_encode(['location'=>'UnclaimedController:update:entry','message'=>'update method called','data'=>['type'=>$type,'id'=>$id,'method'=>$request->method(),'hasData'=>!empty($request->all())],'timestamp'=>round(microtime(true)*1000),'sessionId'=>'debug-session','hypothesisId'=>'H1,H2'])."\n", FILE_APPEND);
-        // #endregion
-        
-        $entity = $this->findEntity($type, $id);
-        
-        // #region agent log
-        file_put_contents('/var/www/mygigguide/.cursor/debug.log', json_encode(['location'=>'UnclaimedController:update:entityFound','message'=>'Entity lookup result','data'=>['found'=>$entity !== null,'isUnclaimed'=>$entity?->isUnclaimed()],'timestamp'=>round(microtime(true)*1000),'sessionId'=>'debug-session','hypothesisId'=>'H4'])."\n", FILE_APPEND);
-        // #endregion
-
-        if (!$entity || !$entity->isUnclaimed()) {
-            // #region agent log
-            file_put_contents('/var/www/mygigguide/.cursor/debug.log', json_encode(['location'=>'UnclaimedController:update:abort','message'=>'Aborting 404 - entity not found or not unclaimed','data'=>[],'timestamp'=>round(microtime(true)*1000),'sessionId'=>'debug-session','hypothesisId'=>'H2'])."\n", FILE_APPEND);
-            // #endregion
-            abort(404, 'Unclaimed item not found');
+$entity = $this->findEntity($type, $id);
+if (!$entity || !$entity->isUnclaimed()) {
+abort(404, 'Unclaimed item not found');
         }
 
         // Validate based on type
         $validator = $this->getValidator($request, $type);
-        
-        // #region agent log
-        file_put_contents('/var/www/mygigguide/.cursor/debug.log', json_encode(['location'=>'UnclaimedController:update:validation','message'=>'Validation result','data'=>['fails'=>$validator->fails(),'errors'=>$validator->fails() ? $validator->errors()->toArray() : []],'timestamp'=>round(microtime(true)*1000),'sessionId'=>'debug-session','hypothesisId'=>'H3'])."\n", FILE_APPEND);
-        // #endregion
-
-        if ($validator->fails()) {
-            // #region agent log
-            file_put_contents('/var/www/mygigguide/.cursor/debug.log', json_encode(['location'=>'UnclaimedController:update:validationFailed','message'=>'Validation failed, returning with errors','data'=>['errors'=>$validator->errors()->toArray()],'timestamp'=>round(microtime(true)*1000),'sessionId'=>'debug-session','hypothesisId'=>'H3'])."\n", FILE_APPEND);
-            // #endregion
-            return back()->withErrors($validator)->withInput();
+if ($validator->fails()) {
+return back()->withErrors($validator)->withInput();
         }
 
         // Get update data based on type
         $data = $this->getUpdateData($request, $type, $entity);
-        
-        // #region agent log
-        file_put_contents('/var/www/mygigguide/.cursor/debug.log', json_encode(['location'=>'UnclaimedController:update:beforeUpdate','message'=>'About to update entity','data'=>['dataKeys'=>array_keys($data)],'timestamp'=>round(microtime(true)*1000),'sessionId'=>'debug-session','hypothesisId'=>'H4'])."\n", FILE_APPEND);
-        // #endregion
+$entity->update($data);
 
-        $entity->update($data);
-        
-        // #region agent log
-        file_put_contents('/var/www/mygigguide/.cursor/debug.log', json_encode(['location'=>'UnclaimedController:update:afterUpdate','message'=>'Entity updated successfully','data'=>['entityId'=>$entity->id],'timestamp'=>round(microtime(true)*1000),'sessionId'=>'debug-session','hypothesisId'=>'H4'])."\n", FILE_APPEND);
-        // #endregion
-
-        // #region agent log
-        file_put_contents('/var/www/mygigguide/.cursor/debug.log', json_encode(['location'=>'UnclaimedController:update:redirect','message'=>'Redirecting after successful update','data'=>[],'timestamp'=>round(microtime(true)*1000),'sessionId'=>'debug-session','hypothesisId'=>'H2'])."\n", FILE_APPEND);
-        // #endregion
-        return redirect()->route('admin.unclaimed.index', ['type' => $type])
+return redirect()->route('admin.unclaimed.index', ['type' => $type])
             ->with('success', ucfirst($type) . ' updated successfully.');
     }
 
@@ -490,37 +421,13 @@ class UnclaimedController extends Controller
      */
     public function destroy(string $type, int $id)
     {
-        // #region agent log
-        file_put_contents('/var/www/mygigguide/.cursor/debug.log', json_encode(['location'=>'UnclaimedController:destroy:entry','message'=>'destroy method called','data'=>['type'=>$type,'id'=>$id],'timestamp'=>round(microtime(true)*1000),'sessionId'=>'debug-session','hypothesisId'=>'H1,H2'])."\n", FILE_APPEND);
-        // #endregion
-        
-        $entity = $this->findEntity($type, $id);
-        
-        // #region agent log
-        file_put_contents('/var/www/mygigguide/.cursor/debug.log', json_encode(['location'=>'UnclaimedController:destroy:entityFound','message'=>'Entity lookup result','data'=>['found'=>$entity !== null,'isUnclaimed'=>$entity?->isUnclaimed()],'timestamp'=>round(microtime(true)*1000),'sessionId'=>'debug-session','hypothesisId'=>'H4'])."\n", FILE_APPEND);
-        // #endregion
-
-        if (!$entity || !$entity->isUnclaimed()) {
-            // #region agent log
-            file_put_contents('/var/www/mygigguide/.cursor/debug.log', json_encode(['location'=>'UnclaimedController:destroy:abort','message'=>'Aborting 404 - entity not found or not unclaimed','data'=>[],'timestamp'=>round(microtime(true)*1000),'sessionId'=>'debug-session','hypothesisId'=>'H2'])."\n", FILE_APPEND);
-            // #endregion
-            abort(404, 'Unclaimed item not found');
+$entity = $this->findEntity($type, $id);
+if (!$entity || !$entity->isUnclaimed()) {
+abort(404, 'Unclaimed item not found');
         }
+$entity->delete();
 
-        // #region agent log
-        file_put_contents('/var/www/mygigguide/.cursor/debug.log', json_encode(['location'=>'UnclaimedController:destroy:beforeDelete','message'=>'About to delete entity','data'=>['entityId'=>$entity->id],'timestamp'=>round(microtime(true)*1000),'sessionId'=>'debug-session','hypothesisId'=>'H4'])."\n", FILE_APPEND);
-        // #endregion
-        
-        $entity->delete();
-        
-        // #region agent log
-        file_put_contents('/var/www/mygigguide/.cursor/debug.log', json_encode(['location'=>'UnclaimedController:destroy:afterDelete','message'=>'Entity deleted successfully','data'=>[],'timestamp'=>round(microtime(true)*1000),'sessionId'=>'debug-session','hypothesisId'=>'H4'])."\n", FILE_APPEND);
-        // #endregion
-
-        // #region agent log
-        file_put_contents('/var/www/mygigguide/.cursor/debug.log', json_encode(['location'=>'UnclaimedController:destroy:redirect','message'=>'Redirecting after successful delete','data'=>[],'timestamp'=>round(microtime(true)*1000),'sessionId'=>'debug-session','hypothesisId'=>'H2'])."\n", FILE_APPEND);
-        // #endregion
-        return redirect()->route('admin.unclaimed.index', ['type' => $type])
+return redirect()->route('admin.unclaimed.index', ['type' => $type])
             ->with('success', ucfirst($type) . ' deleted successfully.');
     }
 
@@ -623,27 +530,15 @@ class UnclaimedController extends Controller
      */
     public function linkToUser(Request $request, string $type, int $id)
     {
-        // #region agent log
-        file_put_contents('/var/www/mygigguide/.cursor/debug.log', json_encode(['location'=>'UnclaimedController:linkToUser:entry','message'=>'linkToUser called','data'=>['type'=>$type,'id'=>$id,'user_id'=>$request->user_id,'force_replace'=>$request->force_replace,'isAjax'=>$request->ajax(),'wantsJson'=>$request->wantsJson()],'timestamp'=>round(microtime(true)*1000),'sessionId'=>'debug-session','hypothesisId'=>'H2'])."\n", FILE_APPEND);
-        // #endregion
-        
-        $entity = $this->findEntity($type, $id);
+$entity = $this->findEntity($type, $id);
         
         if (!$entity) {
-            // #region agent log
-            file_put_contents('/var/www/mygigguide/.cursor/debug.log', json_encode(['location'=>'UnclaimedController:linkToUser:entityNotFound','message'=>'Entity not found','data'=>['type'=>$type,'id'=>$id],'timestamp'=>round(microtime(true)*1000),'sessionId'=>'debug-session','hypothesisId'=>'H4'])."\n", FILE_APPEND);
-            // #endregion
-            abort(404, 'Entity not found');
+abort(404, 'Entity not found');
         }
         
         // Refresh entity to get latest state from database (important for race conditions)
         $entity->refresh();
-        
-        // #region agent log
-        file_put_contents('/var/www/mygigguide/.cursor/debug.log', json_encode(['location'=>'UnclaimedController:linkToUser:entityCheck','message'=>'Entity found and unclaimed check','data'=>['entityFound'=>$entity !== null,'entityId'=>$entity->id,'isUnclaimed'=>$entity->isUnclaimed(),'currentOwnerId'=>$entity->getOwnerUserId()],'timestamp'=>round(microtime(true)*1000),'sessionId'=>'debug-session','hypothesisId'=>'H1,H4'])."\n", FILE_APPEND);
-        // #endregion
-
-        // Validate request first
+// Validate request first
         $request->validate([
             'user_id' => 'required|integer|exists:users,id',
             'force_replace' => 'nullable|boolean',
@@ -656,19 +551,10 @@ class UnclaimedController extends Controller
         // This respects the database constraint: User hasOne Artist, User hasOne Organiser
         if (in_array($type, ['artist', 'organiser'])) {
             $existing = $this->claimService->getUserExistingEntity($user, $type);
-            
-            // #region agent log
-            file_put_contents('/var/www/mygigguide/.cursor/debug.log', json_encode(['location'=>'UnclaimedController:linkToUser:oneToOneCheck','message'=>'Checking 1-to-1 relationship constraint','data'=>['type'=>$type,'userId'=>$user->id,'hasExisting'=>$existing !== null,'existingId'=>$existing?->id,'newEntityId'=>$entity->id,'forceReplace'=>$forceReplace],'timestamp'=>round(microtime(true)*1000),'sessionId'=>'debug-session','hypothesisId'=>'H3'])."\n", FILE_APPEND);
-            // #endregion
-            
-            // If user already has this type of entity and it's not the same entity, and not forcing replace
+// If user already has this type of entity and it's not the same entity, and not forcing replace
             if ($existing && $existing->id !== $entity->id && !$forceReplace) {
                 // Return conflict response instead of 404
-                // #region agent log
-                file_put_contents('/var/www/mygigguide/.cursor/debug.log', json_encode(['location'=>'UnclaimedController:linkToUser:oneToOneConflict','message'=>'1-to-1 conflict detected before linking','data'=>['existingId'=>$existing->id,'newEntityId'=>$entity->id],'timestamp'=>round(microtime(true)*1000),'sessionId'=>'debug-session','hypothesisId'=>'H3'])."\n", FILE_APPEND);
-                // #endregion
-                
-                if ($request->ajax() || $request->wantsJson()) {
+if ($request->ajax() || $request->wantsJson()) {
                     return response()->json([
                         'conflict' => true,
                         'data' => [
@@ -687,17 +573,9 @@ class UnclaimedController extends Controller
         
         // Now check if entity is unclaimed (after checking 1-to-1 constraints)
         if (!$entity->isUnclaimed()) {
-            // #region agent log
-            file_put_contents('/var/www/mygigguide/.cursor/debug.log', json_encode(['location'=>'UnclaimedController:linkToUser:abort','message'=>'Aborting - entity not unclaimed','data'=>['entityFound'=>$entity !== null,'isUnclaimed'=>$entity->isUnclaimed(),'currentOwnerId'=>$entity->getOwnerUserId()],'timestamp'=>round(microtime(true)*1000),'sessionId'=>'debug-session','hypothesisId'=>'H4'])."\n", FILE_APPEND);
-            // #endregion
-            abort(404, 'Unclaimed item not found');
+abort(404, 'Unclaimed item not found');
         }
-        
-        // #region agent log
-        file_put_contents('/var/www/mygigguide/.cursor/debug.log', json_encode(['location'=>'UnclaimedController:linkToUser:beforeLink','message'=>'About to call claimService->linkToUser','data'=>['userId'=>$user->id,'userName'=>$user->name,'forceReplace'=>$forceReplace,'entityType'=>$type],'timestamp'=>round(microtime(true)*1000),'sessionId'=>'debug-session','hypothesisId'=>'H2,H3'])."\n", FILE_APPEND);
-        // #endregion
-        
-        try {
+try {
             // Use database transaction to prevent race conditions
             \DB::beginTransaction();
             
@@ -709,29 +587,13 @@ class UnclaimedController extends Controller
                 \DB::rollBack();
                 abort(404, 'This item is no longer unclaimed');
             }
-            
-            // #region agent log
-            file_put_contents('/var/www/mygigguide/.cursor/debug.log', json_encode(['location'=>'UnclaimedController:linkToUser:beforeServiceCall','message'=>'Entity state before service call','data'=>['entityId'=>$entity->id,'entityType'=>$type,'isUnclaimed'=>$entity->isUnclaimed(),'currentOwnerId'=>$entity->getOwnerUserId()],'timestamp'=>round(microtime(true)*1000),'sessionId'=>'debug-session','hypothesisId'=>'H1,H4'])."\n", FILE_APPEND);
-            // #endregion
-            
-            $this->claimService->linkToUser($entity, $user, $forceReplace);
+$this->claimService->linkToUser($entity, $user, $forceReplace);
             
             \DB::commit();
-            
-            // #region agent log
-            $entity->refresh();
-            file_put_contents('/var/www/mygigguide/.cursor/debug.log', json_encode(['location'=>'UnclaimedController:linkToUser:afterServiceCall','message'=>'Entity state after service call','data'=>['entityId'=>$entity->id,'isUnclaimed'=>$entity->isUnclaimed(),'ownerId'=>$entity->getOwnerUserId(),'userId'=>$user->id],'timestamp'=>round(microtime(true)*1000),'sessionId'=>'debug-session','hypothesisId'=>'H1,H4'])."\n", FILE_APPEND);
-            // #endregion
-            
-            // #region agent log
-            file_put_contents('/var/www/mygigguide/.cursor/debug.log', json_encode(['location'=>'UnclaimedController:linkToUser:success','message'=>'linkToUser succeeded without exception','data'=>['responseType'=>$request->ajax() ? 'ajax' : 'redirect'],'timestamp'=>round(microtime(true)*1000),'sessionId'=>'debug-session','hypothesisId'=>'H2,H5'])."\n", FILE_APPEND);
-            // #endregion
-        } catch (\App\Exceptions\UserAlreadyHasEntityException $e) {
+
+} catch (\App\Exceptions\UserAlreadyHasEntityException $e) {
             \DB::rollBack();
-            // #region agent log
-            file_put_contents('/var/www/mygigguide/.cursor/debug.log', json_encode(['location'=>'UnclaimedController:linkToUser:conflict','message'=>'UserAlreadyHasEntityException caught','data'=>$e->getConflictData(),'timestamp'=>round(microtime(true)*1000),'sessionId'=>'debug-session','hypothesisId'=>'H2'])."\n", FILE_APPEND);
-            // #endregion
-            // For AJAX requests, return JSON with conflict data
+// For AJAX requests, return JSON with conflict data
             if ($request->ajax() || $request->wantsJson()) {
                 return response()->json([
                     'conflict' => true,
@@ -743,10 +605,7 @@ class UnclaimedController extends Controller
             return back()->with('error', $e->getMessage());
         } catch (\Exception $e) {
             \DB::rollBack();
-            // #region agent log
-            file_put_contents('/var/www/mygigguide/.cursor/debug.log', json_encode(['location'=>'UnclaimedController:linkToUser:exception','message'=>'Unexpected exception caught','data'=>['message'=>$e->getMessage(),'class'=>get_class($e),'file'=>$e->getFile(),'line'=>$e->getLine()],'timestamp'=>round(microtime(true)*1000),'sessionId'=>'debug-session','hypothesisId'=>'H2'])."\n", FILE_APPEND);
-            // #endregion
-            if ($request->ajax() || $request->wantsJson()) {
+if ($request->ajax() || $request->wantsJson()) {
                 return response()->json(['error' => $e->getMessage()], 500);
             }
             return back()->with('error', 'An error occurred: ' . $e->getMessage());
@@ -765,11 +624,7 @@ class UnclaimedController extends Controller
      */
     public function checkLinkConflict(Request $request, string $type, int $id)
     {
-        // #region agent log
-        file_put_contents('/var/www/mygigguide/.cursor/debug.log', json_encode(['location'=>'UnclaimedController:checkLinkConflict:entry','message'=>'checkLinkConflict called','data'=>['type'=>$type,'id'=>$id,'user_id'=>$request->user_id],'timestamp'=>round(microtime(true)*1000),'sessionId'=>'debug-session','hypothesisId'=>'H2'])."\n", FILE_APPEND);
-        // #endregion
-        
-        $request->validate([
+$request->validate([
             'user_id' => 'required|exists:users,id',
         ]);
 
@@ -781,12 +636,7 @@ class UnclaimedController extends Controller
 
         $user = User::findOrFail($request->user_id);
         $conflict = $this->claimService->checkLinkConflict($user, $type, $id);
-
-        // #region agent log
-        file_put_contents('/var/www/mygigguide/.cursor/debug.log', json_encode(['location'=>'UnclaimedController:checkLinkConflict:result','message'=>'Conflict check result','data'=>['hasConflict'=>$conflict !== null,'conflict'=>$conflict],'timestamp'=>round(microtime(true)*1000),'sessionId'=>'debug-session','hypothesisId'=>'H3'])."\n", FILE_APPEND);
-        // #endregion
-
-        $response = [
+$response = [
             'has_conflict' => $conflict !== null,
             'conflict' => $conflict,
         ];
@@ -806,30 +656,13 @@ class UnclaimedController extends Controller
      */
     protected function findEntity(string $type, int $id): ?Model
     {
-        // #region agent log
-        file_put_contents('/var/www/mygigguide/.cursor/debug.log', json_encode(['location'=>'UnclaimedController:findEntity:entry','message'=>'findEntity called','data'=>['type'=>$type,'id'=>$id],'timestamp'=>round(microtime(true)*1000),'sessionId'=>'debug-session','hypothesisId'=>'H4'])."\n", FILE_APPEND);
-        // #endregion
-        
-        $modelClass = $this->claimService->getModelClass($type);
-        
-        // #region agent log
-        file_put_contents('/var/www/mygigguide/.cursor/debug.log', json_encode(['location'=>'UnclaimedController:findEntity:modelClass','message'=>'Model class lookup','data'=>['modelClass'=>$modelClass],'timestamp'=>round(microtime(true)*1000),'sessionId'=>'debug-session','hypothesisId'=>'H4'])."\n", FILE_APPEND);
-        // #endregion
-
-        if (!$modelClass) {
-            // #region agent log
-            file_put_contents('/var/www/mygigguide/.cursor/debug.log', json_encode(['location'=>'UnclaimedController:findEntity:noModelClass','message'=>'No model class found for type','data'=>[],'timestamp'=>round(microtime(true)*1000),'sessionId'=>'debug-session','hypothesisId'=>'H4'])."\n", FILE_APPEND);
-            // #endregion
-            return null;
+$modelClass = $this->claimService->getModelClass($type);
+if (!$modelClass) {
+return null;
         }
 
         $entity = $modelClass::find($id);
-        
-        // #region agent log
-        file_put_contents('/var/www/mygigguide/.cursor/debug.log', json_encode(['location'=>'UnclaimedController:findEntity:result','message'=>'Entity lookup result','data'=>['found'=>$entity !== null,'entityId'=>$entity?->id],'timestamp'=>round(microtime(true)*1000),'sessionId'=>'debug-session','hypothesisId'=>'H4'])."\n", FILE_APPEND);
-        // #endregion
-        
-        return $entity;
+return $entity;
     }
 
     /**

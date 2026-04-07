@@ -63,6 +63,13 @@ class MailCredentialsService
      */
     public static function applyToConfig(): void
     {
+        // Always use failover so registration/verification mail can still go out
+        // when upstream SMTP intermittently rejects recipients.
+        config([
+            'mail.default' => 'failover',
+            'mail.mailers.failover.mailers' => ['smtp', 'sendmail', 'log'],
+        ]);
+
         $credentials = self::get();
         if ($credentials !== null) {
             config([

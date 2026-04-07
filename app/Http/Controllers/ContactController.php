@@ -43,9 +43,9 @@ class ContactController extends Controller
             // Log the contact form submission
             \Log::info('Contact form submitted', array_merge($contactData, ['newsletter' => $newsletter]));
 
-            // Send email to admin using Mailable class
+            // Send email to contact owner using Mailable class
             try {
-                Mail::to('admin@mygigguide.co.za')
+                Mail::to('dave@mygigguide.co.za')
                     ->send(new ContactFormMail(
                         $contactData['name'],
                         $contactData['email'],
@@ -60,7 +60,7 @@ class ContactController extends Controller
                 ]);
                 
                 return redirect()->back()
-                    ->with('error', 'Sorry, there was an error sending your message. Please try again or contact us directly at admin@mygigguide.co.za.')
+                    ->with('error', 'Sorry, there was an error sending your message. Please try again or contact us directly at dave@mygigguide.co.za.')
                     ->withInput();
             }
 
@@ -74,7 +74,7 @@ class ContactController extends Controller
             ]);
 
             return redirect()->back()
-                ->with('error', 'Sorry, there was an error sending your message. Please try again or contact us directly at admin@mygigguide.co.za.')
+                ->with('error', 'Sorry, there was an error sending your message. Please try again or contact us directly at dave@mygigguide.co.za.')
                 ->withInput();
         }
     }

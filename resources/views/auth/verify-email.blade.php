@@ -40,6 +40,12 @@
                     </div>
                 @endif
 
+                @if (session('warning'))
+                    <div class="mb-4 bg-amber-50 border border-amber-200 text-amber-800 px-4 py-3 rounded-lg">
+                        {{ session('warning') }}
+                    </div>
+                @endif
+
                 @if (session('error'))
                     <div class="mb-4 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
                         {{ session('error') }}

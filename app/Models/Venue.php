@@ -13,50 +13,7 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
 class Venue extends Model
 {
     use Claimable;
-    // #region agent log
-    protected static function booted()
-    {
-        static::updating(function ($venue) {
-            $original = $venue->getOriginal();
-            $changes = $venue->getDirty();
-            @file_put_contents('/var/www/mygigguide/.cursor/debug.log', json_encode([
-                'location' => 'Venue::updating',
-                'message' => 'Venue model updating event triggered',
-                'data' => [
-                    'venue_id' => $venue->id,
-                    'venue_name' => $venue->name,
-                    'original_contact_email' => $original['contact_email'] ?? 'NOT_SET',
-                    'new_contact_email' => $venue->contact_email,
-                    'dirty_fields' => array_keys($changes),
-                    'contact_email_changing' => array_key_exists('contact_email', $changes),
-                    'backtrace' => collect(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 10))->map(fn($t) => ($t['class'] ?? '') . '::' . ($t['function'] ?? '') . ' (' . basename($t['file'] ?? '') . ':' . ($t['line'] ?? '') . ')')->toArray(),
-                ],
-                'timestamp' => now()->timestamp * 1000,
-                'sessionId' => 'debug-session',
-                'runId' => 'run1',
-                'hypothesisId' => 'MODEL',
-            ]) . "\n", FILE_APPEND | LOCK_EX);
-        });
-
-        static::creating(function ($venue) {
-            @file_put_contents('/var/www/mygigguide/.cursor/debug.log', json_encode([
-                'location' => 'Venue::creating',
-                'message' => 'Venue model creating event triggered',
-                'data' => [
-                    'venue_name' => $venue->name,
-                    'contact_email' => $venue->contact_email,
-                    'backtrace' => collect(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 10))->map(fn($t) => ($t['class'] ?? '') . '::' . ($t['function'] ?? '') . ' (' . basename($t['file'] ?? '') . ':' . ($t['line'] ?? '') . ')')->toArray(),
-                ],
-                'timestamp' => now()->timestamp * 1000,
-                'sessionId' => 'debug-session',
-                'runId' => 'run1',
-                'hypothesisId' => 'MODEL',
-            ]) . "\n", FILE_APPEND | LOCK_EX);
-        });
-    }
-    // #endregion
-
-    protected $fillable = [
+protected $fillable = [
         'name',
         'description',
         'city',

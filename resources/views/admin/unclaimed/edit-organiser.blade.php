@@ -217,7 +217,6 @@ function linkUserSection() {
             const user = detail.user;
             this.selectedUserId = user.id;
             
-            // #region agent log
             
             this.checkingConflict = true;
             this.errorMessage = '';
@@ -236,7 +235,6 @@ function linkUserSection() {
                 
                 const data = await response.json();
                 
-                // #region agent log
                 
                 if (data.has_conflict && data.conflict) {
                     this.conflictData = {

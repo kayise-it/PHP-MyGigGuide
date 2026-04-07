@@ -1,5 +1,21 @@
 @extends('layouts.app')
 
+@push('head')
+<!-- Open Graph / Facebook -->
+<meta property="og:type" content="website">
+<meta property="og:url" content="{{ url('/') }}">
+<meta property="og:title" content="Home - Discover Amazing Events">
+<meta property="og:description" content="Find the best concerts, festivals, and events happening in your area.">
+<meta property="og:image" content="{{ url(asset('logos/logo1.jpeg')) }}">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:site_name" content="{{ config('app.name', 'My Gig Guide') }}">
+<!-- Twitter -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Home - Discover Amazing Events">
+<meta name="twitter:description" content="Find the best concerts, festivals, and events happening in your area.">
+<meta name="twitter:image" content="{{ url(asset('logos/logo1.jpeg')) }}">
+@endpush
 
 @section('title', 'Home - Discover Amazing Events')
 @section('description', 'Find the best concerts, festivals, and events happening in your area')

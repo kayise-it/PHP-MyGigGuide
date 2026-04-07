@@ -49,9 +49,6 @@ class VenueManagementController extends Controller
 
     public function store(Request $request)
     {
-        // #region agent log
-        @file_put_contents('/var/www/mygigguide/.cursor/debug.log', json_encode(['location'=>'VenueManagementController.php:store:entry','message'=>'Admin venue CREATE entry','data'=>['request_contact_email'=>$request->input('contact_email'),'request_name'=>$request->input('name'),'all_request_keys'=>array_keys($request->all())],'timestamp'=>now()->timestamp*1000,'sessionId'=>'debug-session','runId'=>'run1','hypothesisId'=>'F'])."\n", FILE_APPEND | LOCK_EX);
-        // #endregion
 
         $validator = Validator::make($request->all(), [
             'name' => ['required', 'string', 'max:255', UniqueNormalizedName::forVenue()],
@@ -148,9 +145,6 @@ class VenueManagementController extends Controller
 
     public function update(Request $request, Venue $venue)
     {
-        // #region agent log
-        @file_put_contents('/var/www/mygigguide/.cursor/debug.log', json_encode(['location'=>'VenueManagementController.php:update:entry','message'=>'Admin venue update entry','data'=>['venue_id'=>$venue->id,'venue_name'=>$venue->name,'current_contact_email'=>$venue->contact_email,'request_contact_email'=>$request->input('contact_email'),'request_owner_email'=>$request->input('owner_email'),'all_request_keys'=>array_keys($request->all())],'timestamp'=>now()->timestamp*1000,'sessionId'=>'debug-session','runId'=>'run1','hypothesisId'=>'A'])."\n", FILE_APPEND | LOCK_EX);
-        // #endregion
 
         $venue->loadMissing('user');
         $owner = $venue->user;
@@ -189,10 +183,6 @@ class VenueManagementController extends Controller
             'name', 'description', 'address', 'city', 'capacity', 'contact_email', 'contact_phone', 'latitude', 'longitude',
         ]);
 
-        // #region agent log
-        @file_put_contents('/var/www/mygigguide/.cursor/debug.log', json_encode(['location'=>'VenueManagementController.php:update:after-only','message'=>'Data after request->only()','data'=>['data_contact_email'=>$data['contact_email'] ?? 'NOT_SET','data_keys'=>array_keys($data),'is_contact_email_empty'=>empty($data['contact_email']),'venue_original_contact_email'=>$venue->contact_email],'timestamp'=>now()->timestamp*1000,'sessionId'=>'debug-session','runId'=>'run1','hypothesisId'=>'C'])."\n", FILE_APPEND | LOCK_EX);
-        // #endregion
-
         // Handle main picture
         if ($request->hasFile('main_picture')) {
             if ($venue->main_picture && Storage::disk('public')->exists($venue->main_picture)) {
@@ -218,16 +208,7 @@ class VenueManagementController extends Controller
             $data['venue_gallery'] = $galleryPaths;
         }
 
-        // #region agent log
-        @file_put_contents('/var/www/mygigguide/.cursor/debug.log', json_encode(['location'=>'VenueManagementController.php:update:before-save','message'=>'Data about to be saved to venue','data'=>['data_being_saved'=>$data,'venue_id'=>$venue->id,'venue_contact_email_before_save'=>$venue->contact_email,'data_contact_email'=>$data['contact_email'] ?? 'NOT_SET'],'timestamp'=>now()->timestamp*1000,'sessionId'=>'debug-session','runId'=>'run1','hypothesisId'=>'A'])."\n", FILE_APPEND | LOCK_EX);
-        // #endregion
-
         $venue->update($data);
-
-        // #region agent log
-        $venue->refresh();
-        @file_put_contents('/var/www/mygigguide/.cursor/debug.log', json_encode(['location'=>'VenueManagementController.php:update:after-save','message'=>'Venue after update','data'=>['venue_id'=>$venue->id,'venue_contact_email_after_save'=>$venue->contact_email],'timestamp'=>now()->timestamp*1000,'sessionId'=>'debug-session','runId'=>'run1','hypothesisId'=>'A'])."\n", FILE_APPEND | LOCK_EX);
-        // #endregion
 
         // Only update owner email if explicitly provided, different, and not accidentally the venue's contact_email
         if ($owner && $request->filled('owner_email')) {

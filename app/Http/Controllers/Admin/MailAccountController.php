@@ -12,6 +12,52 @@ use Illuminate\Support\Facades\Validator;
 class MailAccountController extends Controller
 {
     /**
+     * Resolve the single/default mail domain.
+     */
+    private function getDefaultDomain()
+    {
+        return DB::connection('mailserver')
+            ->table('virtual_domains')
+            ->select('id', 'name')
+            ->orderBy('id')
+            ->first();
+    }
+
+    /**
+     * Normalize a username/full email into a validated full email.
+     */
+    private function normalizeEmail(string $inputEmail, int $domainId): array
+    {
+        $emailInput = trim($inputEmail);
+        if ($emailInput === '') {
+            return [null, 'Email address is required.'];
+        }
+
+        if (!str_contains($emailInput, '@')) {
+            if (!preg_match('/^[A-Za-z0-9._%+\-]+$/', $emailInput)) {
+                return [null, 'Use only letters, numbers, dot, underscore, plus or dash in the username.'];
+            }
+
+            $domain = DB::connection('mailserver')
+                ->table('virtual_domains')
+                ->where('id', $domainId)
+                ->value('name');
+
+            if (!$domain) {
+                return [null, 'No valid domain is configured.'];
+            }
+
+            return [$emailInput.'@'.$domain, null];
+        }
+
+        if (!filter_var($emailInput, FILTER_VALIDATE_EMAIL)) {
+            return [null, 'Please enter a valid email address.'];
+        }
+
+        return [strtolower($emailInput), null];
+    }
+
+    /**
      * Display a listing of email accounts
      */
     public function index(Request $request)
@@ -48,12 +94,14 @@ class MailAccountController extends Controller
      */
     public function create()
     {
-        $domains = DB::connection('mailserver')
-            ->table('virtual_domains')
-            ->distinct()
-            ->pluck('name', 'id');
+        $defaultDomain = $this->getDefaultDomain();
 
-        return view('admin.mail-accounts.create', compact('domains'));
+        if (!$defaultDomain) {
+            return redirect()->route('admin.mail-accounts.index')
+                ->with('error', 'No mail domain is configured yet.');
+        }
+
+        return view('admin.mail-accounts.create', compact('defaultDomain'));
     }
 
     /**
@@ -61,87 +109,64 @@ class MailAccountController extends Controller
      */
     public function store(Request $request)
     {
-        // #region agent log
-        $logPath = base_path('.cursor/debug.log');
-        $log = function ($hypothesisId, $message, $data = []) use ($logPath) {
-            $line = json_encode(array_filter([
-                'timestamp' => (int)(microtime(true) * 1000),
-                'sessionId' => 'debug-session',
-                'runId' => $data['runId'] ?? 'run1',
-                'hypothesisId' => $hypothesisId,
-                'location' => 'MailAccountController.php:store',
-                'message' => $message,
-                'data' => $data,
-            ])) . "\n";
-            @file_put_contents($logPath, $line, FILE_APPEND | LOCK_EX);
-        };
-        $log('A', 'store() entry', ['email_raw' => $request->input('email'), 'domain_id' => $request->input('domain_id'), 'has_at' => str_contains((string)$request->input('email'), '@')]);
-        // #endregion
+        $domainId = $request->input('domain_id');
+        if (empty($domainId)) {
+            $domainId = $this->getDefaultDomain()?->id;
+        }
 
         $validator = Validator::make($request->all(), [
-            'email' => 'required|email|max:120',
+            'email' => 'required|string|max:120',
             'password' => 'required|string|min:8|confirmed',
-            'domain_id' => 'required|exists:mailserver.virtual_domains,id',
         ], [
             'email.required' => 'Email address is required.',
-            'email.email' => 'Please enter a valid email address.',
             'email.max' => 'Email address cannot exceed 120 characters.',
             'password.required' => 'Password is required.',
             'password.min' => 'Password must be at least 8 characters.',
             'password.confirmed' => 'Password confirmation does not match.',
-            'domain_id.required' => 'Domain is required.',
-            'domain_id.exists' => 'Selected domain does not exist.',
         ]);
 
-        // #region agent log
-        $log('A', 'after Validator::make', ['fails' => $validator->fails(), 'errors' => $validator->errors()->get('email')]);
-        // #endregion
+        if ($validator->fails()) {
+            return redirect()->back()
+                ->withErrors($validator)
+                ->withInput();
+        }
+
+        if (empty($domainId) || !DB::connection('mailserver')->table('virtual_domains')->where('id', $domainId)->exists()) {
+            return redirect()->back()
+                ->withErrors(['domain_id' => 'No valid domain is configured.'])
+                ->withInput();
+        }
+
+        [$email, $emailError] = $this->normalizeEmail((string) $request->email, (int) $domainId);
+        if ($emailError) {
+            return redirect()->back()
+                ->withErrors(['email' => $emailError])
+                ->withInput();
+        }
 
         // Check if email already exists
         $exists = DB::connection('mailserver')
             ->table('virtual_users')
-            ->where('email', $request->email)
+            ->where('email', $email)
             ->exists();
 
-        // #region agent log
-        $log('C', 'duplicate check', ['request_email' => $request->email, 'exists' => $exists]);
-        // #endregion
-
         if ($exists) {
-            $validator->errors()->add('email', 'This email address already exists.');
             return redirect()->back()
-                ->withErrors($validator)
+                ->withErrors(['email' => 'This email address already exists.'])
                 ->withInput();
         }
 
-        if ($validator->fails()) {
-            // #region agent log
-            $log('E', 'redirect back due to validation failure', ['failed_rules' => $validator->errors()->keys()]);
-            // #endregion
-            return redirect()->back()
-                ->withErrors($validator)
-                ->withInput();
-        }
-
-        // Hash password using Dovecot
+        // Hash password in Dovecot-compatible format
         $hashedPassword = MailAccount::hashPassword($request->password);
-
-        // Construct full email if only username provided
-        $email = $request->email;
-        // #region agent log
-        $log('E', 'before construct full email', ['email' => $email, 'will_append_domain' => !str_contains($email, '@')]);
-        // #endregion
-        if (!str_contains($email, '@')) {
-            $domain = DB::connection('mailserver')
-                ->table('virtual_domains')
-                ->where('id', $request->domain_id)
-                ->value('name');
-            $email = $email . '@' . $domain;
+        if (empty($hashedPassword)) {
+            return redirect()->back()
+                ->withErrors(['password' => 'Failed to hash password. Please try again.'])
+                ->withInput();
         }
 
         // Create email account
         DB::connection('mailserver')->table('virtual_users')->insert([
-            'domain_id' => $request->domain_id,
+            'domain_id' => $domainId,
             'email' => $email,
             'password' => $hashedPassword,
         ]);
@@ -171,7 +196,7 @@ class MailAccountController extends Controller
             'incoming' => [
                 'server' => 'mail.mygigguide.co.za',
                 'port' => 143,
-                'security' => 'None',
+                'security' => 'STARTTLS',
                 'username' => $account->email,
                 'password' => '*** (hidden)',
             ],
@@ -201,12 +226,12 @@ class MailAccountController extends Controller
             abort(404, 'Email account not found.');
         }
 
-        $domains = DB::connection('mailserver')
+        $domainName = DB::connection('mailserver')
             ->table('virtual_domains')
-            ->distinct()
-            ->pluck('name', 'id');
+            ->where('id', $account->domain_id)
+            ->value('name');
 
-        return view('admin.mail-accounts.edit', compact('account', 'domains'));
+        return view('admin.mail-accounts.edit', compact('account', 'domainName'));
     }
 
     /**
@@ -224,24 +249,35 @@ class MailAccountController extends Controller
         }
 
         $validator = Validator::make($request->all(), [
-            'email' => 'required|email|max:120',
+            'email' => 'required|string|max:120',
             'password' => 'nullable|string|min:8|confirmed',
-            'domain_id' => 'required|exists:mailserver.virtual_domains,id',
+            'domain_id' => 'required',
         ], [
             'email.required' => 'Email address is required.',
-            'email.email' => 'Please enter a valid email address.',
             'email.max' => 'Email address cannot exceed 120 characters.',
             'password.min' => 'Password must be at least 8 characters.',
             'password.confirmed' => 'Password confirmation does not match.',
             'domain_id.required' => 'Domain is required.',
-            'domain_id.exists' => 'Selected domain does not exist.',
         ]);
 
+        if (!DB::connection('mailserver')->table('virtual_domains')->where('id', $request->domain_id)->exists()) {
+            return redirect()->back()
+                ->withErrors(['domain_id' => 'Selected domain does not exist.'])
+                ->withInput();
+        }
+
+        [$normalizedEmail, $emailError] = $this->normalizeEmail((string) $request->email, (int) $request->domain_id);
+        if ($emailError) {
+            return redirect()->back()
+                ->withErrors(['email' => $emailError])
+                ->withInput();
+        }
+
         // Check if email already exists (excluding current account)
-        if ($request->email !== $account->email) {
+        if ($normalizedEmail !== $account->email) {
             $exists = DB::connection('mailserver')
                 ->table('virtual_users')
-                ->where('email', $request->email)
+                ->where('email', $normalizedEmail)
                 ->where('id', '!=', $id)
                 ->exists();
 
@@ -260,13 +296,19 @@ class MailAccountController extends Controller
         }
 
         $updateData = [
-            'email' => $request->email,
+            'email' => $normalizedEmail,
             'domain_id' => $request->domain_id,
         ];
 
         // Update password only if provided
         if ($request->filled('password')) {
-            $updateData['password'] = MailAccount::hashPassword($request->password);
+            $hashedPassword = MailAccount::hashPassword($request->password);
+            if (empty($hashedPassword)) {
+                return redirect()->back()
+                    ->withErrors(['password' => 'Failed to hash password. Please try again.'])
+                    ->withInput();
+            }
+            $updateData['password'] = $hashedPassword;
         }
 
         DB::connection('mailserver')
@@ -279,7 +321,7 @@ class MailAccountController extends Controller
         $defaultAccountId = (int) config('mail.default_account_id', 2);
         if ((int) $id === $defaultAccountId) {
             $plainPassword = $request->filled('password') ? $request->password : null;
-            MailCredentialsService::store($request->email, $plainPassword);
+            MailCredentialsService::store($normalizedEmail, $plainPassword);
         }
 
         return redirect()->route('admin.mail-accounts.show', $id)

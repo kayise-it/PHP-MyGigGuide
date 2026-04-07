@@ -245,22 +245,11 @@ class ClaimService
     public function linkToUser(Model $entity, User $user, bool $forceReplace = false): bool
     {
         $type = $entity->getClaimableType();
-        
-        // #region agent log
-        file_put_contents('/var/www/mygigguide/.cursor/debug.log', json_encode(['location'=>'ClaimService:linkToUser:entry','message'=>'linkToUser called','data'=>['type'=>$type,'entityId'=>$entity->id,'userId'=>$user->id,'forceReplace'=>$forceReplace,'isHasOneType'=>in_array($type, ['artist', 'organiser'])],'timestamp'=>round(microtime(true)*1000),'sessionId'=>'debug-session','hypothesisId'=>'H3'])."\n", FILE_APPEND);
-        // #endregion
-        
-        // For hasOne relationships (artist, organiser), check for existing
+// For hasOne relationships (artist, organiser), check for existing
         if (in_array($type, ['artist', 'organiser']) && !$forceReplace) {
             $existing = $this->getUserExistingEntity($user, $type);
-            // #region agent log
-            file_put_contents('/var/www/mygigguide/.cursor/debug.log', json_encode(['location'=>'ClaimService:linkToUser:existingCheck','message'=>'Checked for existing entity','data'=>['hasExisting'=>$existing !== null,'existingId'=>$existing?->id,'existingName'=>$existing?->getDisplayName(),'newEntityId'=>$entity->id],'timestamp'=>round(microtime(true)*1000),'sessionId'=>'debug-session','hypothesisId'=>'H3'])."\n", FILE_APPEND);
-            // #endregion
-            if ($existing && $existing->id !== $entity->id) {
-                // #region agent log
-                file_put_contents('/var/www/mygigguide/.cursor/debug.log', json_encode(['location'=>'ClaimService:linkToUser:throwingException','message'=>'Throwing UserAlreadyHasEntityException','data'=>['existingId'=>$existing->id,'newEntityId'=>$entity->id],'timestamp'=>round(microtime(true)*1000),'sessionId'=>'debug-session','hypothesisId'=>'H3'])."\n", FILE_APPEND);
-                // #endregion
-                throw new \App\Exceptions\UserAlreadyHasEntityException(
+if ($existing && $existing->id !== $entity->id) {
+throw new \App\Exceptions\UserAlreadyHasEntityException(
                     $type,
                     $existing,
                     $user
@@ -278,38 +267,13 @@ class ClaimService
         }
         
         $ownerField = $entity->getOwnerUserIdField();
-        
-        // #region agent log
-        file_put_contents('/var/www/mygigguide/.cursor/debug.log', json_encode(['location'=>'ClaimService:linkToUser:beforeUpdate','message'=>'About to update entity owner field','data'=>['ownerField'=>$ownerField,'userId'=>$user->id,'entityId'=>$entity->id,'currentOwnerId'=>$entity->getOwnerUserId()],'timestamp'=>round(microtime(true)*1000),'sessionId'=>'debug-session','hypothesisId'=>'H1,H4'])."\n", FILE_APPEND);
-        // #endregion
-        
-        $entity->update([
+$entity->update([
             $ownerField => $user->id,
         ]);
-        
-        // #region agent log
-        $entity->refresh();
-        file_put_contents('/var/www/mygigguide/.cursor/debug.log', json_encode(['location'=>'ClaimService:linkToUser:afterUpdate','message'=>'Entity updated, checking state','data'=>['entityId'=>$entity->id,'ownerIdAfterUpdate'=>$entity->getOwnerUserId(),'isUnclaimedAfterUpdate'=>$entity->isUnclaimed()],'timestamp'=>round(microtime(true)*1000),'sessionId'=>'debug-session','hypothesisId'=>'H1,H3,H4'])."\n", FILE_APPEND);
-        // #endregion
-        
-        $entity->clearClaimData();
-        
-        // #region agent log
-        $entity->refresh();
-        file_put_contents('/var/www/mygigguide/.cursor/debug.log', json_encode(['location'=>'ClaimService:linkToUser:afterClearClaimData','message'=>'After clearClaimData, checking state','data'=>['entityId'=>$entity->id,'ownerIdAfterClear'=>$entity->getOwnerUserId(),'isUnclaimedAfterClear'=>$entity->isUnclaimed()],'timestamp'=>round(microtime(true)*1000),'sessionId'=>'debug-session','hypothesisId'=>'H1,H3,H6'])."\n", FILE_APPEND);
-        // #endregion
-        
-        // #region agent log
-        file_put_contents('/var/www/mygigguide/.cursor/debug.log', json_encode(['location'=>'ClaimService:linkToUser:beforeAssignRole','message'=>'About to assign role','data'=>['userId'=>$user->id,'entityType'=>$type],'timestamp'=>round(microtime(true)*1000),'sessionId'=>'debug-session','hypothesisId'=>'H4'])."\n", FILE_APPEND);
-        // #endregion
-        
-        $this->assignRoleForEntity($user, $entity);
-        
-        // #region agent log
-        file_put_contents('/var/www/mygigguide/.cursor/debug.log', json_encode(['location'=>'ClaimService:linkToUser:success','message'=>'linkToUser completed successfully','data'=>[],'timestamp'=>round(microtime(true)*1000),'sessionId'=>'debug-session','hypothesisId'=>'H2'])."\n", FILE_APPEND);
-        // #endregion
+$entity->clearClaimData();
 
-        return true;
+$this->assignRoleForEntity($user, $entity);
+return true;
     }
 
     /**

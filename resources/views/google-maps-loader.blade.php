@@ -6,7 +6,7 @@
     // Prevent multiple Google Maps API loads
     window.googleMapsLoaded = false;
     window.googleMapsCallbacks = [];
-    window.googleMapsAPIKey = '{{ config('services.google_maps.api_key') }}';
+    window.googleMapsAPIKey = '{{ config('services.google_maps.api_key', env('GOOGLE_MAPS_API_KEY', 'YOUR_API_KEY')) }}';
 
     function loadGoogleMaps() {
         if (window.googleMapsLoaded || document.querySelector('script[src*="maps.googleapis.com"]')) {

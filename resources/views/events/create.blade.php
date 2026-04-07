@@ -208,7 +208,7 @@
                     </label>
                     <x-venue-selector 
                         name="venue_id" 
-                        :selectedVenueId="old('venue_id', $selectedVenueId)"
+                        :selectedVenueId="old('venue_id')"
                         placeholder="Choose a venue for your event..."
                         userRole="organiser"
                         :organiserId="auth()->user()->id"
@@ -719,7 +719,7 @@ function loadGoogleMapsForVenue() {
 
     // Load the script
     const script = document.createElement('script');
-    script.src = `https://maps.googleapis.com/maps/api/js?key={{ env('GOOGLE_MAPS_API_KEY') }}&libraries=places&callback=initVenueAutocomplete`;
+    script.src = `https://maps.googleapis.com/maps/api/js?key={{ config('services.google_maps.api_key') }}&libraries=places&callback=initVenueAutocomplete`;
     script.async = true;
     script.defer = true;
     document.head.appendChild(script);
