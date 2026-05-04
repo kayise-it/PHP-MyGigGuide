@@ -11,20 +11,19 @@ return new class extends Migration
      */
     public function up(): void
     {
-Schema::create('youtube_videos', function (Blueprint $table) {
+        Schema::create('youtube_videos', function (Blueprint $table) {
             $table->id();
-            $table->morphs('videoable'); // videoable_type, videoable_id
+            // morphs() already adds an index on (videoable_type, videoable_id)
+            $table->morphs('videoable');
             $table->string('youtube_url');
             $table->string('youtube_video_id');
             $table->string('title')->nullable();
             $table->integer('order')->default(0);
             $table->timestamps();
 
-            // Indexes for polymorphic relationship
-            $table->index(['videoable_type', 'videoable_id']);
             $table->index('order');
         });
-}
+    }
 
     /**
      * Reverse the migrations.

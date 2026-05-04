@@ -19,10 +19,7 @@ return new class extends Migration
             $table->timestamp('read_at')->nullable();
             $table->timestamps();
         });
-
-        Schema::table('notifications', function (Blueprint $table) {
-            $table->index(['notifiable_type', 'notifiable_id']);
-        });
+        // morphs('notifiable') already indexes (notifiable_type, notifiable_id)
     }
 
     /**
