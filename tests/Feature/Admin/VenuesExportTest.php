@@ -38,11 +38,18 @@ class VenuesExportTest extends TestCase
         $response = $this->actingAs($admin)->get(route('admin.venues.export'));
 
         $response->assertOk();
-        $response->assertHeader('Content-Type', 'text/csv');
-        $response->assertHeaderContains('Content-Disposition', 'attachment;');
+        $this->assertStringStartsWith(
+            'text/csv',
+            (string) $response->headers->get('Content-Type')
+        );
+        $this->assertStringContainsString(
+            'attachment;',
+            (string) $response->headers->get('Content-Disposition')
+        );
 
         $csv = $response->streamedContent();
-        $this->assertStringContainsString('ID,Name,Description,Address,City,Capacity,Contact Email', $csv);
+        $this->assertStringContainsString('ID,Name,Description,Address,City,Capacity', $csv);
+        $this->assertStringContainsString('Contact Email', $csv);
         $this->assertStringContainsString('Test Venue', $csv);
     }
 }

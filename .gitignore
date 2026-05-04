@@ -1,6 +1,7 @@
 # Laravel specific
 /vendor/
 /node_modules/
+.phpunit.result.cache
 /public/build/
 /public/hot
 /public/storage

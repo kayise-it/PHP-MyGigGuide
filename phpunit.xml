@@ -19,6 +19,8 @@
     </source>
     <php>
         <env name="APP_ENV" value="testing"/>
+        <!-- Fixed key for CI/phpunit only; never use in production -->
+        <env name="APP_KEY" value="base64:yzNiK2Hh777P9XiFnxh1G/AiyDfRRnxm6zPr86flfFQ="/>
         <env name="APP_MAINTENANCE_DRIVER" value="file"/>
         <env name="BCRYPT_ROUNDS" value="4"/>
         <env name="CACHE_STORE" value="array"/>
