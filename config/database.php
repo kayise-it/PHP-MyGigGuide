@@ -2,6 +2,20 @@
 
 use Illuminate\Support\Str;
 
+if (! function_exists('mgg_mysql_ssl_ca_pdo_option')) {
+    /**
+     * PHP 8.5 deprecates PDO::MYSQL_ATTR_SSL_CA in favour of Pdo\Mysql::ATTR_SSL_CA.
+     */
+    function mgg_mysql_ssl_ca_pdo_option(): int
+    {
+        if (PHP_VERSION_ID >= 80500) {
+            return \Pdo\Mysql::ATTR_SSL_CA;
+        }
+
+        return \PDO::MYSQL_ATTR_SSL_CA;
+    }
+}
+
 return [
 
     /*
@@ -59,7 +73,7 @@ return [
             'strict' => true,
             'engine' => null,
             'options' => extension_loaded('pdo_mysql') ? array_filter([
-                PDO::MYSQL_ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA'),
+                mgg_mysql_ssl_ca_pdo_option() => env('MYSQL_ATTR_SSL_CA'),
             ]) : [],
         ],
 
@@ -79,7 +93,7 @@ return [
             'strict' => true,
             'engine' => null,
             'options' => extension_loaded('pdo_mysql') ? array_filter([
-                PDO::MYSQL_ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA'),
+                mgg_mysql_ssl_ca_pdo_option() => env('MYSQL_ATTR_SSL_CA'),
             ]) : [],
         ],
 
