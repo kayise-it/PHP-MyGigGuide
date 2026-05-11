@@ -1,7 +1,9 @@
 <?php
 
 use App\Http\Controllers\Api\V1\ArtistController;
+use App\Http\Controllers\Api\V1\AuthController;
 use App\Http\Controllers\Api\V1\EventController;
+use App\Http\Controllers\Api\V1\MeController;
 use App\Http\Controllers\Api\V1\MetaController;
 use App\Http\Controllers\Api\V1\VenueController;
 use Illuminate\Support\Facades\Route;
@@ -25,4 +27,17 @@ Route::prefix('v1')->group(function () {
 
     Route::get('artists', [ArtistController::class, 'index']);
     Route::get('artists/{artist}', [ArtistController::class, 'show']);
+
+    Route::post('auth/login', [AuthController::class, 'login']);
+
+    Route::middleware('auth:sanctum')->group(function () {
+        Route::post('auth/logout', [AuthController::class, 'logout']);
+
+        Route::get('me', [MeController::class, 'show']);
+        Route::get('me/favorites', [MeController::class, 'favorites']);
+        Route::post('me/favorites/{type}/{id}', [MeController::class, 'addFavorite'])
+            ->whereNumber('id');
+        Route::delete('me/favorites/{type}/{id}', [MeController::class, 'removeFavorite'])
+            ->whereNumber('id');
+    });
 });

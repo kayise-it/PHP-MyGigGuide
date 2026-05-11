@@ -9,11 +9,7 @@
     
     // Try event poster first
     if ($event->poster && \Illuminate\Support\Facades\Storage::disk('public')->exists($event->poster)) {
-        $storageUrl = \Illuminate\Support\Facades\Storage::disk('public')->url($event->poster);
-        // Ensure absolute URL - Storage::url() may return relative if APP_URL not set
-        $imageUrl = (str_starts_with($storageUrl, 'http://') || str_starts_with($storageUrl, 'https://')) 
-            ? $storageUrl 
-            : url($storageUrl);
+        $imageUrl = url('/storage/' . ltrim($event->poster, '/'));
     } 
     // Try event gallery images
     elseif ($event->gallery) {
@@ -35,19 +31,13 @@
         if (count($galleryImages) > 0) {
             $firstImage = $galleryImages[0];
             if (\Illuminate\Support\Facades\Storage::disk('public')->exists($firstImage)) {
-                $storageUrl = \Illuminate\Support\Facades\Storage::disk('public')->url($firstImage);
-                $imageUrl = (str_starts_with($storageUrl, 'http://') || str_starts_with($storageUrl, 'https://')) 
-                    ? $storageUrl 
-                    : url($storageUrl);
+                $imageUrl = url('/storage/' . ltrim($firstImage, '/'));
             }
         }
     }
     // Try venue main picture
     if (!$imageUrl && $event->venue && $event->venue->main_picture && \Illuminate\Support\Facades\Storage::disk('public')->exists($event->venue->main_picture)) {
-        $storageUrl = \Illuminate\Support\Facades\Storage::disk('public')->url($event->venue->main_picture);
-        $imageUrl = (str_starts_with($storageUrl, 'http://') || str_starts_with($storageUrl, 'https://')) 
-            ? $storageUrl 
-            : url($storageUrl);
+        $imageUrl = url('/storage/' . ltrim($event->venue->main_picture, '/'));
     }
     // Fallback to logo
     if (!$imageUrl) {
@@ -144,7 +134,7 @@
                     @continue
                 @endif
             <div class="item relative w-full h-full">
-                <img src="{{ Storage::disk('public')->url($image) }}" alt="{{ $event->name }} - Image {{ $index + 1 }}"
+                <img src="{{ url('/storage/' . ltrim($image, '/')) }}" alt="{{ $event->name }} - Image {{ $index + 1 }}"
                     class="w-full h-full object-cover">
                 <div class="absolute inset-0 bg-black/40"></div>
             </div>
@@ -153,7 +143,7 @@
         @elseif($mainImage)
         <!-- Single image background -->
         <div class="relative w-full h-full">
-            <img src="{{ Storage::disk('public')->url($mainImage) }}" alt="{{ $event->name }}" class="w-full h-full object-cover">
+            <img src="{{ url('/storage/' . ltrim($mainImage, '/')) }}" alt="{{ $event->name }}" class="w-full h-full object-cover">
             <div class="absolute inset-0 bg-black/40"></div>
         </div>
         @else
@@ -392,7 +382,7 @@
                             @endphp
                             @if($imageExists && !str_contains($image, '/tmp/php') && !str_contains($image, 'tmp.php'))
                             <div class="relative group cursor-pointer" data-gallery-index="{{ $galleryIndexMap[$index] ?? $index }}" role="button" tabindex="0" aria-label="Open image {{ ($galleryIndexMap[$index] ?? $index) + 1 }} in gallery">
-                                <img src="{{ Storage::disk('public')->url($image) }}" alt="{{ $event->name }} - Image {{ ($galleryIndexMap[$index] ?? $index) + 1 }}"
+                                <img src="{{ url('/storage/' . ltrim($image, '/')) }}" alt="{{ $event->name }} - Image {{ ($galleryIndexMap[$index] ?? $index) + 1 }}"
                                     class="w-full h-32 object-cover rounded-lg shadow-sm group-hover:shadow-md transition-shadow">
                             <div
                                 class="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all rounded-lg flex items-center justify-center">
@@ -886,7 +876,7 @@
                 $galleryUrls = [];
                 foreach ($galleryImages as $image) {
                     if ($image && !str_contains($image, '/tmp/php') && !str_contains($image, 'tmp.php') && \Illuminate\Support\Facades\Storage::disk('public')->exists($image)) {
-                        $galleryUrls[] = \Illuminate\Support\Facades\Storage::disk('public')->url($image);
+                        $galleryUrls[] = url('/storage/' . ltrim($image, '/'));
                     }
                 }
             @endphp

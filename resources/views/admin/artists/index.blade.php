@@ -18,6 +18,20 @@
         </div>
     @endif
 
+    @if(session('import_warnings') && count(session('import_warnings')) > 0)
+        <div class="mb-4 bg-amber-100 border border-amber-400 text-amber-800 px-4 py-3 rounded relative" role="alert">
+            <strong class="font-bold">Import Warnings:</strong>
+            <ul class="list-disc list-inside mt-2">
+                @foreach(array_slice(session('import_warnings'), 0, 10) as $warning)
+                    <li>{{ $warning }}</li>
+                @endforeach
+                @if(count(session('import_warnings')) > 10)
+                    <li>... and {{ count(session('import_warnings')) - 10 }} more warnings</li>
+                @endif
+            </ul>
+        </div>
+    @endif
+
     @if(session('import_errors') && count(session('import_errors')) > 0)
         <div class="mb-4 bg-yellow-100 border border-yellow-400 text-yellow-700 px-4 py-3 rounded relative" role="alert">
             <strong class="font-bold">Import Errors:</strong>

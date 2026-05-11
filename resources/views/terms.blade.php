@@ -1,5 +1,38 @@
 @extends('layouts.app')
 
+@section('title', 'Terms of Service')
+@section('description', 'Read the terms of service for using My Gig Guide.')
+
+@section('content')
+<div class="min-h-screen bg-gradient-to-br from-purple-50 via-white to-blue-50">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+        <h1 class="text-4xl font-bold text-gray-900 mb-6">Terms of Service</h1>
+
+        <div class="bg-white border border-gray-200 rounded-xl p-8 space-y-6 text-gray-700">
+            <p>
+                By accessing and using My Gig Guide, you agree to use the platform lawfully and respectfully.
+            </p>
+            <p>
+                Event listings, artist profiles, and venue information are provided for general information.
+                We do not guarantee availability, accuracy, or changes made by third parties.
+            </p>
+            <p>
+                Users are responsible for the content they submit and must not post misleading, harmful, or
+                unlawful material.
+            </p>
+            <p>
+                We may update these terms from time to time. Continued use of the platform means you accept
+                the latest version.
+            </p>
+            <p>
+                For support questions, please contact us via the Contact page.
+            </p>
+        </div>
+    </div>
+</div>
+@endsection
+@extends('layouts.app')
+
 @section('title', 'Terms and Conditions - My Gig Guide')
 
 @section('content')

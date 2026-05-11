@@ -227,11 +227,6 @@ $event->load(['venue', 'artists', 'owner', 'ratings.user', 'youtubeVideos']);
                 ->header('X-Robots-Tag', 'noindex, nofollow');
         }
 
-        // Only require auth for regular users, not crawlers
-        if (! $request->user()) {
-            return redirect()->route('login', ['continue' => $request->fullUrl()]);
-        }
-
         return view('events.show', compact('event'));
     }
 

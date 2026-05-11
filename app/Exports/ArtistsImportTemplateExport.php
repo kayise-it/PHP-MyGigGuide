@@ -25,6 +25,8 @@ class ArtistsImportTemplateExport implements FromArray, WithHeadings
             'User Name',
             'Created At',
             'Updated At',
+            'Profile Picture',
+            'Gallery JSON',
         ];
     }
 
@@ -47,6 +49,8 @@ class ArtistsImportTemplateExport implements FromArray, WithHeadings
                 '',  // User Name (ignored on import)
                 '',  // Created At (ignored on import)
                 '',  // Updated At (ignored on import)
+                '',  // Profile Picture (path under storage disk public, or https URL to download)
+                '',  // Gallery JSON (optional array of paths)
             ],
         ];
     }

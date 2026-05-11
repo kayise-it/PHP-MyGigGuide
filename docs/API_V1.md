@@ -16,6 +16,17 @@ All endpoints return **JSON**. No authentication required for these read-only ro
 | GET | `/api/v1/artists` | Paginated artists |
 | GET | `/api/v1/artists/{id}` | Single artist (+ genres) |
 
+### Authenticated endpoints (Sanctum bearer token)
+
+| Method | Path | Description |
+|--------|------|-------------|
+| POST | `/api/v1/auth/login` | Login with username + password, returns bearer token |
+| POST | `/api/v1/auth/logout` | Revoke current bearer token |
+| GET | `/api/v1/me` | Current user profile |
+| GET | `/api/v1/me/favorites` | Current user favorites (events, venues, artists, organisers) |
+| POST | `/api/v1/me/favorites/{type}/{id}` | Add favorite (`type`: events\|venues\|artists\|organisers) |
+| DELETE | `/api/v1/me/favorites/{type}/{id}` | Remove favorite |
+
 ### Query parameters
 
 **Events**
@@ -36,6 +47,23 @@ All endpoints return **JSON**. No authentication required for these read-only ro
 ./vendor/bin/sail up -d
 curl -s "http://localhost/api/v1/meta" | jq .
 curl -s "http://localhost/api/v1/events?per_page=5" | jq .
+```
+
+## Auth testing example
+
+```bash
+# 1) Login (username-based)
+TOKEN=$(curl -s -X POST "http://127.0.0.1:8000/api/v1/auth/login" \
+  -H "Content-Type: application/json" \
+  -d '{"username":"mobileuser1","password":"Password123!","device_name":"local-cli"}' | jq -r '.access_token')
+
+# 2) Current user
+curl -s "http://127.0.0.1:8000/api/v1/me" \
+  -H "Authorization: Bearer $TOKEN" | jq .
+
+# 3) Favorites
+curl -s "http://127.0.0.1:8000/api/v1/me/favorites" \
+  -H "Authorization: Bearer $TOKEN" | jq .
 ```
 
 ## Production deploy

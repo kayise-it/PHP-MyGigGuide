@@ -390,9 +390,12 @@ class ArtistManagementController extends Controller
         $import = new ArtistsImport;
         Excel::import($import, $file);
 
-        $message = "Import completed: {$import->imported} artists imported";
+        $message = "Import completed: {$import->imported} artists processed ({$import->created} created, {$import->updated} updated)";
         if ($import->skipped > 0) {
             $message .= ", {$import->skipped} skipped";
+        }
+        if (! empty($import->warnings)) {
+            $message .= '. ' . count($import->warnings) . ' warning(s).';
         }
         if (! empty($import->errors)) {
             $message .= '. ' . count($import->errors) . ' error(s) occurred.';
@@ -400,6 +403,7 @@ class ArtistManagementController extends Controller
 
         return redirect()->route('admin.artists.index')
             ->with('success', $message)
+            ->with('import_warnings', $import->warnings)
             ->with('import_errors', $import->errors);
     }
 }

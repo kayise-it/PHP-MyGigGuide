@@ -35,6 +35,8 @@ class ArtistsExport implements FromCollection, WithHeadings, WithMapping
             'User Name',
             'Created At',
             'Updated At',
+            'Profile Picture',
+            'Gallery JSON',
         ];
     }
 
@@ -59,6 +61,10 @@ class ArtistsExport implements FromCollection, WithHeadings, WithMapping
             $artist->user?->name ?? '',
             $artist->created_at?->format('Y-m-d H:i:s') ?? '',
             $artist->updated_at?->format('Y-m-d H:i:s') ?? '',
+            $artist->profile_picture ?? '',
+            ! empty($artist->gallery)
+                ? json_encode($artist->gallery, JSON_UNESCAPED_SLASHES)
+                : '',
         ];
     }
 }

@@ -62,8 +62,12 @@ class DashboardController extends Controller
                 ->pluck('count', 'name');
 
             // Get monthly event counts for the last 6 months
+            $monthExpression = DB::connection()->getDriverName() === 'sqlite'
+                ? "strftime('%Y-%m', created_at)"
+                : 'DATE_FORMAT(created_at, "%Y-%m")';
+
             $monthly_events = Event::select(
-                DB::raw('DATE_FORMAT(created_at, "%Y-%m") as month'),
+                DB::raw("{$monthExpression} as month"),
                 DB::raw('count(*) as count')
             )
                 ->where('created_at', '>=', now()->subMonths(6))

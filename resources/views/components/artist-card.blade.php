@@ -7,8 +7,8 @@
 @php
     $targetUrl = $href ?? route('artists.show', $artist->id);
     
-    // Handle profile picture with temp path filtering and file existence check
-    $image = asset('logos/logo2.jpeg'); // Default placeholder
+    // Default when artist has no usable profile image (keep for cards / listings)
+    $image = asset('logos/logo2.jpeg');
     $profilePicture = $artist->profile_picture ?? $artist->user->profile_picture ?? null;
     if ($profilePicture && !str_contains($profilePicture, '/tmp/php') && !str_contains($profilePicture, 'tmp.php')) {
         // Use 'public' disk since images are stored in storage/app/public

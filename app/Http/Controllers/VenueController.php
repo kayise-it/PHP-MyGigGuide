@@ -186,9 +186,9 @@ class VenueController extends Controller
 
         // Prioritise owned venues (top) while keeping other sort order
         if (!empty($ownedVenueIds)) {
-            // Ensure owned venues appear first; duplicates are fine as DB will handle orderBy chain
-            $idsList = implode(',', $ownedVenueIds);
-            $query->orderByRaw("FIELD(id, {$idsList}) DESC");
+            // Cross-DB safe prioritization (SQLite does not support MySQL FIELD()).
+            $placeholders = implode(',', array_fill(0, count($ownedVenueIds), '?'));
+            $query->orderByRaw("CASE WHEN id IN ({$placeholders}) THEN 1 ELSE 0 END DESC", $ownedVenueIds);
         }
 
         $perPage = $request->get('per_page', 12);

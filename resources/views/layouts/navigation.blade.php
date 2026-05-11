@@ -4,8 +4,8 @@
             <!-- Logo (with notification dot when user has unread notifications) -->
             <div class="flex items-center relative">
                 <a href="{{ route('home') }}" class="flex items-center space-x-3">
-                    <span class="relative inline-block">
-                        <img src="{{ asset('logos/logo1.jpeg') }}" alt="My Gig Guide" class="h-10 w-auto">
+                    <span class="relative inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-dashed border-gray-300 bg-gray-50 text-gray-400" title="Tenant logo (white-label)">
+                        {{-- Optional: <img src="..." class="h-10 w-10 object-contain rounded-lg" alt=""> --}}
                         @auth
                             @if(isset($unreadNotificationCount) && $unreadNotificationCount > 0)
                                 <span class="absolute -top-0.5 -right-0.5 flex h-3 w-3" title="You have {{ $unreadNotificationCount }} unread notification(s)">

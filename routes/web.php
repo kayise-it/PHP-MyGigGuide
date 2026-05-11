@@ -48,6 +48,7 @@ Route::view('/about', 'about')->name('about');
 
 // Legal pages
 Route::view('/popia', 'popia')->name('popia');
+Route::view('/terms', 'terms')->name('terms');
 
 // Venue selector demo
 Route::view('/venue-selector-demo', 'venue-selector-demo')->name('venue-selector-demo');
@@ -79,10 +80,12 @@ Route::middleware(['auth', 'capability'])->group(function () {
 
 Route::get('/events/{event}', [EventController::class, 'show'])->name('events.show');
 
-// Artist listing and show routes (require login)
+// Public artist listing/show routes
+Route::get('/artists', [ArtistController::class, 'index'])->name('artists.index');
+Route::get('/artists/{artist}', [ArtistController::class, 'show'])->name('artists.show');
+
+// Protected artist actions
 Route::middleware(['auth', 'capability'])->group(function () {
-    Route::get('/artists', [ArtistController::class, 'index'])->name('artists.index');
-    Route::get('/artists/{artist}', [ArtistController::class, 'show'])->name('artists.show');
     Route::get('/artists/{artist}/dispute', [ArtistController::class, 'dispute'])->name('artist.dispute');
 });
 Route::get('/venues/{venue}', [VenueController::class, 'show'])->name('venues.show');
