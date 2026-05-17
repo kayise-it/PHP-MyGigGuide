@@ -9,12 +9,15 @@ All endpoints return **JSON**. No authentication required for these read-only ro
 | Method | Path | Description |
 |--------|------|-------------|
 | GET | `/api/v1/meta` | App name + API version |
+| GET | `/api/v1/categories` | Active event categories (`id`, `name`, `slug`) for filters / UI |
 | GET | `/api/v1/events` | Paginated events (same filters as website listing) |
 | GET | `/api/v1/events/{id}` | Single event (`upcoming` / `ongoing` only) |
 | GET | `/api/v1/venues` | Paginated venues |
-| GET | `/api/v1/venues/{id}` | Single venue |
+| GET | `/api/v1/venues/{id}` | Single venue (+ `upcoming_events`, next 90 days) |
 | GET | `/api/v1/artists` | Paginated artists |
-| GET | `/api/v1/artists/{id}` | Single artist (+ genres) |
+| GET | `/api/v1/artists/{id}` | Single artist (+ genres, `upcoming_events`, next 90 days) |
+
+**Mobile:** Native detail screens use the three `show` routes above. Artist/venue upcoming gigs come from embedded `upcoming_events` (same fields as event list rows). See `mygigguide_app/docs/MOBILE_NATIVE_DETAIL.md`.
 
 ### Authenticated endpoints (Sanctum bearer token)
 
@@ -40,6 +43,10 @@ All endpoints return **JSON**. No authentication required for these read-only ro
 
 - `search` — text search
 - `per_page` — max **50**
+
+**Artist / venue `show` only**
+
+- `upcoming_events` — array of event objects (same shape as `GET /events` rows): upcoming/ongoing gigs in the **next 90 calendar days**, ordered by date/time (max 100).
 
 ## Local testing (Sail)
 

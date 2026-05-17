@@ -26,6 +26,7 @@ class VenueResource extends JsonResource
             'capacity' => $this->capacity,
             'website' => $this->website,
             'main_picture_url' => self::publicStorageUrl($this->main_picture),
+            'upcoming_events' => EventResource::collection($this->whenLoaded('upcomingEvents')),
             'detail_url' => route('venues.show', $this->resource),
         ];
     }

@@ -78,6 +78,14 @@ protected $fillable = [
     }
 
     /**
+     * Populated on API `show` with upcoming events (not a default eager load).
+     */
+    public function upcomingEvents(): HasMany
+    {
+        return $this->events();
+    }
+
+    /**
      * Get the ratings for the venue.
      */
     public function ratings(): MorphMany

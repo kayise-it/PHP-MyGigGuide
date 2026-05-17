@@ -42,6 +42,7 @@ class EventController extends Controller
                     })
                     ->orWhereHas('artists', function ($artistQuery) use ($searchTerm) {
                         $artistQuery->where('stage_name', 'like', "%{$searchTerm}%")
+                            ->orWhere('real_name', 'like', "%{$searchTerm}%")
                             ->orWhere('genre', 'like', "%{$searchTerm}%");
                     });
             });
@@ -82,7 +83,7 @@ class EventController extends Controller
             $query->whereBetween('date', [$dateFrom, $dateTo]);
         }
 
-        $perPage = min((int) $request->get('per_page', 30), 50);
+        $perPage = min((int) $request->get('per_page', 30), 100);
 
         $events = $query->orderBy('date', 'asc')->orderBy('time', 'asc')->paginate($perPage);
 

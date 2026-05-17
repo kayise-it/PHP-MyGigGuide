@@ -77,6 +77,14 @@ class Artist extends Model
     }
 
     /**
+     * Populated on API `show` with upcoming gigs (not a default eager load).
+     */
+    public function upcomingEvents(): BelongsToMany
+    {
+        return $this->events();
+    }
+
+    /**
      * Get the venues owned by the artist.
      */
     public function venues(): HasMany
