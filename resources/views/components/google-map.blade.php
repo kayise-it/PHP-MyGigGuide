@@ -252,6 +252,23 @@ document.addEventListener('DOMContentLoaded', function() {
                 ]]);
             }
 
+            $posterUrl = null;
+            if (! empty($event->poster)) {
+                try {
+                    $posterUrl = url(\Illuminate\Support\Facades\Storage::url($event->poster));
+                } catch (\Throwable $e) {
+                    $posterUrl = null;
+                }
+            }
+
+            $galleryUrls = collect($event->gallery ?? [])
+                ->filter(fn ($p) => is_string($p) && $p !== '')
+                ->map(fn ($p) => url(\Illuminate\Support\Facades\Storage::url($p)))
+                ->values()
+                ->all();
+
+            $genre = $event->categories?->first()?->name ?? ($event->category ?? null);
+
             return [
                 'id' => $event->id,
                 'name' => $event->name,
@@ -259,11 +276,14 @@ document.addEventListener('DOMContentLoaded', function() {
                 'time' => $event->time ? $event->time->format('H:i') : null,
                 'price' => $event->price,
                 'categories' => $categories->values(),
+                'genre' => $genre,
+                'poster_url' => $posterUrl,
+                'images' => $galleryUrls,
                 'venue' => [
                     'name' => $event->venue->name,
                     'latitude' => (float) $event->venue->latitude,
                     'longitude' => (float) $event->venue->longitude,
-                ]
+                ],
             ];
         })) !!},
         showLegend: {{ $showLegend ? 'true' : 'false' }},

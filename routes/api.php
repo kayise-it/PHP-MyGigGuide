@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\V1\ArtistController;
 use App\Http\Controllers\Api\V1\AuthController;
+use App\Http\Controllers\Api\V1\CategoryController;
 use App\Http\Controllers\Api\V1\EventController;
 use App\Http\Controllers\Api\V1\MeController;
 use App\Http\Controllers\Api\V1\MetaController;
@@ -18,6 +19,8 @@ use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1')->group(function () {
     Route::get('meta', [MetaController::class, 'show']);
+
+    Route::get('categories', [CategoryController::class, 'index']);
 
     Route::get('events', [EventController::class, 'index']);
     Route::get('events/{event}', [EventController::class, 'show']);

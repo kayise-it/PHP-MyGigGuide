@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\Category;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
@@ -12,6 +13,24 @@ class CategorySeeder extends Seeder
      */
     public function run(): void
     {
-        //
+        $rows = [
+            ['name' => 'Live music', 'slug' => 'live-music', 'sort_order' => 10],
+            ['name' => 'DJ / Club', 'slug' => 'dj-club', 'sort_order' => 20],
+            ['name' => 'Festival', 'slug' => 'festival', 'sort_order' => 30],
+            ['name' => 'Comedy', 'slug' => 'comedy', 'sort_order' => 40],
+            ['name' => 'Theatre', 'slug' => 'theatre', 'sort_order' => 50],
+            ['name' => 'Open mic', 'slug' => 'open-mic', 'sort_order' => 60],
+        ];
+
+        foreach ($rows as $row) {
+            Category::query()->updateOrCreate(
+                ['slug' => $row['slug']],
+                [
+                    'name' => $row['name'],
+                    'is_active' => true,
+                    'sort_order' => $row['sort_order'],
+                ]
+            );
+        }
     }
 }

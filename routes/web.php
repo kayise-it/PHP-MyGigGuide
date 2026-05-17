@@ -40,6 +40,8 @@ Route::middleware(['auth', 'capability'])->group(function () {
 
 // Public routes
 Route::get('/', [HomeController::class, 'index'])->name('home');
+Route::get('/map', [HomeController::class, 'map'])->name('map');
+Route::get('/test-map', [HomeController::class, 'testMap'])->name('test-map');
 Route::get('/test-auth', function () {
     return view('test-auth');
 })->name('test-auth');
@@ -160,10 +162,6 @@ Route::get('/activation-required', function () {
 
 // Protected routes (require login)
 Route::middleware('auth')->group(function () {
-    // Map pages
-    Route::get('/map', [HomeController::class, 'map'])->name('map');
-    Route::get('/test-map', [HomeController::class, 'testMap'])->name('test-map');
-    
     // Paid feature purchase flow
     Route::get('/boost/checkout', [FeaturePurchaseController::class, 'create'])->name('features.checkout');
     Route::post('/boost/purchase', [FeaturePurchaseController::class, 'store'])->name('features.purchase');
