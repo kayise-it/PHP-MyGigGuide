@@ -32,15 +32,20 @@ Route::prefix('v1')->group(function () {
     Route::get('artists/{artist}', [ArtistController::class, 'show']);
 
     Route::post('auth/login', [AuthController::class, 'login']);
+    Route::post('auth/firebase', [AuthController::class, 'firebaseLogin']);
 
     Route::middleware('auth:sanctum')->group(function () {
         Route::post('auth/logout', [AuthController::class, 'logout']);
 
         Route::get('me', [MeController::class, 'show']);
+        Route::post('me/link-firebase', [MeController::class, 'linkFirebase']);
         Route::get('me/favorites', [MeController::class, 'favorites']);
         Route::post('me/favorites/{type}/{id}', [MeController::class, 'addFavorite'])
             ->whereNumber('id');
         Route::delete('me/favorites/{type}/{id}', [MeController::class, 'removeFavorite'])
             ->whereNumber('id');
+
+        Route::post('events', [EventController::class, 'store'])
+            ->middleware('api.permission:create-events');
     });
 });

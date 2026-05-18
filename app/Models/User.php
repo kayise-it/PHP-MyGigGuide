@@ -27,6 +27,7 @@ class User extends Authenticatable implements LaratrustUser
         'password',
         'auth_provider',
         'auth_provider_id',
+        'firebase_uid',
         'profile_picture',
         'settings',
         'email_verified_at',

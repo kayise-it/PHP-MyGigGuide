@@ -7,11 +7,19 @@ use App\Models\Artist;
 use App\Models\Event;
 use App\Models\Organiser;
 use App\Models\Venue;
+use App\Services\UserFirebaseLinkService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
+use InvalidArgumentException;
+use RuntimeException;
 
 class MeController extends Controller
 {
+    public function __construct(
+        private readonly UserFirebaseLinkService $firebaseLink,
+    ) {}
+
     public function show(Request $request): JsonResponse
     {
         $user = $request->user()->loadMissing('roles');
@@ -23,6 +31,39 @@ class MeController extends Controller
             'email' => $user->email,
             'roles' => $user->roles->pluck('name')->values(),
             'is_active' => (bool) $user->is_active,
+            'firebase_linked' => $user->firebase_uid !== null,
+        ]);
+    }
+
+    public function linkFirebase(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'id_token' => ['required', 'string'],
+        ]);
+
+        try {
+            $user = $this->firebaseLink->linkAuthenticatedUser(
+                $request->user(),
+                $validated['id_token'],
+            );
+        } catch (InvalidArgumentException|ValidationException $e) {
+            $message = $e instanceof ValidationException
+                ? collect($e->errors())->flatten()->first()
+                : $e->getMessage();
+
+            return response()->json(['message' => $message], 422);
+        } catch (RuntimeException $e) {
+            return response()->json(['message' => $e->getMessage()], 503);
+        }
+
+        return response()->json([
+            'message' => 'Firebase account linked to your website profile.',
+            'firebase_linked' => true,
+            'user' => [
+                'id' => $user->id,
+                'username' => $user->username,
+                'firebase_linked' => true,
+            ],
         ]);
     }
 

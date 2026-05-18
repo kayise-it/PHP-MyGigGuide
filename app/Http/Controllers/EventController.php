@@ -8,6 +8,7 @@ use App\Models\Event;
 use App\Models\Venue;
 use App\Models\YoutubeVideo;
 use App\Rules\YoutubeUrl;
+use App\Services\EventCreationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -113,94 +114,14 @@ class EventController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(Request $request, EventCreationService $eventCreation)
     {
-$validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'date' => 'required|date|after_or_equal:today',
-            'time' => 'required|date_format:H:i',
-            'price' => 'nullable|numeric|min:0',
-            'ticket_url' => 'nullable|url',
-            'poster' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:10240', // 10MB max
-            'gallery' => 'nullable|array|max:10', // Max 10 images
-            'gallery.*' => 'image|mimes:jpeg,png,jpg,gif,webp|max:10240',
-            'category' => 'nullable|string|max:255',
-            'capacity' => 'nullable|integer|min:1',
-            'venue_id' => 'required|exists:venues,id',
-            'artists' => 'nullable|array',
-            'artists.*' => 'exists:artists,id',
-            'categories' => 'nullable|array',
-            'categories.*' => 'exists:categories,id',
-            'youtube_videos' => 'nullable|array',
-            'youtube_videos.*' => ['nullable', new YoutubeUrl()],
-        ], [
-            'venue_id.required' => 'Please select or add a venue for your event.',
-            'venue_id.exists' => 'The selected venue is invalid.',
-        ], [
-            'venue_id' => 'venue',
-        ]);
-
-        // Get user's folder path
         $user = auth()->user();
-        if (!$user) {
+        if (! $user) {
             return redirect()->route('login')->with('error', 'You must be logged in to create an event.');
         }
-        $userFolder = $user->getFolderPath();
 
-        // Create event-specific folder
-        $eventFolder = $this->createEventFolder($userFolder, $validated['name'], $validated['date']);
-
-        // Handle poster upload
-        if ($request->hasFile('poster')) {
-            $validated['poster'] = $request->file('poster')->store($eventFolder.'/poster', 'public');
-        }
-
-        // Handle gallery uploads
-        $galleryPaths = [];
-        if ($request->hasFile('gallery')) {
-            foreach ($request->file('gallery') as $image) {
-                $galleryPaths[] = $image->store($eventFolder.'/gallery', 'public');
-            }
-            $validated['gallery'] = json_encode($galleryPaths);
-        }
-
-        // Set owner based on authenticated user
-        $validated['owner_id'] = auth()->id();
-        $validated['owner_type'] = auth()->user()->hasRole('artist') ? 'artist' : 'organiser';
-        $validated['status'] = 'upcoming';
-$event = Event::create($validated);
-// Attach artists
-        if ($request->has('artists')) {
-            $event->artists()->attach($request->artists);
-        }
-
-        // Attach categories
-        if ($request->has('categories')) {
-            $event->categories()->attach($request->categories);
-        }
-
-        // Handle YouTube videos
-        if ($request->has('youtube_videos') && is_array($request->youtube_videos)) {
-foreach ($request->youtube_videos as $index => $url) {
-                if (!empty($url)) {
-                    $videoId = YoutubeVideo::extractVideoId($url);
-if ($videoId) {
-                        try {
-                            YoutubeVideo::create([
-                                'videoable_type' => Event::class,
-                                'videoable_id' => $event->id,
-                                'youtube_url' => $url,
-                                'youtube_video_id' => $videoId,
-                                'order' => $index,
-                            ]);
-} catch (\Exception $e) {
-throw $e;
-                        }
-                    }
-                }
-            }
-        }
+        $event = $eventCreation->createFromRequest($request, $user);
 
         return redirect()->route('events.show', $event)
             ->with('success', 'Event created successfully!');

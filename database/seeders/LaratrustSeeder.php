@@ -133,11 +133,14 @@ class LaratrustSeeder extends Seeder
         ]);
 
         $venueOwner->syncPermissions([
-            'edit-profile', 'edit-venues', 'view-venues', 'rate-content', 'view-ratings',
+            'edit-profile', 'create-events', 'edit-events', 'delete-events', 'view-events',
+            'edit-venues', 'view-venues', 'rate-content', 'view-ratings',
         ]);
 
+        // Any authenticated member can list gigs (matches @auth "List an Event" on site).
         $user->syncPermissions([
-            'edit-profile', 'view-events', 'view-artists', 'view-venues', 'view-organisers',
+            'edit-profile', 'create-events', 'edit-events', 'delete-events', 'view-events',
+            'view-artists', 'view-venues', 'view-organisers',
             'rate-content', 'view-ratings',
         ]);
     }

@@ -3,12 +3,21 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
+use App\Models\User;
+use App\Services\UserFirebaseLinkService;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\ValidationException;
+use InvalidArgumentException;
+use RuntimeException;
 
 class AuthController extends Controller
 {
+    public function __construct(
+        private readonly UserFirebaseLinkService $firebaseLink,
+    ) {}
     public function login(Request $request): JsonResponse
     {
         $validated = $request->validate([
@@ -42,13 +51,54 @@ class AuthController extends Controller
         return response()->json([
             'token_type' => 'Bearer',
             'access_token' => $token,
-            'user' => [
-                'id' => $user->id,
-                'username' => $user->username,
-                'name' => $user->name,
-                'email' => $user->email,
-                'roles' => $user->roles()->pluck('name')->values(),
-            ],
+            'user' => $this->userPayload($user),
+        ]);
+    }
+
+    /**
+     * Sign in with a Firebase ID token (mobile app account linked to Laravel users.id).
+     */
+    public function firebaseLogin(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'id_token' => ['required', 'string'],
+            'device_name' => ['nullable', 'string', 'max:100'],
+        ]);
+
+        try {
+            $user = $this->firebaseLink->resolveUserForFirebaseLogin($validated['id_token']);
+        } catch (ModelNotFoundException) {
+            return response()->json([
+                'message' => 'No website account is linked to this Firebase sign-in. Log in with your username and password, then link Firebase in Settings.',
+            ], 404);
+        } catch (InvalidArgumentException|ValidationException $e) {
+            $message = $e instanceof ValidationException
+                ? collect($e->errors())->flatten()->first()
+                : $e->getMessage();
+
+            return response()->json(['message' => $message], 422);
+        } catch (RuntimeException $e) {
+            return response()->json(['message' => $e->getMessage()], 503);
+        }
+
+        if (! $user->is_active) {
+            return response()->json([
+                'message' => 'This account is inactive.',
+            ], 403);
+        }
+
+        if (! $user->hasVerifiedEmail()) {
+            return response()->json([
+                'message' => 'Please verify your email before signing in.',
+            ], 403);
+        }
+
+        $token = $user->createToken($validated['device_name'] ?? 'mobile-app')->plainTextToken;
+
+        return response()->json([
+            'token_type' => 'Bearer',
+            'access_token' => $token,
+            'user' => $this->userPayload($user),
         ]);
     }
 
@@ -59,5 +109,17 @@ class AuthController extends Controller
         return response()->json([
             'message' => 'Logged out successfully.',
         ]);
+    }
+
+    private function userPayload(User $user): array
+    {
+        return [
+            'id' => $user->id,
+            'username' => $user->username,
+            'name' => $user->name,
+            'email' => $user->email,
+            'roles' => $user->roles()->pluck('name')->values(),
+            'firebase_linked' => $user->firebase_uid !== null,
+        ];
     }
 }

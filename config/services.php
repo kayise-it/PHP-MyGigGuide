@@ -45,4 +45,9 @@ return [
         'redirect' => env('FACEBOOK_REDIRECT_URI', env('APP_URL') . '/auth/facebook/callback'),
     ],
 
+    'firebase' => [
+        /** Web API Key — used to verify mobile Firebase ID tokens (Identity Toolkit). */
+        'web_api_key' => env('FIREBASE_WEB_API_KEY'),
+    ],
+
 ];

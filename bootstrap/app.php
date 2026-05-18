@@ -16,6 +16,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'admin' => \App\Http\Middleware\AdminMiddleware::class,
             'force.https' => \App\Http\Middleware\ForceHttps::class,
             'capability' => \App\Http\Middleware\EnsureHasCapability::class,
+            'api.permission' => \App\Http\Middleware\EnsureApiPermission::class,
         ]);
 
         // Force HTTPS in production

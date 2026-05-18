@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\Api\V1\EventResource;
 use App\Models\Category;
 use App\Models\Event;
+use App\Services\EventCreationService;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Support\Str;
@@ -97,5 +99,19 @@ class EventController extends Controller
         $event->load(['venue', 'artists', 'owner', 'categories', 'youtubeVideos']);
 
         return new EventResource($event);
+    }
+
+    /**
+     * Create an event (mobile app). Requires Sanctum token + create-events permission.
+     * Multipart when uploading poster/gallery; JSON acceptable without files.
+     */
+    public function store(Request $request, EventCreationService $eventCreation): JsonResponse
+    {
+        $event = $eventCreation->createFromRequest($request, $request->user());
+
+        return (new EventResource($event))
+            ->additional(['message' => 'Event created successfully.'])
+            ->response()
+            ->setStatusCode(201);
     }
 }
