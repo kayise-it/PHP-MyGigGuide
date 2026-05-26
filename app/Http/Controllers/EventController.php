@@ -26,7 +26,14 @@ class EventController extends Controller
         // Default: rolling 30-day window from today
         $startDateDefault = now()->toDateString();
         $endDateDefault = now()->addDays(30)->toDateString();
-        $query->whereBetween('date', [$startDateDefault, $endDateDefault]);
+
+        if ($request->filled('date_from') || $request->filled('date_to')) {
+            $dateFrom = $request->get('date_from', $startDateDefault);
+            $dateTo = $request->get('date_to', $endDateDefault);
+            $query->whereBetween('date', [$dateFrom, $dateTo]);
+        } else {
+            $query->whereBetween('date', [$startDateDefault, $endDateDefault]);
+        }
 
         // Handle search
         if ($request->filled('search')) {
@@ -81,13 +88,6 @@ class EventController extends Controller
             });
         }
 
-        // Handle date filter overrides
-        if ($request->filled('date_from') || $request->filled('date_to')) {
-            $dateFrom = $request->get('date_from', $startDateDefault);
-            $dateTo = $request->get('date_to', $endDateDefault);
-            $query->whereBetween('date', [$dateFrom, $dateTo]);
-        }
-
         $perPage = $request->get('per_page', 12);
         $events = $query->orderBy('date', 'asc')->paginate($perPage);
 
@@ -121,10 +121,15 @@ class EventController extends Controller
             return redirect()->route('login')->with('error', 'You must be logged in to create an event.');
         }
 
-        $event = $eventCreation->createFromRequest($request, $user);
+        $result = $eventCreation->createFromRequest($request, $user);
+        $event = $result['event'];
+
+        $message = $result['existing']
+            ? 'This gig is already listed — opened the existing event.'
+            : 'Event created successfully!';
 
         return redirect()->route('events.show', $event)
-            ->with('success', 'Event created successfully!');
+            ->with('success', $message);
     }
 
     /**

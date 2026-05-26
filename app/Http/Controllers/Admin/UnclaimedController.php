@@ -79,19 +79,14 @@ return view('admin.unclaimed.index', compact('unclaimed', 'counts', 'type'));
 
         $query = $modelClass::query();
 
-        // Apply unclaimed filter based on type
-        if ($type === 'event') {
-            $query->whereNull('owner_id');
-        } elseif ($type === 'venue') {
-            $query->whereNull('user_id')->whereNull('owner_id');
-        } else {
-            $query->whereNull('user_id');
-        }
+        $this->applyAdminListingFilter($query, $type);
 
         // Apply search (searches both name and email)
         if ($search) {
             $this->applySearch($query, $type, $search);
         }
+
+        $this->applyStatusFilter($query, $type, $request);
 
         return $query->orderByDesc('created_at')->paginate($perPage)->withQueryString();
     }
@@ -104,21 +99,16 @@ return view('admin.unclaimed.index', compact('unclaimed', 'counts', 'type'));
         // Helper to build query for each type
         $buildQuery = function ($modelClass, string $type) use ($search, $request) {
             $query = $modelClass::query();
-            
-            // Apply unclaimed filter
-            if ($type === 'event') {
-                $query->whereNull('owner_id');
-            } elseif ($type === 'venue') {
-                $query->whereNull('user_id')->whereNull('owner_id');
-            } else {
-                $query->whereNull('user_id');
-            }
-            
+
+            $this->applyAdminListingFilter($query, $type);
+
             // Apply search (searches both name and email)
             if ($search) {
                 $this->applySearch($query, $type, $search);
             }
-            
+
+            $this->applyStatusFilter($query, $type, $request);
+
             return $query->get()->map(fn($item) => $this->transformForUnified($item, $type));
         };
 
@@ -194,6 +184,20 @@ return view('admin.unclaimed.index', compact('unclaimed', 'counts', 'type'));
             'organiser' => $item->logo,
             default => null,
         };
+    }
+
+    /**
+     * Which listings belong in the admin Unclaimed dashboard (not officially verified).
+     */
+    protected function applyAdminListingFilter($query, string $type): void
+    {
+        if ($type === 'event') {
+            $query->whereNull('owner_id');
+
+            return;
+        }
+
+        $query->notOfficiallyOwned();
     }
 
     /**
@@ -383,9 +387,12 @@ return view('admin.unclaimed.index', compact('unclaimed', 'counts', 'type'));
     public function edit(string $type, int $id)
     {
 $entity = $this->findEntity($type, $id);
-if (!$entity || !$entity->isUnclaimed()) {
+if (!$entity || ! $entity->isManageableInUnclaimedAdmin()) {
 abort(404, 'Unclaimed item not found');
         }
+
+        $entity->loadMissing('pendingClaimUser');
+
 return view("admin.unclaimed.edit-{$type}", [
             'entity' => $entity,
             'type' => $type,
@@ -398,7 +405,7 @@ return view("admin.unclaimed.edit-{$type}", [
     public function update(Request $request, string $type, int $id)
     {
 $entity = $this->findEntity($type, $id);
-if (!$entity || !$entity->isUnclaimed()) {
+if (!$entity || ! $entity->isManageableInUnclaimedAdmin()) {
 abort(404, 'Unclaimed item not found');
         }
 
@@ -422,7 +429,7 @@ return redirect()->route('admin.unclaimed.index', ['type' => $type])
     public function destroy(string $type, int $id)
     {
 $entity = $this->findEntity($type, $id);
-if (!$entity || !$entity->isUnclaimed()) {
+if (!$entity || ! $entity->isManageableInUnclaimedAdmin()) {
 abort(404, 'Unclaimed item not found');
         }
 $entity->delete();
@@ -438,7 +445,7 @@ return redirect()->route('admin.unclaimed.index', ['type' => $type])
     {
         $entity = $this->findEntity($type, $id);
 
-        if (!$entity || !$entity->isUnclaimed()) {
+        if (!$entity || ! $entity->isManageableInUnclaimedAdmin()) {
             abort(404, 'Unclaimed item not found');
         }
 
@@ -486,7 +493,7 @@ return redirect()->route('admin.unclaimed.index', ['type' => $type])
             try {
                 $entity = $this->findEntity($type, $id);
 
-                if (!$entity || !$entity->isUnclaimed()) {
+                if (!$entity || ! $entity->isManageableInUnclaimedAdmin()) {
                     $failed++;
                     $errors[] = "{$type} #{$id} is not unclaimed or not found";
                     continue;
@@ -572,8 +579,8 @@ if ($request->ajax() || $request->wantsJson()) {
         }
         
         // Now check if entity is unclaimed (after checking 1-to-1 constraints)
-        if (!$entity->isUnclaimed()) {
-abort(404, 'Unclaimed item not found');
+        if (! $entity->isManageableInUnclaimedAdmin()) {
+            abort(404, 'Unclaimed item not found');
         }
 try {
             // Use database transaction to prevent race conditions
@@ -582,8 +589,8 @@ try {
             // Refresh entity to get latest state (prevents stale data issues)
             $entity->refresh();
             
-            // Double-check entity is still unclaimed after refresh
-            if (!$entity->isUnclaimed()) {
+            // Double-check entity is still manageable after refresh
+            if (! $entity->isManageableInUnclaimedAdmin()) {
                 \DB::rollBack();
                 abort(404, 'This item is no longer unclaimed');
             }
@@ -617,6 +624,46 @@ if ($request->ajax() || $request->wantsJson()) {
 
         return redirect()->route('admin.unclaimed.index', ['type' => $type])
             ->with('success', ucfirst($type) . ' linked to ' . $user->name . ' successfully.');
+    }
+
+    /**
+     * Approve a pending claim request (manual or email-matched).
+     */
+    public function approvePendingClaim(string $type, int $id)
+    {
+        $entity = $this->findEntity($type, $id);
+
+        if (! $entity || ! $entity->hasPendingClaim()) {
+            abort(404, 'Pending claim not found');
+        }
+
+        if (! $this->claimService->approveClaim($entity)) {
+            return back()->with('error', 'Could not approve claim.');
+        }
+
+        return back()->with('success', 'Claim approved and page linked to user.');
+    }
+
+    /**
+     * Reject a pending claim request.
+     */
+    public function rejectPendingClaim(Request $request, string $type, int $id)
+    {
+        $request->validate([
+            'reason' => ['nullable', 'string', 'max:1000'],
+        ]);
+
+        $entity = $this->findEntity($type, $id);
+
+        if (! $entity || ! $entity->hasPendingClaim()) {
+            abort(404, 'Pending claim not found');
+        }
+
+        if (! $this->claimService->rejectClaim($entity, $request->input('reason'))) {
+            return back()->with('error', 'Could not reject claim.');
+        }
+
+        return back()->with('success', 'Claim rejected.');
     }
 
     /**

@@ -563,8 +563,8 @@ class VenueManagementController extends Controller
                         continue;
                     }
                 } else {
-                    // Default to current admin user
-                    $rowData['user_id'] = Auth::id() ?? 1;
+                    // Leave unclaimed when CSV has no owner — do not assign to importing admin.
+                    $rowData['user_id'] = null;
                 }
 
                 // Generate contact_email if missing
@@ -573,9 +573,14 @@ class VenueManagementController extends Controller
                     $rowData['contact_email'] = $base . '+' . time() . rand(1000, 9999) . '@example.local';
                 }
 
-                // Set owner fields
-                $rowData['owner_id'] = $rowData['user_id'];
-                $rowData['owner_type'] = \App\Models\User::class;
+                // Set owner fields only when a real user owns this venue
+                if (! empty($rowData['user_id'])) {
+                    $rowData['owner_id'] = $rowData['user_id'];
+                    $rowData['owner_type'] = \App\Models\User::class;
+                } else {
+                    $rowData['owner_id'] = null;
+                    $rowData['owner_type'] = null;
+                }
 
                 try {
                     if ($venue) {

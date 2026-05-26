@@ -1,11 +1,11 @@
-<nav class="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-50" x-data="{ mobileMenuOpen: false }">
+<nav class="{{ $siteBrand->navBarClass() }} sticky top-0 z-50" x-data="{ mobileMenuOpen: false }">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between items-center h-16">
-            <!-- Logo (with notification dot when user has unread notifications) -->
+            <!-- Logo -->
             <div class="flex items-center relative">
                 <a href="{{ route('home') }}" class="flex items-center space-x-3">
-                    <span class="relative inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-dashed border-gray-300 bg-gray-50 text-gray-400" title="Tenant logo (white-label)">
-                        {{-- Optional: <img src="..." class="h-10 w-10 object-contain rounded-lg" alt=""> --}}
+                    <span class="relative inline-flex h-10 shrink-0 items-center justify-center rounded-lg overflow-hidden {{ $siteBrand->isRogues ? 'bg-slate-800 ring-1 ring-sky-500/30' : 'border border-gray-200 bg-white' }}">
+                        <img src="{{ $siteBrand->logoUrl() }}" alt="{{ $siteBrand->name }}" class="h-10 w-auto max-w-[140px] object-contain px-1">
                         @auth
                             @if(isset($unreadNotificationCount) && $unreadNotificationCount > 0)
                                 <span class="absolute -top-0.5 -right-0.5 flex h-3 w-3" title="You have {{ $unreadNotificationCount }} unread notification(s)">
@@ -15,24 +15,23 @@
                             @endif
                         @endauth
                     </span>
-                    <span class="text-xl font-bold text-gray-900 whitespace-nowrap">My Gig Guide</span>
+                    <span class="{{ $siteBrand->navTitleClass() }}">{{ $siteBrand->name }}</span>
                 </a>
             </div>
 
             <!-- Desktop Navigation -->
             <div class="hidden md:flex items-center space-x-6">
-                <a href="{{ route('home') }}" class="nav-link {{ request()->routeIs('home') ? 'nav-link-active' : '' }}">Home</a>
-                <a href="{{ route('events.index') }}" class="nav-link {{ request()->routeIs('events.*') ? 'nav-link-active' : '' }}">Events</a>
-                <a href="{{ route('artists.index') }}" class="nav-link {{ request()->routeIs('artists.*') ? 'nav-link-active' : '' }}">Artists</a>
-                <a href="{{ route('venues.index') }}" class="nav-link {{ request()->routeIs('venues.*') ? 'nav-link-active' : '' }}">Venues</a>
-                <a href="{{ url('/about') }}" class="nav-link {{ request()->is('about') ? 'nav-link-active' : '' }}">About</a>
-                <a href="{{ route('contact.index') }}" class="nav-link {{ request()->routeIs('contact.*') ? 'nav-link-active' : '' }}">Contact</a>
+                <a href="{{ route('home') }}" class="{{ $siteBrand->navLinkClass(request()->routeIs('home')) }}">Home</a>
+                <a href="{{ route('events.index') }}" class="{{ $siteBrand->navLinkClass(request()->routeIs('events.*')) }}">Events</a>
+                <a href="{{ route('artists.index') }}" class="{{ $siteBrand->navLinkClass(request()->routeIs('artists.*')) }}">Artists</a>
+                <a href="{{ route('venues.index') }}" class="{{ $siteBrand->navLinkClass(request()->routeIs('venues.*')) }}">Venues</a>
+                <a href="{{ url('/about') }}" class="{{ $siteBrand->navLinkClass(request()->is('about')) }}">About</a>
+                <a href="{{ route('contact.index') }}" class="{{ $siteBrand->navLinkClass(request()->routeIs('contact.*')) }}">Contact</a>
                 
                 @auth
                     @if(auth()->user()->hasRole(['admin', 'superuser']))
-                        <!-- Admin Navigation -->
-                        <div class="border-l border-gray-300 h-6 mx-2"></div>
-                        <a href="{{ route('admin.dashboard') }}" class="nav-link {{ request()->routeIs('admin.*') ? 'nav-link-active' : '' }}">Admin Panel</a>
+                        <div class="border-l {{ $siteBrand->isRogues ? 'border-slate-700' : 'border-gray-300' }} h-6 mx-2"></div>
+                        <a href="{{ route('admin.dashboard') }}" class="{{ $siteBrand->navLinkClass(request()->routeIs('admin.*')) }}">Admin Panel</a>
                     @endif
                 @endauth
             </div>
@@ -42,7 +41,7 @@
                 @auth
                     <!-- Notifications (bell with dot when unread) -->
                     <div class="relative" x-data="{ notificationOpen: false }" @click.outside="notificationOpen = false">
-                        <button type="button" @click="notificationOpen = !notificationOpen" class="relative p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 transition-colors" aria-label="Notifications">
+                        <button type="button" @click="notificationOpen = !notificationOpen" class="relative p-2 {{ $siteBrand->isRogues ? 'text-slate-300 hover:text-white hover:bg-slate-800' : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100' }} rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 transition-colors" aria-label="Notifications">
                             <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
                             </svg>
@@ -81,7 +80,7 @@
                     </div>
 
                     <div class="relative" x-data="{ open: false }" @click.outside="open = false">
-                        <button @click="open = !open" class="flex items-center space-x-3 text-gray-700 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 rounded-lg px-3 py-2 transition-colors duration-200">
+                        <button @click="open = !open" class="flex items-center space-x-3 {{ $siteBrand->isRogues ? 'text-slate-200 hover:text-white' : 'text-gray-700 hover:text-gray-900' }} focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 rounded-lg px-3 py-2 transition-colors duration-200">
                             <div class="relative">
                                 @php
                                     $userProfileImage = null;
@@ -165,7 +164,7 @@
 
             <!-- Mobile menu button -->
             <div class="md:hidden flex items-center ml-4">
-                <button @click="mobileMenuOpen = !mobileMenuOpen" class="text-gray-700 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 rounded-lg p-2 transition-colors duration-200">
+                <button @click="mobileMenuOpen = !mobileMenuOpen" class="{{ $siteBrand->isRogues ? 'text-slate-200 hover:text-white' : 'text-gray-700 hover:text-gray-900' }} focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 rounded-lg p-2 transition-colors duration-200">
                     <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
                     </svg>
@@ -175,15 +174,15 @@
     </div>
 
     <!-- Mobile Navigation -->
-    <div x-show="mobileMenuOpen" class="md:hidden bg-white border-t border-gray-200">
+    <div x-show="mobileMenuOpen" class="{{ $siteBrand->mobileNavPanelClass() }}">
         <div class="px-2 pt-2 pb-3 space-y-1">
-            <a href="{{ route('home') }}" class="mobile-nav-link {{ request()->routeIs('home') ? 'mobile-nav-link-active' : '' }}">Home</a>
-            <a href="{{ route('events.index') }}" class="mobile-nav-link {{ request()->routeIs('events.*') ? 'mobile-nav-link-active' : '' }}">Events</a>
-            <a href="{{ route('artists.index') }}" class="mobile-nav-link {{ request()->routeIs('artists.*') ? 'mobile-nav-link-active' : '' }}">Artists</a>
-            <a href="{{ url('/about') }}" class="mobile-nav-link {{ request()->is('about') ? 'mobile-nav-link-active' : '' }}">About</a>
-            <a href="{{ route('venues.index') }}" class="mobile-nav-link {{ request()->routeIs('venues.*') ? 'mobile-nav-link-active' : '' }}">Venues</a>
-            <a href="{{ route('organisers.index') }}" class="mobile-nav-link {{ request()->routeIs('organisers.*') ? 'mobile-nav-link-active' : '' }}">Organisers</a>
-            <a href="{{ route('contact.index') }}" class="mobile-nav-link {{ request()->routeIs('contact.*') ? 'mobile-nav-link-active' : '' }}">Contact</a>
+            <a href="{{ route('home') }}" class="{{ $siteBrand->mobileNavLinkClass(request()->routeIs('home')) }}">Home</a>
+            <a href="{{ route('events.index') }}" class="{{ $siteBrand->mobileNavLinkClass(request()->routeIs('events.*')) }}">Events</a>
+            <a href="{{ route('artists.index') }}" class="{{ $siteBrand->mobileNavLinkClass(request()->routeIs('artists.*')) }}">Artists</a>
+            <a href="{{ url('/about') }}" class="{{ $siteBrand->mobileNavLinkClass(request()->is('about')) }}">About</a>
+            <a href="{{ route('venues.index') }}" class="{{ $siteBrand->mobileNavLinkClass(request()->routeIs('venues.*')) }}">Venues</a>
+            <a href="{{ route('organisers.index') }}" class="{{ $siteBrand->mobileNavLinkClass(request()->routeIs('organisers.*')) }}">Organisers</a>
+            <a href="{{ route('contact.index') }}" class="{{ $siteBrand->mobileNavLinkClass(request()->routeIs('contact.*')) }}">Contact</a>
         </div>
     </div>
 </nav>

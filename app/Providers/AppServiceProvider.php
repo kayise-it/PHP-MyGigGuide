@@ -6,6 +6,7 @@ use App\Models\Artist;
 use App\Models\Organiser;
 use App\Models\User;
 use App\Services\MailCredentialsService;
+use App\Support\SiteBrand;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
@@ -25,8 +26,12 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        // Use mail credentials from Admin > Mail Accounts (encrypted file) instead of .env when set
+        // Mail credentials from Admin > Mail Accounts (encrypted file) instead of .env when set
         MailCredentialsService::applyToConfig();
+
+        if (! $this->app->runningInConsole()) {
+            View::share('siteBrand', SiteBrand::current());
+        }
 
         // Share unread notifications for navbar (when user is logged in and notifications table exists)
         View::composer('layouts.navigation', function ($view) {

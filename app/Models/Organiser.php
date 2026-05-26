@@ -28,6 +28,7 @@ class Organiser extends Model
         'dispute_raised',
         'dispute_raised_at',
         'dispute_reason',
+        'claim_request_message',
         'claim_status',
         'grace_period_ends_at',
         'warning_email_sent_at',

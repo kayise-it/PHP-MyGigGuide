@@ -3,10 +3,15 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\Api\V1\Concerns\ResolvesStorageUrl;
 use App\Models\Artist;
 use App\Models\Event;
 use App\Models\Organiser;
+use App\Models\User;
 use App\Models\Venue;
+use App\Services\ApiMeProfileService;
+use App\Services\AppWebSessionService;
+use App\Services\ClaimService;
 use App\Services\UserFirebaseLinkService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -16,8 +21,13 @@ use RuntimeException;
 
 class MeController extends Controller
 {
+    use ResolvesStorageUrl;
+
     public function __construct(
         private readonly UserFirebaseLinkService $firebaseLink,
+        private readonly ApiMeProfileService $meProfile,
+        private readonly ClaimService $claimService,
+        private readonly AppWebSessionService $webSession,
     ) {}
 
     public function show(Request $request): JsonResponse
@@ -31,7 +41,127 @@ class MeController extends Controller
             'email' => $user->email,
             'roles' => $user->roles->pluck('name')->values(),
             'is_active' => (bool) $user->is_active,
+            'email_verified' => $user->email_verified_at !== null,
             'firebase_linked' => $user->firebase_uid !== null,
+            'owned_pages' => $this->meProfile->ownedPages($user),
+            'claimable_pages' => $this->meProfile->claimablePages($user),
+            'website_claim_url' => route('register'),
+        ]);
+    }
+
+    public function createWebSession(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'redirect' => ['nullable', 'string', 'max:2048'],
+        ]);
+
+        $user = $request->user();
+        if (! $user->is_active) {
+            return response()->json(['message' => 'Account is inactive.'], 403);
+        }
+
+        $issued = $this->webSession->issue($user);
+        $redirect = $this->webSession->sanitizeRedirect($validated['redirect'] ?? null);
+
+        return response()->json([
+            'url' => $this->webSession->buildLoginUrl($issued['token'], $redirect),
+            'expires_in' => $this->webSession->ttlSeconds(),
+            'redirect' => $redirect,
+        ]);
+    }
+
+    public function initiateClaims(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'type' => ['nullable', 'string', 'in:artist,venue,organiser'],
+            'id' => ['nullable', 'integer', 'required_with:type'],
+        ]);
+
+        $user = $request->user();
+        $type = $validated['type'] ?? null;
+        $id = isset($validated['id']) ? (int) $validated['id'] : null;
+
+        $result = $this->claimService->initiateClaimsForVerifiedUser($user, $type, $id);
+
+        $user->refresh()->loadMissing('roles');
+
+        $approved = $result['approved'];
+        $pending = $result['pending'];
+        $errors = $result['errors'];
+
+        if (empty($approved) && empty($pending) && ! empty($errors)) {
+            return response()->json([
+                'message' => $errors[0]['message'] ?? 'Could not start claim.',
+                'approved' => [],
+                'pending' => [],
+                'skipped' => $result['skipped'],
+                'errors' => $errors,
+                'owned_pages' => $this->meProfile->ownedPages($user),
+                'claimable_pages' => $this->meProfile->claimablePages($user),
+            ], 422);
+        }
+
+        $message = match (true) {
+            count($approved) > 0 => count($approved) === 1
+                ? 'Page claimed: '.$approved[0]['name']
+                : count($approved).' pages claimed.',
+            count($pending) > 0 => 'Claim started — pending verification or grace period.',
+            default => 'Claim request recorded.',
+        };
+
+        return response()->json([
+            'message' => $message,
+            'approved' => $approved,
+            'pending' => $pending,
+            'skipped' => $result['skipped'],
+            'errors' => $errors,
+            'owned_pages' => $this->meProfile->ownedPages($user),
+            'claimable_pages' => $this->meProfile->claimablePages($user),
+            'roles' => $user->roles->pluck('name')->values(),
+        ]);
+    }
+
+    public function requestClaim(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'type' => ['required', 'string', 'in:artist,venue,organiser'],
+            'id' => ['required', 'integer'],
+            'message' => ['nullable', 'string', 'max:2000'],
+        ]);
+
+        $user = $request->user();
+        $type = $validated['type'];
+        $id = (int) $validated['id'];
+
+        $result = $this->claimService->requestManualClaimForUser(
+            $user,
+            $type,
+            $id,
+            $validated['message'] ?? null,
+        );
+
+        $user->refresh()->loadMissing('roles');
+
+        if (empty($result['pending']) && ! empty($result['errors'])) {
+            return response()->json([
+                'message' => $result['errors'][0]['message'] ?? 'Could not submit claim request.',
+                'pending' => [],
+                'errors' => $result['errors'],
+                'owned_pages' => $this->meProfile->ownedPages($user),
+                'claimable_pages' => $this->meProfile->claimablePages($user),
+            ], 422);
+        }
+
+        $message = count($result['pending']) === 1
+            ? 'Claim request submitted for '.$result['pending'][0]['name'].' — our team will review it.'
+            : 'Claim request submitted — our team will review it.';
+
+        return response()->json([
+            'message' => $message,
+            'pending' => $result['pending'],
+            'errors' => $result['errors'],
+            'owned_pages' => $this->meProfile->ownedPages($user),
+            'claimable_pages' => $this->meProfile->claimablePages($user),
         ]);
     }
 
@@ -72,10 +202,40 @@ class MeController extends Controller
         $user = $request->user();
 
         return response()->json([
-            'events' => $user->favoriteEvents()->select('events.id', 'events.name')->orderBy('events.name')->get(),
-            'venues' => $user->favoriteVenues()->select('venues.id', 'venues.name')->orderBy('venues.name')->get(),
-            'artists' => $user->favoriteArtists()->select('artists.id', 'artists.stage_name')->orderBy('artists.stage_name')->get(),
-            'organisers' => $user->favoriteOrganisers()->select('organisers.id', 'organisers.organisation_name')->orderBy('organisers.organisation_name')->get(),
+            'events' => $user->favoriteEvents()
+                ->select('events.id', 'events.name', 'events.poster')
+                ->orderBy('events.name')
+                ->get()
+                ->map(fn (Event $e) => [
+                    'id' => $e->id,
+                    'name' => $e->name,
+                    'image_url' => self::publicStorageUrl($e->poster),
+                ])
+                ->values(),
+            'venues' => $user->favoriteVenues()
+                ->select('venues.id', 'venues.name', 'venues.main_picture')
+                ->orderBy('venues.name')
+                ->get()
+                ->map(fn (Venue $v) => [
+                    'id' => $v->id,
+                    'name' => $v->name,
+                    'image_url' => self::publicStorageUrl($v->main_picture),
+                ])
+                ->values(),
+            'artists' => $user->favoriteArtists()
+                ->select('artists.id', 'artists.stage_name', 'artists.profile_picture')
+                ->orderBy('artists.stage_name')
+                ->get()
+                ->map(fn (Artist $a) => [
+                    'id' => $a->id,
+                    'stage_name' => $a->stage_name,
+                    'image_url' => self::publicStorageUrl($a->profile_picture),
+                ])
+                ->values(),
+            'organisers' => $user->favoriteOrganisers()
+                ->select('organisers.id', 'organisers.organisation_name')
+                ->orderBy('organisers.organisation_name')
+                ->get(),
         ]);
     }
 

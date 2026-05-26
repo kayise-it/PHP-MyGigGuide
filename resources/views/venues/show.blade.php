@@ -152,7 +152,8 @@ $description = \Illuminate\Support\Str::limit(strip_tags($venue->description ?? 
                     <div class="flex items-end justify-between">
                         <div class="text-white">
                             <h1 class="text-4xl md:text-6xl font-bold mb-2">{{ $venue->name }}</h1>
-                            <div class="flex items-center space-x-6 text-lg">
+                            <div class="flex items-center flex-wrap gap-3 text-lg">
+                                <x-page-ownership-badge :entity="$venue" variant="hero" />
                                 <span class="inline-flex items-center px-3 py-1 rounded-full bg-yellow-100 text-yellow-700 text-sm font-semibold">★ {{ number_format($ratingAvg, 1) }}</span>
                                 @if($venue->address)
                                 <div class="flex items-center space-x-2">
@@ -217,6 +218,10 @@ $description = \Illuminate\Support\Str::limit(strip_tags($venue->description ?? 
                 </div>
             </div>
         </div>
+    </div>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-4 mb-8">
+        <x-page-claim-cta :entity="$venue" />
     </div>
 
     <!-- Main Content -->
@@ -377,6 +382,11 @@ $description = \Illuminate\Support\Str::limit(strip_tags($venue->description ?? 
                             <span class="font-medium">{{ number_format($venue->capacity) }} people</span>
                         </div>
                         
+                        <div class="flex justify-between items-center gap-3">
+                            <span class="text-gray-500">Page status:</span>
+                            <x-page-ownership-badge :entity="$venue" variant="inline" />
+                        </div>
+
                         <div class="flex justify-between">
                             <span class="text-gray-500">Rating:</span>
                             <span class="font-medium text-yellow-600">★ {{ number_format($ratingAvg, 1) }}</span>

@@ -91,6 +91,10 @@ class ArtistManagementController extends Controller
 
         $artist = Artist::create($data);
 
+        if (! empty($artist->user_id)) {
+            $artist->markOwnershipApproved();
+        }
+
         // Handle YouTube videos
         if ($request->has('youtube_videos') && is_array($request->youtube_videos)) {
             foreach ($request->youtube_videos as $index => $url) {
@@ -245,6 +249,13 @@ class ArtistManagementController extends Controller
 
         try {
             $artist->update($updateData);
+
+            if (! empty($artist->user_id)) {
+                $artist->markOwnershipApproved();
+            } elseif (array_key_exists('user_id', $updateData) && empty($updateData['user_id'])) {
+                $artist->clearClaimData();
+            }
+
             \Log::info('Artist updated successfully', [
                 'artist_id' => $artist->id, 
                 'fields_updated' => array_keys($updateData)

@@ -11,6 +11,10 @@ use Illuminate\Support\Facades\Storage;
 
 class EventCreationService
 {
+    public function __construct(
+        private readonly EventDuplicateService $duplicateService,
+    ) {}
+
     /**
      * Validation rules shared by web and API create flows.
      *
@@ -61,13 +65,24 @@ class EventCreationService
         ];
     }
 
-    public function createFromRequest(Request $request, User $user): Event
+    /**
+     * @return array{event: Event, existing: bool}
+     */
+    public function createFromRequest(Request $request, User $user): array
     {
         $validated = $request->validate(
             $this->rules(),
             $this->messages(),
             $this->attributeNames()
         );
+
+        $duplicate = $this->duplicateService->findDuplicate($validated);
+        if ($duplicate !== null) {
+            return [
+                'event' => $duplicate->loadMissing(['venue', 'artists', 'owner', 'categories', 'youtubeVideos']),
+                'existing' => true,
+            ];
+        }
 
         $userFolder = $user->getFolderPath();
         $eventFolder = $this->createEventFolder($userFolder, $validated['name'], $validated['date']);
@@ -121,6 +136,114 @@ class EventCreationService
         }
 
         if ($request->has('youtube_videos') && is_array($request->youtube_videos)) {
+            foreach ($request->youtube_videos as $index => $url) {
+                if (! empty($url)) {
+                    $videoId = YoutubeVideo::extractVideoId($url);
+                    if ($videoId) {
+                        YoutubeVideo::create([
+                            'videoable_type' => Event::class,
+                            'videoable_id' => $event->id,
+                            'youtube_url' => $url,
+                            'youtube_video_id' => $videoId,
+                            'order' => $index,
+                        ]);
+                    }
+                }
+            }
+        }
+
+        return [
+            'event' => $event->fresh(['venue', 'artists', 'owner', 'categories', 'youtubeVideos']),
+            'existing' => false,
+        ];
+    }
+
+    /**
+     * Whether this user posted / owns the event (matches crowd-source create ownership).
+     */
+    public function userOwnsEvent(User $user, Event $event): bool
+    {
+        if ($user->hasRole(['superuser', 'admin'])) {
+            return true;
+        }
+
+        $user->loadMissing(['artist', 'organiser']);
+
+        return match ($event->owner_type) {
+            'user' => (int) $event->owner_id === (int) $user->id,
+            'artist' => $user->artist && (int) $event->owner_id === (int) $user->artist->id,
+            'organiser' => $user->organiser && (int) $event->owner_id === (int) $user->organiser->id,
+            default => false,
+        };
+    }
+
+    /**
+     * Update an event the user owns (web edit parity, API + app).
+     */
+    public function updateFromRequest(Request $request, Event $event, User $user): Event
+    {
+        if (! $this->userOwnsEvent($user, $event)) {
+            abort(403, 'You can only edit events you posted.');
+        }
+
+        $validated = $request->validate(
+            $this->rules(),
+            $this->messages(),
+            $this->attributeNames()
+        );
+
+        $userFolder = $user->getFolderPath();
+        $eventFolder = $this->createEventFolder($userFolder, $validated['name'], $validated['date']);
+
+        $posterPath = $event->poster;
+        if ($request->hasFile('poster')) {
+            if ($event->poster) {
+                Storage::disk('public')->delete($event->poster);
+            }
+            $posterPath = $request->file('poster')->store($eventFolder.'/poster', 'public');
+        }
+        $validated['poster'] = $posterPath;
+
+        $existingGallery = is_array($event->gallery)
+            ? $event->gallery
+            : (is_string($event->gallery) ? json_decode($event->gallery, true) : []);
+        if (! is_array($existingGallery)) {
+            $existingGallery = [];
+        }
+
+        if ($request->hasFile('gallery')) {
+            foreach ($request->file('gallery') as $image) {
+                $existingGallery[] = $image->store($eventFolder.'/gallery', 'public');
+            }
+        }
+        $validated['gallery'] = json_encode(array_values($existingGallery));
+
+        unset($validated['artists'], $validated['categories'], $validated['youtube_videos']);
+
+        $event->update($validated);
+
+        if ($request->has('artists')) {
+            $artistIds = collect($request->input('artists'))
+                ->map(fn ($id) => (int) $id)
+                ->filter(fn ($id) => $id > 0)
+                ->unique()
+                ->values()
+                ->all();
+            $event->artists()->sync($artistIds);
+        }
+
+        if ($request->has('categories')) {
+            $categoryIds = collect($request->input('categories'))
+                ->map(fn ($id) => (int) $id)
+                ->filter(fn ($id) => $id > 0)
+                ->unique()
+                ->values()
+                ->all();
+            $event->categories()->sync($categoryIds);
+        }
+
+        if ($request->has('youtube_videos') && is_array($request->youtube_videos)) {
+            $event->youtubeVideos()->delete();
             foreach ($request->youtube_videos as $index => $url) {
                 if (! empty($url)) {
                     $videoId = YoutubeVideo::extractVideoId($url);

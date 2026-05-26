@@ -91,6 +91,10 @@ Route::prefix('admin')->name('admin.')->group(function () {
                 ->where('type', 'artist|venue|event|organiser');
             Route::post('/{type}/{id}/link-user', [UnclaimedController::class, 'linkToUser'])->name('link-user')
                 ->where('type', 'artist|venue|event|organiser');
+            Route::post('/{type}/{id}/approve-claim', [UnclaimedController::class, 'approvePendingClaim'])->name('approve-claim')
+                ->where('type', 'artist|venue|event|organiser');
+            Route::post('/{type}/{id}/reject-claim', [UnclaimedController::class, 'rejectPendingClaim'])->name('reject-claim')
+                ->where('type', 'artist|venue|event|organiser');
             Route::post('/{type}/{id}/check-link-conflict', [UnclaimedController::class, 'checkLinkConflict'])->name('check-link-conflict')
                 ->where('type', 'artist|venue|event|organiser');
         });

@@ -35,6 +35,7 @@ protected $fillable = [
         'dispute_raised',
         'dispute_raised_at',
         'dispute_reason',
+        'claim_request_message',
         'claim_status',
         'grace_period_ends_at',
         'warning_email_sent_at',
@@ -52,6 +53,14 @@ protected $fillable = [
         'warning_email_sent_at' => 'datetime',
         'dispute_raised' => 'boolean',
     ];
+
+    /**
+     * Venues are unclaimed only when neither a user nor polymorphic owner is set.
+     */
+    public function isUnclaimed(): bool
+    {
+        return $this->user_id === null && $this->owner_id === null;
+    }
 
     /**
      * Get the user that created the venue.

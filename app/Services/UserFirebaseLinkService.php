@@ -4,16 +4,18 @@ namespace App\Services;
 
 use App\Models\User;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 
 class UserFirebaseLinkService
 {
     public function __construct(
         private readonly FirebaseIdTokenService $firebaseIdToken,
+        private readonly ApiUserRegistrationService $registration,
     ) {}
 
     /**
-     * @return array{uid: string, email: ?string}
+     * @return array{uid: string, email: ?string, name: ?string}
      */
     public function claimsFromToken(string $idToken): array
     {
@@ -52,6 +54,20 @@ class UserFirebaseLinkService
                     return $byEmail->fresh();
                 }
             }
+        }
+
+        if ($claims['email']) {
+            $name = $claims['name'] ?? Str::before($claims['email'], '@');
+            $result = $this->registration->register(
+                name: $name,
+                email: $claims['email'],
+                password: Str::random(40),
+                username: null,
+            );
+            $user = $result['user'];
+            $user->update(['firebase_uid' => $claims['uid']]);
+
+            return $user->fresh();
         }
 
         throw new ModelNotFoundException('No website account is linked to this Firebase sign-in.');

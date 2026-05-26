@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\ArtistController;
+use App\Http\Controllers\AppWebSessionController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\DashboardController;
@@ -124,6 +125,8 @@ Route::middleware(['auth', 'capability'])->group(function () {
 // Authentication routes
 Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [AuthController::class, 'login']);
+Route::get('/auth/app-session', [AppWebSessionController::class, 'consume'])
+    ->name('auth.app-session');
 
 // Facebook OAuth routes
 Route::get('/auth/facebook', [AuthController::class, 'redirectToFacebook'])->name('facebook.login');

@@ -11,31 +11,46 @@ All endpoints return **JSON**. No authentication required for these read-only ro
 | GET | `/api/v1/meta` | App name + API version |
 | GET | `/api/v1/categories` | Active event categories (`id`, `name`, `slug`) for filters / UI |
 | GET | `/api/v1/events` | Paginated events (same filters as website listing) |
-| GET | `/api/v1/events/{id}` | Single event (`upcoming` / `ongoing` only) |
+| GET | `/api/v1/events/{id}` | Single event (`upcoming` / `ongoing`; owners may also load their own past/cancelled gigs) |
 | GET | `/api/v1/venues` | Paginated venues |
 | GET | `/api/v1/venues/{id}` | Single venue (+ `upcoming_events`, next 90 days) |
 | GET | `/api/v1/artists` | Paginated artists |
 | GET | `/api/v1/artists/{id}` | Single artist (+ genres, `upcoming_events`, next 90 days) |
 
-**Mobile:** Native detail screens use the three `show` routes above. Artist/venue upcoming gigs come from embedded `upcoming_events` (same fields as event list rows). See `mygigguide_app/docs/MOBILE_NATIVE_DETAIL.md`.
+**Artists / venues list** (`GET /api/v1/artists`, `GET /api/v1/venues`): optional query **`sort`** — `name` (default), `rating`, `events`, `newest`. Rows include **`rating_summary`** (`average`, `count`) and **`events_count`**. Matches website browse sorts (website venues also has capacity — not in app MVP).
+
+**Mobile:** Native detail screens use the three `show` routes above.
 
 ### Authenticated endpoints (Sanctum bearer token)
 
 | Method | Path | Description |
 |--------|------|-------------|
 | POST | `/api/v1/auth/login` | Login with username + password, returns bearer token |
+| POST | `/api/v1/auth/register` | **Mobile-first signup** — name, email, password → creates Laravel `user`, returns bearer token |
 | POST | `/api/v1/auth/firebase` | Login with Firebase ID token (user must be linked or same email) |
 | POST | `/api/v1/auth/logout` | Revoke current bearer token |
-| GET | `/api/v1/me` | Current user profile (`firebase_linked` boolean) |
+| GET | `/api/v1/me` | Current user profile — `roles`, `email_verified`, `firebase_linked`, **`owned_pages`**, **`claimable_pages`**, `website_claim_url` |
+| POST | `/api/v1/me/claims/initiate` | **Start email-matched page claims** (optional body `{ "type": "artist\|venue\|organiser", "id": 123 }`; omit for all matches) |
+| POST | `/api/v1/me/claims/request` | **Manual claim request** when email does not match — `{ "type", "id", "message?" }` → pending admin review (no auto-approve) |
+| POST | `/api/v1/me/web-session` | **App → website SSO** — one-time URL to open www signed in (optional `{ "redirect": "/dashboard" }`) |
 | POST | `/api/v1/me/link-firebase` | Link Firebase UID to current user (requires bearer + `id_token`) |
-| GET | `/api/v1/me/favorites` | Current user favorites (events, venues, artists, organisers) |
+| GET | `/api/v1/me/favorites` | Current user favorites (events, venues, artists, organisers). Events/venues/artists rows include optional **`image_url`** (poster / main picture / profile photo). |
 | POST | `/api/v1/me/favorites/{type}/{id}` | Add favorite (`type`: events\|venues\|artists\|organisers) |
 | DELETE | `/api/v1/me/favorites/{type}/{id}` | Remove favorite |
 | POST | `/api/v1/events` | **Create event** (requires `create-events` permission; see below) |
+| PUT/PATCH | `/api/v1/events/{id}` | **Update own event** (same permission + ownership; see below) |
+| POST | `/api/v1/artists` | **Quick-create artist** (same auth; for add-event crowd-source) |
+| POST | `/api/v1/venues` | **Quick-create venue** (same auth; for add-event crowd-source) |
+| POST | `/api/v1/ratings` | **Submit or update rating** (requires `rate-content`; 1–5 stars + optional review) |
+| GET | `/api/v1/{type}/{id}/reviews` | Paginated reviews (`type`: `events` \| `artists` \| `venues`; query `offset`, `limit`) |
+
+Event / artist / venue **`show`** responses include **`rating_summary`**: `{ average, count, user: { rating, review } | null }`. Send optional bearer token on GET to populate `user` for the signed-in account.
+
+Artist / venue **`show`** also include ownership fields when a bearer token is sent: **`ownership_status`** (`official` \| `unclaimed` \| `pending` \| `disputed`), **`user_claim_pending`** (bool), **`can_request_claim`** (bool — logged-in user may call manual claim).
 
 ### Create event (`POST /api/v1/events`)
 
-**Auth:** `Authorization: Bearer {access_token}` from `POST /api/v1/auth/login` (verified email required at login).
+**Auth:** `Authorization: Bearer {access_token}` from `POST /api/v1/auth/login` or `POST /api/v1/auth/register`.
 
 **Permission:** Laratrust `create-events` (all member roles including plain `user` after May 2026).
 
@@ -73,11 +88,38 @@ All endpoints return **JSON**. No authentication required for these read-only ro
 ```json
 {
   "data": { "id": 123, "name": "...", "venue": { ... }, ... },
-  "message": "Event created successfully."
+  "message": "Event created successfully.",
+  "existing": false
+}
+```
+
+**Likely duplicate (May 2026):** if the gig matches an existing listing (same `ticket_url`, or same **venue + date + similar title + start time within ~30 min**), the API returns **`200 OK`** with `"existing": true` and the **existing** event in `data` — **no new row** is created.
+
+```json
+{
+  "data": { "id": 99, "name": "Friday Jazz Night", ... },
+  "message": "Event already exists — using existing listing.",
+  "existing": true
 }
 ```
 
 **Errors:** `401` unauthenticated · `403` missing permission or unverified account at login · `422` validation (e.g. missing `venue_id`)
+
+### Update event (`PUT` / `PATCH /api/v1/events/{id}`)
+
+**Auth:** same as create (`Authorization: Bearer {access_token}`).
+
+**Permission:** `create-events` (member roles including plain `user`).
+
+**Ownership:** only the user who posted the event (or admin/superuser) may update. Others receive **`403`**.
+
+**Body:** same fields as create (`multipart/form-data` when uploading `poster` / `gallery[]`; JSON when no files). Sending `artists[]` or `categories[]` replaces the linked rows; omit to leave unchanged.
+
+**Success:** `200 OK` — `EventResource` with `"message": "Event updated successfully."`
+
+**`GET /api/v1/events/{id}`** includes **`user_can_edit`** (bool) when a bearer token is sent — `true` when the authenticated user owns the listing.
+
+**Errors:** `401` · `403` (not owner or missing permission) · `422` validation
 
 ### Firebase ↔ website account linking
 
@@ -92,6 +134,94 @@ All endpoints return **JSON**. No authentication required for these read-only ro
 After link, `GET /api/v1/me` returns `"firebase_linked": true`. You can then use `POST /api/v1/auth/firebase` with only the Firebase ID token to obtain a Sanctum token (auto-links by email if the Firebase email matches an existing user with no `firebase_uid` yet).
 
 **Errors:** `422` email mismatch or UID already on another user · `404` on `/auth/firebase` when no matching website account · `503` when `FIREBASE_WEB_API_KEY` is missing
+
+### `GET /api/v1/me` — pages (May 2026)
+
+| Field | Type | Notes |
+|-------|------|--------|
+| `owned_pages` | array | Official pages (`claim_status` **approved**): `{ type, id, name, ownership_status, website_url, claim_url, claimable }` |
+| `claimable_pages` | array | Unclaimed listings whose `contact_email` matches the user’s account email (same shape) |
+| `website_claim_url` | string | Generic register URL on www |
+| `email_verified` | boolean | Laravel `email_verified_at` set |
+
+### `POST /api/v1/me/claims/initiate` — app claims (May 2026)
+
+**Auth:** bearer token from login/register.
+
+**Body (optional):**
+
+| Field | Type | Notes |
+|-------|------|--------|
+| `type` | string | `artist`, `venue`, or `organiser` — required with `id` |
+| `id` | integer | Listing id — claim one page; omit both fields to claim all email matches |
+
+**Behaviour:** Same `ClaimService` flow as website register + verify. App registrations are verified immediately, so matching listings are usually **approved** in one step (grace period off by default). Unverified accounts get **pending** claims until they verify on www.
+
+**Response (200):** `{ message, approved[], pending[], skipped[], errors[], owned_pages[], claimable_pages[], roles[] }`
+
+**Errors:** `422` when nothing matches the account email (or the given type/id).
+
+#### Example
+
+```bash
+curl -s -X POST "$BASE/api/v1/me/claims/initiate" \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "Accept: application/json" \
+  -H "Content-Type: application/json" \
+  -d '{"type":"artist","id":42}' | jq .
+```
+
+### `POST /api/v1/me/claims/request` — manual claim (May 2026)
+
+**Auth:** bearer token from login/register.
+
+**Body:**
+
+| Field | Type | Notes |
+|-------|------|--------|
+| `type` | string | `artist`, `venue`, or `organiser` |
+| `id` | integer | Listing id |
+| `message` | string | Optional — why you should manage this page (max 2000 chars) |
+
+**Behaviour:** Sets `claim_status = pending` and `pending_claim_user_id` — **no** email match required, **no** auto-approve, **no** warning email to listing contact. Admin approves/rejects in **Unclaimed** edit screen.
+
+**Response (200):** `{ message, pending[], errors[], owned_pages[], claimable_pages[] }`
+
+**Errors:** `422` when page is already official, under review, or another user has a pending request.
+
+#### Example
+
+```bash
+curl -s -X POST "$BASE/api/v1/me/claims/request" \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "Accept: application/json" \
+  -H "Content-Type: application/json" \
+  -d '{"type":"artist","id":851,"message":"I am the band manager."}' | jq .
+```
+
+### `POST /api/v1/me/web-session` — app → website SSO (May 2026)
+
+**Auth:** bearer token from login/register.
+
+**Body (optional):**
+
+| Field | Type | Notes |
+|-------|------|--------|
+| `redirect` | string | Path on www after sign-in, e.g. `/dashboard` or `/artists/851` (same host only) |
+
+**Response (200):** `{ url, expires_in, redirect }` — open **`url`** in the device browser within **`expires_in`** seconds (default 300). Link is **single-use**.
+
+**Web route:** `GET /auth/app-session?token=…&redirect=…` sets the normal Laravel **session cookie** and redirects.
+
+#### Example
+
+```bash
+curl -s -X POST "$BASE/api/v1/me/web-session" \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "Accept: application/json" \
+  -H "Content-Type: application/json" \
+  -d '{"redirect":"/dashboard"}'
+```
 
 #### Example: login + create (JSON, no poster)
 
@@ -133,6 +263,29 @@ curl -s -X POST "$BASE/api/v1/events" \
 ```
 
 **Mobile:** Use the same fields from `AddGigScreen` after Laravel login (not Firebase). Pick `venue_id` from `GET /api/v1/venues?search=...`.
+
+### Quick-create artist (`POST /api/v1/artists`)
+
+**Auth:** same as create event (`create-events` permission).
+
+| Field | Required | Notes |
+|-------|----------|--------|
+| `stage_name` | yes | |
+| `genre` | no | defaults to `Unknown` |
+| `real_name` | no | |
+
+Returns `201` (new) or `200` with `"existing": true` if stage name matches (case-insensitive).
+
+### Quick-create venue (`POST /api/v1/venues`)
+
+| Field | Required | Notes |
+|-------|----------|--------|
+| `name` | yes | |
+| `address` | yes | |
+| `city` | no | |
+| `latitude`, `longitude` | no | |
+
+Returns `201` (new) or `200` with `"existing": true` when name + address match.
 
 ### Query parameters
 

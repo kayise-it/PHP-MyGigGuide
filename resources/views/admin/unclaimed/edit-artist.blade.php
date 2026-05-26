@@ -27,6 +27,8 @@
     </div>
 
     <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        @include('admin.unclaimed._pending-claim-review', ['entity' => $entity, 'type' => 'artist'])
+
         <form method="POST" action="{{ route('admin.unclaimed.update', ['type' => 'artist', 'id' => $entity->id]) }}" enctype="multipart/form-data">
             @csrf
             @method('PUT')

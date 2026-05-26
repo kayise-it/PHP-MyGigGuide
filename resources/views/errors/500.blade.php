@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Oops! 500 Error • My Gig Guide</title>
     <meta name="robots" content="noindex">
-    <link rel="icon" href="/favicon.ico">
+    <link rel="icon" href="/logos/favicon.png" type="image/png">
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         .code-block {

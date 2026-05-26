@@ -8,6 +8,14 @@ use Symfony\Component\HttpFoundation\Response;
 
 class EnsureApiPermission
 {
+    /** Crowd-source MVP: any logged-in member may list events or rate (curation later). */
+    private const MEMBER_ROLES = [
+        'user',
+        'venue_owner',
+        'organiser',
+        'artist',
+    ];
+
     /**
      * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
      */
@@ -22,6 +30,11 @@ class EnsureApiPermission
         // Admin roles bypass Laratrust capability names (production superuser may not
         // have every permission row attached even though the website grants full access).
         if ($user->hasRole(['superuser', 'admin'])) {
+            return $next($request);
+        }
+
+        if (in_array($permission, ['create-events', 'rate-content'], true)
+            && $user->hasRole(self::MEMBER_ROLES)) {
             return $next($request);
         }
 

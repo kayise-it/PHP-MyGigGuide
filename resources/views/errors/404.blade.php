@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Page not found • My Gig Guide</title>
     <meta name="robots" content="noindex">
-    <link rel="icon" href="/favicon.ico">
+    <link rel="icon" href="/logos/favicon.png" type="image/png">
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="min-h-screen bg-gradient-to-br from-purple-50 via-white to-blue-50 antialiased flex items-center justify-center p-6">

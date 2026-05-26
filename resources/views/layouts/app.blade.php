@@ -5,8 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     
-    <title>@yield('title', 'My Gig Guide')</title>
-    <meta name="description" content="@yield('description', 'Discover amazing events, artists, and venues in your area.')">
+    <title>@yield('title', $siteBrand->name)</title>
+    <meta name="description" content="@yield('description', $siteBrand->tagline)">
+    <link rel="icon" href="{{ $siteBrand->faviconUrl() }}" type="image/png" sizes="32x32">
+    @if(! $siteBrand->isRogues)
+    <link rel="apple-touch-icon" href="{{ asset('logos/apple-touch-icon.png') }}">
+    @endif
     
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.bunny.net">
@@ -41,7 +45,7 @@
     }
     </style>
 </head>
-<body class="font-sans antialiased bg-gray-50">
+<body class="font-sans antialiased bg-gray-50 {{ $siteBrand->bodyClass() }}">
     <div id="app" x-data="{ mobileMenuOpen: false }">
         @include('layouts.navigation')
         

@@ -9,7 +9,13 @@
         <a href="{{ route('admin.artist-disputes.index') }}" class="text-purple-600 hover:text-purple-800 mb-4 inline-block">
             ← Back to Disputes
         </a>
-        <h1 class="text-2xl font-bold text-gray-900">Review Claim Dispute</h1>
+        <h1 class="text-2xl font-bold text-gray-900">
+            @if($artist->dispute_raised || $artist->claim_status === 'disputed')
+                Review Claim Dispute
+            @else
+                Review Pending Claim
+            @endif
+        </h1>
     </div>
 
     @if($artist->dispute_raised)
@@ -26,6 +32,13 @@
                 </p>
             </div>
         </div>
+    </div>
+    @endif
+
+    @if($artist->hasPendingClaim() && !empty($artist->claim_request_message))
+    <div class="bg-amber-50 border-l-4 border-amber-500 p-4 mb-6">
+        <p class="text-sm font-medium text-amber-900 mb-1">Message from claimant (manual request)</p>
+        <p class="text-sm text-amber-950 whitespace-pre-wrap">{{ $artist->claim_request_message }}</p>
     </div>
     @endif
 

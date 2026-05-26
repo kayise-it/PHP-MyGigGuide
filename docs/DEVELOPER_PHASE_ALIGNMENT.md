@@ -18,7 +18,7 @@ Source PDF: `docs/Alignment with Kayise _ developer scope (1).pdf` · this file 
 | Area | Then (PDF) | Now (May 2026) |
 |------|------------|----------------|
 | Laravel API | “Not catered for; needs go live” | **Partially live** on `mygigguide.co.za` — `GET` listings/detail/categories/venues; **Sanctum** login/logout; favourites; **`POST /api/v1/events`** (create gig from app). Deploy so far: **file copy + migrate**, not full git pipeline. |
-| Flutter app | “Separate repo / in progress” | **Working builds** (My Gig Guide + **Rogues** flavor): native event/artist/venue detail, category filters, map/calendar, **Add event** via API, hearts when logged in. Release APK via Drive. |
+| Flutter app | “Separate repo / in progress” | **Working builds** (My Gig Guide + **Rogues** flavor): Home coverflow browse + map, WhatsApp share, native detail + gallery coverflow, category filters, **Add event** via API, hearts when logged in. Rogues `SITE_URL` → `rogues.mygigguide.co.za`. Release APK via Drive. |
 | Identity | “Needs discussion” | **Agreed model:** Laravel `users.id` = source of truth. Web = session; mobile = **Sanctum bearer**. **Firebase ↔ Laravel link** coded (not finished on phone — see pin below). |
 | Spider (#7) | Not started | **Direction:** RSS + **n8n** (FetchRSS pilot for FB groups) — replaces spider; **not built yet**. |
 | Advertising (#5) | Partial / mobile | **Rogues** white-label in app (branding, radio tab, stream); full ad portal still not started. |
@@ -39,7 +39,7 @@ Source PDF: `docs/Alignment with Kayise _ developer scope (1).pdf` · this file 
 | # | Item | Status |
 |---|------|--------|
 | 1 | Authentication & sign-up (role-based) | **Delivered** — Laravel + Laratrust (user, artist, venue, organiser, admin, etc.). |
-| 2 | Landing / gallery of upcoming events | **Delivered** — home + listings; calendar/map on home; minor UX / white-label tweaks ongoing. |
+| 2 | Landing / gallery of upcoming events | **Delivered** — home + listings; mobile Home = coverflow browse + full-screen map (May 2026); web calendar/map on home; minor UX / white-label tweaks ongoing. |
 | 3 | App deployment | **Delivered; live** — VPS; DNS / SSL per hosting. |
 | 4 | Database & capture forms | **Delivered** — events, venues, artists, admin flows. |
 | 5 | Advertising portal (white label) | **Not started / partial** — Rogues-style branding + radio in **mobile**; full portal TBD. |
@@ -47,7 +47,7 @@ Source PDF: `docs/Alignment with Kayise _ developer scope (1).pdf` · this file 
 | 7 | Spider for venues/artists | **Not started** — direction: **RSS + n8n** (see Phase 2); Excel/import scripts used ad hoc for venues. |
 | 8 | Event sponsorship integration | **Partial / started** — paid-feature building blocks. |
 | 9 | Move to VPS | **Done** (extra unforeseen work). |
-| 10 | Laravel API | **In progress → partially live** — developed by Dave; **not in original scope**. Public JSON + Sanctum on VPS; needs **proper deploy from repo** + Kayise agreement. See [API_V1.md](./API_V1.md). |
+| 10 | Laravel API | **Live (May 2026)** — public JSON + Sanctum + **POST /api/v1/events** on VPS. Deployed via **rsync**; `main` on GitHub. Ongoing: `git pull` on server, Kayise process. See [API_V1.md](./API_V1.md). |
 
 ---
 
@@ -83,7 +83,7 @@ Source PDF: `docs/Alignment with Kayise _ developer scope (1).pdf` · this file 
 |---|--------|----------------|
 | 1 | **Deploy / git** | Written process: production branch, who merges, who runs `migrate` / queue, rollback, env template, repo + SSH access. **Goal:** API/mobile go live without ad-hoc `scp` calls. |
 | 2 | **Auth on production** | Confirm **Sanctum bearer** for mobile is OK (CORS, `SANCTUM_STATEFUL_DOMAINS` if any web SPA later). Who implements server config vs app. |
-| 3 | **White-label DNS** | Spec for subdomains (e.g. `rogues.mygigguide.co.za`) — Kayise to send or approve. |
+| 3 | **White-label DNS** | **Rogues live:** `rogues.mygigguide.co.za` (Dave, May 2026). Pattern for FM919/HOT1027 TBD with Kayise. |
 | 4 | **WhatsApp / n8n** | Access to deploy script or agreed path to update bridge/n8n on VPS. |
 | 5 | **Commercial** | Phase 3 maintenance: does it cover **API + mobile** releases, or web-only? |
 
@@ -93,8 +93,8 @@ Source PDF: `docs/Alignment with Kayise _ developer scope (1).pdf` · this file 
 
 | # | Item | What / where |
 |---|------|----------------|
-| 1 | Laravel API, Sanctum | **Partially on VPS** (`/api/v1/...`). PC repo: much API work **not yet committed** to `main` — agree branch (`Dave_Dev` vs `main`) and deploy path with Kayise. |
-| 2 | Subdomains for white-labelling | **Please send DNS spec.** |
+| 1 | Laravel API, Sanctum | **On VPS** (`/api/v1/...`, create event). PC: **`main`** commit `5860450`. Deploy: rsync worked 18 May 2026; enable `git pull` when deploy key added. |
+| 2 | Subdomains for white-labelling | **Rogues:** `rogues.mygigguide.co.za` live (HTTPS). Other tenants — spec TBD. |
 | 3 | Authentication web & mobile | **Model agreed:** `users.id` SSOT; web session; mobile Sanctum. Firebase optional on device; **link to Laravel** in progress (pinned). Confirm production support. |
 | 4 | GitHub + go live | **Blocking item** — see table above. Target: no more one-off file copies for API. |
 | 5 | Python / WhatsApp update script | Access to push bridge files live; Dave can work in n8n. |

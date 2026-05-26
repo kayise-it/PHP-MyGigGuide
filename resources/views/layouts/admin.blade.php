@@ -7,6 +7,7 @@
     
     <title>@yield('title', 'Admin Dashboard - My Gig Guide')</title>
     <meta name="description" content="@yield('description', 'Management portal for My Gig Guide administrators.')">
+    <link rel="icon" href="{{ asset('logos/favicon.png') }}" type="image/png" sizes="32x32">
     
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.bunny.net">
@@ -131,10 +132,10 @@
                     </a>
                     <!-- Unclaimed Items -->
                     @php
-                        $unclaimedCount = \App\Models\Artist::whereNull('user_id')->count()
-                            + \App\Models\Venue::whereNull('user_id')->whereNull('owner_id')->count()
+                        $unclaimedCount = \App\Models\Artist::notOfficiallyOwned()->count()
+                            + \App\Models\Venue::notOfficiallyOwned()->count()
                             + \App\Models\Event::whereNull('owner_id')->count()
-                            + \App\Models\Organiser::whereNull('user_id')->count();
+                            + \App\Models\Organiser::notOfficiallyOwned()->count();
                     @endphp
                     <a href="{{ route('admin.unclaimed.index') }}" 
                        class="nav-item {{ request()->routeIs('admin.unclaimed.*') ? 'nav-item-active' : '' }}">

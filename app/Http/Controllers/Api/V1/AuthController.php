@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Services\ApiUserRegistrationService;
 use App\Services\UserFirebaseLinkService;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\JsonResponse;
@@ -17,6 +18,7 @@ class AuthController extends Controller
 {
     public function __construct(
         private readonly UserFirebaseLinkService $firebaseLink,
+        private readonly ApiUserRegistrationService $registration,
     ) {}
     public function login(Request $request): JsonResponse
     {
@@ -40,11 +42,7 @@ class AuthController extends Controller
             ], 403);
         }
 
-        if (! $user->hasVerifiedEmail()) {
-            return response()->json([
-                'message' => 'Please verify your email before signing in.',
-            ], 403);
-        }
+        $this->registration->ensureMemberCanCreateEvents($user);
 
         $token = $user->createToken($validated['device_name'] ?? 'mobile-app')->plainTextToken;
 
@@ -87,12 +85,6 @@ class AuthController extends Controller
             ], 403);
         }
 
-        if (! $user->hasVerifiedEmail()) {
-            return response()->json([
-                'message' => 'Please verify your email before signing in.',
-            ], 403);
-        }
-
         $token = $user->createToken($validated['device_name'] ?? 'mobile-app')->plainTextToken;
 
         return response()->json([
@@ -100,6 +92,44 @@ class AuthController extends Controller
             'access_token' => $token,
             'user' => $this->userPayload($user),
         ]);
+    }
+
+    /**
+     * Mobile-first signup — creates a Laravel user (role `user`) and returns a Sanctum token.
+     */
+    public function register(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'string', 'email', 'max:255'],
+            'password' => ['required', 'string', 'min:8'],
+            'username' => ['nullable', 'string', 'max:255'],
+            'device_name' => ['nullable', 'string', 'max:100'],
+        ]);
+
+        try {
+            $result = $this->registration->register(
+                name: $validated['name'],
+                email: $validated['email'],
+                password: $validated['password'],
+                username: $validated['username'] ?? null,
+            );
+        } catch (ValidationException $e) {
+            return response()->json([
+                'message' => collect($e->errors())->flatten()->first() ?? 'Registration failed.',
+                'errors' => $e->errors(),
+            ], 422);
+        }
+
+        $user = $result['user'];
+        $token = $user->createToken($validated['device_name'] ?? 'mobile-app')->plainTextToken;
+
+        return response()->json([
+            'token_type' => 'Bearer',
+            'access_token' => $token,
+            'user' => $this->userPayload($user),
+            'message' => 'Account created. Your username is '.$result['username'].'.',
+        ], 201);
     }
 
     public function logout(Request $request): JsonResponse

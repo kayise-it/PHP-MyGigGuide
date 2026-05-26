@@ -25,6 +25,7 @@ trait Claimable
             'dispute_raised',
             'dispute_raised_at',
             'dispute_reason',
+            'claim_request_message',
             'claim_status',
             'grace_period_ends_at',
             'warning_email_sent_at',
@@ -52,6 +53,86 @@ trait Claimable
     public function isUnclaimed(): bool
     {
         return $this->getOwnerUserId() === null;
+    }
+
+    /**
+     * Public-facing ownership label for artist/venue show pages.
+     *
+     * Official = verified ownership (email claim approved or admin linked with approval).
+     * A row can have user_id set (e.g. prep work) but still show Unclaimed until approved.
+     *
+     * @return 'official'|'unclaimed'|'pending'|'disputed'
+     */
+    public function getPublicOwnershipStatus(): string
+    {
+        if ($this->hasDisputedClaim()) {
+            return 'disputed';
+        }
+
+        if ($this->hasPendingClaim()) {
+            return 'pending';
+        }
+
+        if ($this->isUnclaimed()) {
+            return 'unclaimed';
+        }
+
+        if ($this->claim_status === 'approved') {
+            return 'official';
+        }
+
+        return 'unclaimed';
+    }
+
+    public function getPublicOwnershipLabel(): string
+    {
+        return match ($this->getPublicOwnershipStatus()) {
+            'official' => 'Official page',
+            'unclaimed' => 'Unclaimed listing',
+            'pending' => 'Claim pending',
+            'disputed' => 'Under review',
+            default => '',
+        };
+    }
+
+    public function getPublicOwnershipDescription(): string
+    {
+        return match ($this->getPublicOwnershipStatus()) {
+            'official' => 'This page is linked to a verified account holder.',
+            'unclaimed' => 'This listing is not yet linked to an official account. Information may be community-submitted.',
+            'pending' => 'Someone has requested to manage this page. Verification is in progress.',
+            'disputed' => 'Ownership of this page is being reviewed by our team.',
+            default => '',
+        };
+    }
+
+    /**
+     * Mark this page as officially owned (admin link or successful claim).
+     */
+    public function markOwnershipApproved(): void
+    {
+        $columns = \Illuminate\Support\Facades\Schema::getColumnListing($this->getTable());
+
+        $fields = [
+            'claim_status' => 'approved',
+            'pending_claim_user_id' => null,
+            'pending_claim_at' => null,
+            'grace_period_ends_at' => null,
+            'dispute_raised' => false,
+            'dispute_raised_at' => null,
+            'dispute_reason' => null,
+        ];
+
+        $update = [];
+        foreach ($fields as $field => $value) {
+            if (in_array($field, $columns, true)) {
+                $update[$field] = $value;
+            }
+        }
+
+        if (! empty($update)) {
+            $this->update($update);
+        }
     }
 
     /**
@@ -85,6 +166,25 @@ trait Claimable
     {
         $ownerField = $this->getOwnerUserIdField();
         return $query->whereNull($ownerField);
+    }
+
+    /**
+     * Listings that are not officially verified (includes import placeholders and pending claims).
+     */
+    public function scopeNotOfficiallyOwned($query)
+    {
+        return $query->where(function ($q) {
+            $q->whereNull('claim_status')
+                ->orWhere('claim_status', '!=', 'approved');
+        });
+    }
+
+    /**
+     * Admin Unclaimed panel — anything except an approved official page.
+     */
+    public function isManageableInUnclaimedAdmin(): bool
+    {
+        return $this->getPublicOwnershipStatus() !== 'official';
     }
 
     /**
@@ -229,6 +329,28 @@ trait Claimable
     }
 
     /**
+     * Manual claim request (app / web) — admin review, no email auto-match, no auto-approve.
+     */
+    public function requestManualClaim(User $user, ?string $message = null): void
+    {
+        $update = [
+            'pending_claim_user_id' => $user->id,
+            'pending_claim_at' => now(),
+            'claim_status' => 'pending',
+            'grace_period_ends_at' => null,
+            'dispute_raised' => false,
+            'dispute_raised_at' => null,
+        ];
+
+        $columns = \Illuminate\Support\Facades\Schema::getColumnListing($this->getTable());
+        if (in_array('claim_request_message', $columns, true)) {
+            $update['claim_request_message'] = filled($message) ? mb_substr(trim($message), 0, 2000) : null;
+        }
+
+        $this->update($update);
+    }
+
+    /**
      * Approve a pending claim.
      */
     public function approveClaim(): void
@@ -238,14 +360,21 @@ trait Claimable
         }
 
         $ownerField = $this->getOwnerUserIdField();
-        
-        $this->update([
+
+        $update = [
             $ownerField => $this->pending_claim_user_id,
             'claim_status' => 'approved',
             'pending_claim_user_id' => null,
             'pending_claim_at' => null,
             'grace_period_ends_at' => null,
-        ]);
+        ];
+
+        $columns = \Illuminate\Support\Facades\Schema::getColumnListing($this->getTable());
+        if (in_array('claim_request_message', $columns, true)) {
+            $update['claim_request_message'] = null;
+        }
+
+        $this->update($update);
     }
 
     /**
@@ -253,13 +382,20 @@ trait Claimable
      */
     public function rejectClaim(?string $reason = null): void
     {
-        $this->update([
+        $update = [
             'claim_status' => 'rejected',
             'pending_claim_user_id' => null,
             'pending_claim_at' => null,
             'grace_period_ends_at' => null,
             'dispute_reason' => $reason,
-        ]);
+        ];
+
+        $columns = \Illuminate\Support\Facades\Schema::getColumnListing($this->getTable());
+        if (in_array('claim_request_message', $columns, true)) {
+            $update['claim_request_message'] = null;
+        }
+
+        $this->update($update);
     }
 
     /**
@@ -292,6 +428,7 @@ trait Claimable
             'dispute_raised' => false,
             'dispute_raised_at' => null,
             'dispute_reason' => null,
+            'claim_request_message' => null,
             'warning_email_sent_at' => null,
         ];
 

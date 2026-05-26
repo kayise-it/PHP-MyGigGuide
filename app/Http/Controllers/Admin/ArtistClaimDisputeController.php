@@ -88,12 +88,10 @@ class ArtistClaimDisputeController extends Controller
     public function show(Artist $artist)
     {
         $artist->load('pendingClaimUser');
-        
-        // Allow viewing disputes even without pending claims
-        // Just verify it's actually disputed
-        if (!$artist->dispute_raised && $artist->claim_status !== 'disputed') {
+
+        if (! $artist->hasDisputedClaim() && ! $artist->hasPendingClaim()) {
             return redirect()->route('admin.artist-disputes.index')
-                ->with('error', 'This artist is not in a disputed state.');
+                ->with('error', 'This artist has no pending claim or dispute to review.');
         }
 
         return view('admin.artist-disputes.show', compact('artist'));

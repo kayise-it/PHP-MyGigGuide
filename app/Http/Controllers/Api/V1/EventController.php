@@ -25,7 +25,14 @@ class EventController extends Controller
 
         $startDateDefault = now()->toDateString();
         $endDateDefault = now()->addDays(30)->toDateString();
-        $query->whereBetween('date', [$startDateDefault, $endDateDefault]);
+
+        if ($request->filled('date_from') || $request->filled('date_to')) {
+            $dateFrom = $request->get('date_from', $startDateDefault);
+            $dateTo = $request->get('date_to', $endDateDefault);
+            $query->whereBetween('date', [$dateFrom, $dateTo]);
+        } else {
+            $query->whereBetween('date', [$startDateDefault, $endDateDefault]);
+        }
 
         if ($request->filled('search')) {
             $searchTerm = $request->search;
@@ -79,12 +86,6 @@ class EventController extends Controller
             });
         }
 
-        if ($request->filled('date_from') || $request->filled('date_to')) {
-            $dateFrom = $request->get('date_from', $startDateDefault);
-            $dateTo = $request->get('date_to', $endDateDefault);
-            $query->whereBetween('date', [$dateFrom, $dateTo]);
-        }
-
         $perPage = min((int) $request->get('per_page', 30), 100);
 
         $events = $query->orderBy('date', 'asc')->orderBy('time', 'asc')->paginate($perPage);
@@ -92,11 +93,17 @@ class EventController extends Controller
         return EventResource::collection($events);
     }
 
-    public function show(Event $event): EventResource
+    public function show(Request $request, Event $event): EventResource
     {
-        abort_unless(in_array($event->status, ['upcoming', 'ongoing'], true), 404);
+        $user = $request->user('sanctum');
+        $canView = in_array($event->status, ['upcoming', 'ongoing'], true)
+            || ($user && app(EventCreationService::class)->userOwnsEvent($user, $event));
+
+        abort_unless($canView, 404);
 
         $event->load(['venue', 'artists', 'owner', 'categories', 'youtubeVideos']);
+        $event->loadCount('ratings');
+        $event->loadAvg('ratings', 'rating');
 
         return new EventResource($event);
     }
@@ -107,11 +114,28 @@ class EventController extends Controller
      */
     public function store(Request $request, EventCreationService $eventCreation): JsonResponse
     {
-        $event = $eventCreation->createFromRequest($request, $request->user());
+        $result = $eventCreation->createFromRequest($request, $request->user());
 
-        return (new EventResource($event))
-            ->additional(['message' => 'Event created successfully.'])
+        return (new EventResource($result['event']))
+            ->additional([
+                'message' => $result['existing']
+                    ? 'Event already exists — using existing listing.'
+                    : 'Event created successfully.',
+                'existing' => $result['existing'],
+            ])
             ->response()
-            ->setStatusCode(201);
+            ->setStatusCode($result['existing'] ? 200 : 201);
+    }
+
+    /**
+     * Update an event the authenticated user posted. Multipart or JSON (no new files).
+     */
+    public function update(Request $request, Event $event, EventCreationService $eventCreation): JsonResponse
+    {
+        $updated = $eventCreation->updateFromRequest($request, $event, $request->user());
+
+        return (new EventResource($updated))
+            ->additional(['message' => 'Event updated successfully.'])
+            ->response();
     }
 }

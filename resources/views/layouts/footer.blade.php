@@ -1,14 +1,19 @@
 <footer class="bg-gray-900 text-white">
     <div class="max-w-7xl mx-auto py-10 px-4 sm:px-6 lg:px-8">
         <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
-            <!-- Brand Section (white-label: optional tenant logo in slot) -->
+            <!-- Brand -->
             <div class="col-span-1 md:col-span-2">
                 <div class="flex items-center gap-3 mb-4">
-                    <div class="h-10 w-10 shrink-0 rounded-md border border-dashed border-gray-600/60 bg-gray-800/40" aria-hidden="true" title="Tenant logo (white-label)"></div>
-                    <span class="text-2xl font-bold">Powered by My Gig Guide</span>
+                    <img src="{{ $siteBrand->logoUrl() }}" alt="{{ $siteBrand->name }}" class="h-10 w-auto max-w-[120px] object-contain rounded-md">
+                    <div>
+                        <span class="text-2xl font-bold block">{{ $siteBrand->footerBrandTitle() }}</span>
+                        @if($siteBrand->isRogues)
+                            <span class="text-sm text-gray-400">Powered by My Gig Guide</span>
+                        @endif
+                    </div>
                 </div>
                 <p class="text-gray-400 mb-6 max-w-md">
-                    Discover amazing events, artists, and venues in your area. Connect with the music community and never miss out on the best gigs.
+                    {{ $siteBrand->tagline }}
                 </p>
                 <div class="flex space-x-4">
                     <a href="#" class="text-gray-400 hover:text-white transition-colors duration-200">
@@ -60,10 +65,15 @@
         <div class="border-t border-gray-800 mt-8 pt-6">
             <div class="flex flex-col md:flex-row justify-between items-center">
                 <p class="text-gray-400 text-sm">
-                    &copy; {{ date('Y') }} My Gig Guide. All rights reserved.
+                    &copy; {{ date('Y') }} {{ $siteBrand->isRogues ? 'Rogues on Radio · My Gig Guide' : 'My Gig Guide' }}. All rights reserved.
                 </p>
                 <p class="text-gray-400 text-sm mt-2 md:mt-0">
-                    Created by <a href="https://kayiseit.co.za" class="text-purple-400 hover:text-white font-semibold" target="_blank" rel="noopener">KAYISE IT</a> — promoting My Gig Guide
+                    Created by <a href="https://kayiseit.co.za" class="{{ $siteBrand->isRogues ? 'text-sky-400 hover:text-white' : 'text-purple-400 hover:text-white' }} font-semibold" target="_blank" rel="noopener">KAYISE IT</a>
+                    @if($siteBrand->isRogues)
+                        — gig guide powered by My Gig Guide
+                    @else
+                        — promoting My Gig Guide
+                    @endif
                 </p>
             </div>
         </div>

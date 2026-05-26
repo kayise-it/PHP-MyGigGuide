@@ -61,7 +61,8 @@
         
         <div class="absolute bottom-0 left-0 right-0 p-8 text-white">
                             <h1 class="text-4xl md:text-6xl font-bold mb-2">{{ $artist->stage_name ?? $artist->user->name }}</h1>
-                            <div class="flex items-center space-x-3 text-lg">
+                            <div class="flex items-center flex-wrap gap-2 text-lg">
+                                <x-page-ownership-badge :entity="$artist" variant="hero" />
                                 <span class="inline-flex items-center px-3 py-1 rounded-full bg-yellow-100 text-yellow-700 text-sm font-semibold">★ {{ number_format($ratingAvg, 1) }}</span>
                                 @if($artist->genre)
                                 <span class="inline-flex items-center px-3 py-1 rounded-full bg-white/20 text-white">{{ $artist->genre }}</span>
@@ -74,6 +75,8 @@
                             <x-favorite-button :model="$artist" type="artist" size="lg" />
                         </div>
                         </div>
+
+    <x-page-claim-cta :entity="$artist" />
 
     <!-- Content Section -->
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -141,6 +144,10 @@
                         <span class="font-medium text-gray-900">{{ $artist->genre }}</span>
                     </div>
                     @endif
+                    <div class="flex justify-between">
+                        <span class="text-gray-500">Page status:</span>
+                        <x-page-ownership-badge :entity="$artist" variant="inline" />
+                    </div>
                     <div class="flex justify-between">
                         <span class="text-gray-500">Rating:</span>
                         <span class="font-medium text-yellow-600">★ {{ number_format($ratingAvg, 1) }}</span>

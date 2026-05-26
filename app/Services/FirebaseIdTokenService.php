@@ -58,6 +58,11 @@ class FirebaseIdTokenService
             $email = null;
         }
 
-        return ['uid' => $uid, 'email' => $email];
+        $displayName = isset($record['displayName']) ? trim((string) $record['displayName']) : null;
+        if ($displayName === '') {
+            $displayName = null;
+        }
+
+        return ['uid' => $uid, 'email' => $email, 'name' => $displayName];
     }
 }

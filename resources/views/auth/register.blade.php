@@ -121,7 +121,7 @@
                             id="email"
                             type="email"
                             name="email"
-                            value="{{ old('email') }}"
+                            value="{{ old('email', request('email')) }}"
                             required
                             autocomplete="email"
                             class="block w-full pl-10 pr-3 py-3 border border-purple-200 rounded-xl text-gray-900 placeholder-purple-300 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent @error('email') border-red-300 @enderror"

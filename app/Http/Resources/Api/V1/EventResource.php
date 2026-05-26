@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources\Api\V1;
 
+use App\Http\Resources\Api\V1\Concerns\SerializesRatingSummary;
 use App\Http\Resources\Api\V1\Concerns\ResolvesStorageUrl;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -9,6 +10,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
 class EventResource extends JsonResource
 {
     use ResolvesStorageUrl;
+    use SerializesRatingSummary;
 
     /**
      * @return array<string, mixed>
@@ -41,6 +43,18 @@ class EventResource extends JsonResource
                 ])->values()->all();
             }),
             'detail_url' => route('events.show', $this->resource),
+            'rating_summary' => $this->ratingSummary($request),
+            'user_can_edit' => $this->userCanEdit($request),
         ];
+    }
+
+    protected function userCanEdit(Request $request): bool
+    {
+        $user = $request->user('sanctum');
+        if (! $user) {
+            return false;
+        }
+
+        return app(\App\Services\EventCreationService::class)->userOwnsEvent($user, $this->resource);
     }
 }
