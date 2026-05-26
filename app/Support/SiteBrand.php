@@ -69,18 +69,140 @@ final class SiteBrand
         return $this->isRogues ? 'brand-rogues' : 'brand-mygigguide';
     }
 
+    /** Outer `<body>` background and default text colour. */
+    public function pageShellClass(): string
+    {
+        return $this->isRogues
+            ? 'bg-slate-950 text-slate-100'
+            : 'bg-black text-slate-100';
+    }
+
+    /** Full-page content wrapper (home, listings, map). */
+    public function pageContentShellClass(): string
+    {
+        return $this->isRogues
+            ? 'min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950'
+            : 'min-h-screen bg-gradient-to-br from-black via-[#0a0a12] to-black';
+    }
+
+    public function sectionSurfaceClass(): string
+    {
+        return $this->isRogues
+            ? 'py-8 bg-slate-900/40'
+            : 'py-8 bg-[#12121A]/60';
+    }
+
+    public function sectionAltClass(): string
+    {
+        return $this->isRogues
+            ? 'py-8 bg-gradient-to-br from-slate-900 via-slate-950 to-slate-900'
+            : 'py-8 bg-gradient-to-br from-[#12121A] via-black to-[#12121A]';
+    }
+
+    public function ctaSectionClass(): string
+    {
+        return $this->isRogues
+            ? 'py-8 bg-gradient-to-r from-slate-900 to-slate-950 border-t border-slate-800'
+            : 'py-8 bg-gradient-to-r from-[#12121A] to-black border-t border-white/5';
+    }
+
+    public function heroTitleClass(): string
+    {
+        return 'text-4xl md:text-6xl font-bold text-white mb-6';
+    }
+
+    public function headingClass(): string
+    {
+        return 'text-3xl md:text-4xl font-bold text-white mb-4';
+    }
+
+    public function pageTitleClass(): string
+    {
+        return 'text-3xl font-bold text-white';
+    }
+
+    public function pageSubtitleClass(): string
+    {
+        return 'text-slate-400 mt-2';
+    }
+
+    public function subtitleClass(): string
+    {
+        return 'text-xl md:text-2xl text-slate-300 mb-6 max-w-3xl mx-auto';
+    }
+
+    public function bodyTextClass(): string
+    {
+        return 'text-lg text-slate-400 max-w-2xl mx-auto';
+    }
+
+    public function accentGradientClass(): string
+    {
+        return $this->isRogues
+            ? 'bg-gradient-to-r from-sky-300 to-cyan-400 bg-clip-text text-transparent'
+            : 'bg-gradient-to-r from-indigo-400 to-violet-400 bg-clip-text text-transparent';
+    }
+
+    public function filterPanelClass(): string
+    {
+        return $this->isRogues
+            ? 'bg-slate-900 rounded-2xl shadow-sm border border-slate-700 p-6 mb-8'
+            : 'bg-[#12121A] rounded-2xl shadow-sm border border-white/10 p-6 mb-8';
+    }
+
+    public function listingHeaderBarClass(): string
+    {
+        return $this->isRogues
+            ? 'bg-slate-900/80 border-b border-slate-800'
+            : 'bg-[#12121A]/90 border-b border-white/10';
+    }
+
+    public function listingCardShellClass(): string
+    {
+        return $this->isRogues
+            ? 'bg-slate-900 rounded-lg shadow-sm border border-slate-700 p-6'
+            : 'bg-[#12121A] rounded-lg shadow-sm border border-white/10 p-6';
+    }
+
+    public function directoryCardClass(): string
+    {
+        return $this->isRogues
+            ? 'group relative rounded-xl shadow-sm border border-slate-700 overflow-hidden cursor-pointer hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 block bg-slate-900'
+            : 'group relative rounded-xl shadow-sm border border-white/10 overflow-hidden cursor-pointer hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 block bg-[#12121A]';
+    }
+
     public function navBarClass(): string
     {
         return $this->isRogues
             ? 'site-nav bg-slate-900 border-b border-slate-800 shadow-lg'
-            : 'site-nav bg-white shadow-sm border-b border-gray-200';
+            : 'site-nav bg-[#12121A] border-b border-white/10 shadow-lg';
     }
 
     public function navTitleClass(): string
     {
+        return 'text-xl font-bold text-white whitespace-nowrap';
+    }
+
+    public function navLogoWrapClass(): string
+    {
         return $this->isRogues
-            ? 'text-xl font-bold text-white whitespace-nowrap'
-            : 'text-xl font-bold text-gray-900 whitespace-nowrap';
+            ? 'bg-slate-800 ring-1 ring-sky-500/30'
+            : 'bg-black ring-1 ring-indigo-500/30';
+    }
+
+    public function navIconButtonClass(): string
+    {
+        return 'text-slate-300 hover:text-white hover:bg-slate-800';
+    }
+
+    public function navUserButtonClass(): string
+    {
+        return $this->navIconButtonClass();
+    }
+
+    public function navDividerClass(): string
+    {
+        return 'border-slate-700';
     }
 
     public function navLinkClass(bool $active): string
@@ -91,14 +213,16 @@ final class SiteBrand
                 : 'flex items-center text-slate-300 px-3 py-2.5 rounded-xl text-sm font-medium border border-transparent hover:bg-slate-800 hover:text-white hover:shadow-sm transition-all duration-200';
         }
 
-        return $active ? 'nav-link-active' : 'nav-link';
+        return $active
+            ? 'flex items-center text-indigo-400 bg-slate-800 px-3 py-2.5 rounded-xl text-sm font-medium border border-indigo-500/40 shadow-sm'
+            : 'flex items-center text-slate-300 px-3 py-2.5 rounded-xl text-sm font-medium border border-transparent hover:bg-slate-800 hover:text-white hover:shadow-sm transition-all duration-200';
     }
 
     public function mobileNavPanelClass(): string
     {
         return $this->isRogues
             ? 'md:hidden bg-slate-900 border-t border-slate-800'
-            : 'md:hidden bg-white border-t border-gray-200';
+            : 'md:hidden bg-[#12121A] border-t border-white/10';
     }
 
     public function mobileNavLinkClass(bool $active): string
@@ -109,7 +233,357 @@ final class SiteBrand
                 : 'block px-3 py-2 text-base font-medium text-slate-300 hover:text-white hover:bg-slate-800 rounded-md transition-colors duration-200';
         }
 
-        return $active ? 'mobile-nav-link-active' : 'mobile-nav-link';
+        return $active
+            ? 'block px-3 py-2 text-base font-medium text-indigo-400 bg-slate-800 rounded-md'
+            : 'block px-3 py-2 text-base font-medium text-slate-300 hover:text-white hover:bg-slate-800 rounded-md transition-colors duration-200';
+    }
+
+    public function focusRingClass(): string
+    {
+        return $this->isRogues
+            ? 'focus:ring-sky-400 focus:ring-offset-slate-900'
+            : 'focus:ring-indigo-500 focus:ring-offset-black';
+    }
+
+    public function dropdownPanelClass(): string
+    {
+        return $this->isRogues
+            ? 'absolute right-0 mt-2 w-80 max-h-96 overflow-hidden bg-slate-900 rounded-lg shadow-xl border border-slate-700 z-50'
+            : 'absolute right-0 mt-2 w-80 max-h-96 overflow-hidden bg-[#12121A] rounded-lg shadow-xl border border-white/10 z-50';
+    }
+
+    public function dropdownMenuClass(): string
+    {
+        return $this->isRogues
+            ? 'absolute right-0 mt-2 w-56 bg-slate-900 rounded-lg shadow-xl py-2 z-50 border border-slate-700'
+            : 'absolute right-0 mt-2 w-56 bg-[#12121A] rounded-lg shadow-xl py-2 z-50 border border-white/10';
+    }
+
+    public function dropdownHeaderClass(): string
+    {
+        return $this->isRogues
+            ? 'px-4 py-3 border-b border-slate-700 bg-slate-800/80'
+            : 'px-4 py-3 border-b border-white/10 bg-black/40';
+    }
+
+    public function dropdownTitleClass(): string
+    {
+        return 'text-sm font-semibold text-white';
+    }
+
+    public function dropdownItemClass(): string
+    {
+        return $this->isRogues
+            ? 'block px-4 py-3 text-sm text-slate-200 hover:bg-slate-800 border-b border-slate-800 last:border-b-0 transition-colors'
+            : 'block px-4 py-3 text-sm text-slate-200 hover:bg-indigo-500/10 border-b border-white/5 last:border-b-0 transition-colors';
+    }
+
+    public function calendarFrameClass(): string
+    {
+        return $this->isRogues
+            ? 'rounded-3xl bg-gradient-to-br from-sky-500/20 via-slate-800 to-cyan-500/10 p-[1px] shadow-md shadow-black/40'
+            : 'rounded-3xl bg-gradient-to-br from-indigo-500/25 via-[#12121A] to-violet-500/15 p-[1px] shadow-md shadow-black/40';
+    }
+
+    public function calendarInnerClass(): string
+    {
+        return $this->isRogues
+            ? 'rounded-[1.35rem] bg-slate-900/95 backdrop-blur-sm p-5 text-left ring-1 ring-sky-500/20'
+            : 'rounded-[1.35rem] bg-[#12121A]/95 backdrop-blur-sm p-5 text-left ring-1 ring-indigo-500/20';
+    }
+
+    public function calendarNavButtonClass(): string
+    {
+        return $this->isRogues
+            ? 'inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-slate-600 bg-slate-800 text-slate-200 shadow-sm hover:bg-slate-700 disabled:cursor-not-allowed disabled:opacity-35'
+            : 'inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-white/10 bg-black text-slate-200 shadow-sm hover:bg-slate-900 disabled:cursor-not-allowed disabled:opacity-35';
+    }
+
+    public function calendarMonthTitleClass(): string
+    {
+        return 'min-w-0 flex-1 text-center text-base font-bold tracking-tight text-white sm:text-lg';
+    }
+
+    public function calendarWeekdayClass(): string
+    {
+        return 'mb-2 grid grid-cols-7 gap-1 text-center text-[10px] font-bold uppercase tracking-wider text-slate-500 sm:text-xs';
+    }
+
+    public function calendarDayWithEventsActiveClass(): string
+    {
+        return $this->isRogues
+            ? 'bg-gradient-to-br from-sky-500 to-cyan-600 text-white shadow-md ring-2 ring-sky-400/50'
+            : 'bg-gradient-to-br from-indigo-600 to-violet-600 text-white shadow-md ring-2 ring-indigo-400/50';
+    }
+
+    public function calendarDayWithEventsClass(): string
+    {
+        return $this->isRogues
+            ? 'bg-gradient-to-b from-slate-800 to-slate-900 text-sky-100 ring-1 ring-slate-600 hover:from-slate-700'
+            : 'bg-gradient-to-b from-[#1a1a24] to-[#12121A] text-indigo-100 ring-1 ring-indigo-500/30 hover:from-indigo-950';
+    }
+
+    public function calendarDayEmptyTodayClass(): string
+    {
+        return $this->isRogues
+            ? 'bg-slate-800 font-bold text-white ring-2 ring-sky-500/40'
+            : 'bg-slate-800 font-bold text-white ring-2 ring-indigo-500/40';
+    }
+
+    public function calendarDayEmptyClass(): string
+    {
+        return 'text-slate-400 hover:bg-slate-800/80';
+    }
+
+    public function calendarFooterClass(): string
+    {
+        return $this->isRogues
+            ? 'mt-4 border-t border-slate-700 pt-3 text-center text-xs leading-relaxed text-slate-400'
+            : 'mt-4 border-t border-white/10 pt-3 text-center text-xs leading-relaxed text-slate-400';
+    }
+
+    public function calendarFooterHintClass(): string
+    {
+        return $this->isRogues ? 'text-sky-400/90' : 'text-indigo-400/90';
+    }
+
+    public function breadcrumbBarClass(): string
+    {
+        return $this->isRogues
+            ? 'inline-flex items-center bg-slate-900/90 rounded-lg shadow px-4 py-2 space-x-2 text-xs font-medium text-slate-200 border border-slate-700'
+            : 'inline-flex items-center bg-[#12121A]/90 rounded-lg shadow px-4 py-2 space-x-2 text-xs font-medium text-slate-200 border border-white/10';
+    }
+
+    public function breadcrumbLinkClass(): string
+    {
+        return $this->isRogues
+            ? 'flex items-center hover:underline text-sky-400'
+            : 'flex items-center hover:underline text-indigo-400';
+    }
+
+    public function formLabelClass(): string
+    {
+        return 'block text-sm font-medium text-slate-300 mb-2';
+    }
+
+    public function formInputClass(): string
+    {
+        return $this->isRogues
+            ? 'block w-full px-3 py-2 bg-slate-950 border border-slate-600 rounded-lg text-slate-100 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-sky-400 focus:border-transparent'
+            : 'block w-full px-3 py-2 bg-black border border-white/15 rounded-lg text-slate-100 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent';
+    }
+
+    public function formSelectClass(): string
+    {
+        return $this->formInputClass();
+    }
+
+    public function searchResultsBannerClass(): string
+    {
+        return $this->isRogues
+            ? 'mb-6 p-4 bg-sky-500/10 border border-sky-500/30 rounded-lg'
+            : 'mb-6 p-4 bg-indigo-500/10 border border-indigo-500/30 rounded-lg';
+    }
+
+    public function searchResultsTitleClass(): string
+    {
+        return 'text-sm font-medium text-white';
+    }
+
+    public function searchResultsTextClass(): string
+    {
+        return $this->isRogues ? 'text-sm text-sky-200' : 'text-sm text-indigo-200';
+    }
+
+    public function detailPanelClass(string $padding = 'p-6'): string
+    {
+        $base = $this->isRogues
+            ? 'bg-slate-900 rounded-xl shadow-sm border border-slate-700'
+            : 'bg-[#12121A] rounded-xl shadow-sm border border-white/10';
+
+        return trim($base.' '.$padding);
+    }
+
+    public function detailPanelHeadingClass(): string
+    {
+        return 'text-2xl font-bold text-white mb-4';
+    }
+
+    public function detailSubheadingClass(): string
+    {
+        return 'text-xl font-bold text-white mb-4';
+    }
+
+    public function detailBodyTextClass(): string
+    {
+        return 'text-slate-300';
+    }
+
+    public function detailMutedTextClass(): string
+    {
+        return 'text-slate-400';
+    }
+
+    public function detailEmphasisTextClass(): string
+    {
+        return 'font-semibold text-white';
+    }
+
+    public function detailInsetClass(): string
+    {
+        return $this->isRogues
+            ? 'flex items-center p-4 bg-slate-800 rounded-lg hover:bg-slate-700 transition-colors'
+            : 'flex items-center p-4 bg-black/40 rounded-lg hover:bg-black/60 transition-colors';
+    }
+
+    public function viewSwitcherLabelClass(): string
+    {
+        return 'text-sm text-slate-400 mr-2';
+    }
+
+    public function viewSwitcherActiveClass(): string
+    {
+        return $this->isRogues
+            ? 'p-2 rounded-lg transition-colors bg-sky-500/20 text-sky-300'
+            : 'p-2 rounded-lg transition-colors bg-indigo-500/20 text-indigo-300';
+    }
+
+    public function viewSwitcherInactiveClass(): string
+    {
+        return 'p-2 rounded-lg transition-colors text-slate-500 hover:text-slate-200 hover:bg-slate-800';
+    }
+
+    public function accentLinkClass(): string
+    {
+        return $this->isRogues
+            ? 'text-sky-400 hover:text-sky-300 px-4 py-2 flex items-center font-medium transition-colors duration-200'
+            : 'text-indigo-400 hover:text-indigo-300 px-4 py-2 flex items-center font-medium transition-colors duration-200';
+    }
+
+    public function emptyStateTitleClass(): string
+    {
+        return 'text-lg font-medium text-white mb-2';
+    }
+
+    public function emptyStateTextClass(): string
+    {
+        return 'text-slate-400 mb-6';
+    }
+
+    public function tableShellClass(): string
+    {
+        return $this->isRogues
+            ? 'bg-slate-900 rounded-xl shadow-sm border border-slate-700 overflow-hidden'
+            : 'bg-[#12121A] rounded-xl shadow-sm border border-white/10 overflow-hidden';
+    }
+
+    public function tableHeadClass(): string
+    {
+        return $this->isRogues ? 'bg-slate-800' : 'bg-black/50';
+    }
+
+    public function tableHeadCellClass(): string
+    {
+        return 'px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wider';
+    }
+
+    public function tableBodyClass(): string
+    {
+        return $this->isRogues ? 'divide-y divide-slate-700' : 'divide-y divide-white/10';
+    }
+
+    public function tableRowClass(): string
+    {
+        return $this->isRogues
+            ? 'hover:bg-slate-800/80 transition-colors'
+            : 'hover:bg-white/5 transition-colors';
+    }
+
+    public function tableCellPrimaryClass(): string
+    {
+        return 'text-sm font-medium text-white';
+    }
+
+    public function tableCellSecondaryClass(): string
+    {
+        return 'text-sm text-slate-400';
+    }
+
+    /** Google Maps JSON style rules — dark palette matched to public site brand. */
+    public function googleMapStyles(): array
+    {
+        $land = $this->isRogues ? '#0f172a' : '#12121A';
+        $landAlt = $this->isRogues ? '#1e293b' : '#1a1a24';
+        $road = $this->isRogues ? '#334155' : '#2a2a38';
+        $roadStroke = $this->isRogues ? '#1e293b' : '#1e1e28';
+        $water = $this->isRogues ? '#0c4a6e' : '#0c1222';
+
+        return [
+            ['elementType' => 'geometry', 'stylers' => [['color' => $land]]],
+            ['elementType' => 'labels.text.stroke', 'stylers' => [['color' => $land]]],
+            ['elementType' => 'labels.text.fill', 'stylers' => [['color' => '#94a3b8']]],
+            ['featureType' => 'administrative.locality', 'elementType' => 'labels.text.fill', 'stylers' => [['color' => '#cbd5e1']]],
+            ['featureType' => 'poi', 'elementType' => 'labels.text.fill', 'stylers' => [['color' => '#64748b']]],
+            ['featureType' => 'poi.park', 'elementType' => 'geometry', 'stylers' => [['color' => $landAlt]]],
+            ['featureType' => 'road', 'elementType' => 'geometry', 'stylers' => [['color' => $road]]],
+            ['featureType' => 'road', 'elementType' => 'geometry.stroke', 'stylers' => [['color' => $roadStroke]]],
+            ['featureType' => 'road.highway', 'elementType' => 'geometry', 'stylers' => [['color' => '#475569']]],
+            ['featureType' => 'transit', 'elementType' => 'geometry', 'stylers' => [['color' => $roadStroke]]],
+            ['featureType' => 'water', 'elementType' => 'geometry', 'stylers' => [['color' => $water]]],
+            ['featureType' => 'water', 'elementType' => 'labels.text.fill', 'stylers' => [['color' => '#475569']]],
+        ];
+    }
+
+    public function googleMapStylesJson(): string
+    {
+        return json_encode($this->googleMapStyles(), JSON_UNESCAPED_UNICODE);
+    }
+
+    public function mapFrameClass(): string
+    {
+        return $this->isRogues
+            ? 'w-full rounded-2xl overflow-hidden shadow-sm border border-slate-700 relative'
+            : 'w-full rounded-2xl overflow-hidden shadow-sm border border-white/10 relative';
+    }
+
+    public function mapLegendClass(): string
+    {
+        return $this->isRogues
+            ? 'absolute top-4 left-4 z-10 bg-slate-900 rounded-lg shadow-lg p-3 border border-slate-700'
+            : 'absolute top-4 left-4 z-10 bg-[#12121A] rounded-lg shadow-lg p-3 border border-white/10';
+    }
+
+    public function mapLoadingClass(): string
+    {
+        return $this->isRogues
+            ? 'absolute inset-0 w-full h-full flex items-center justify-center bg-slate-950'
+            : 'absolute inset-0 w-full h-full flex items-center justify-center bg-black';
+    }
+
+    public function mapFilterActiveClass(): string
+    {
+        return $this->isRogues
+            ? 'time-filter-btn px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 bg-sky-400 text-slate-950 shadow-md hover:shadow-lg'
+            : 'time-filter-btn px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 bg-indigo-500 text-white shadow-md hover:shadow-lg';
+    }
+
+    public function mapFilterInactiveClass(): string
+    {
+        return $this->isRogues
+            ? 'time-filter-btn px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 bg-slate-800 text-slate-200 border border-slate-600 hover:border-sky-400 hover:bg-slate-700'
+            : 'time-filter-btn px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 bg-black text-slate-200 border border-white/15 hover:border-indigo-400 hover:bg-slate-900';
+    }
+
+    /** Primary marker / pin colour for inline SVG map icons. */
+    public function mapMarkerHex(): string
+    {
+        return $this->isRogues ? '#0ea5e9' : '#6366f1';
+    }
+
+    /** User-location dot colour on the map. */
+    public function mapUserLocationHex(): string
+    {
+        return $this->isRogues ? '#38bdf8' : '#818cf8';
     }
 
     public function footerBrandTitle(): string

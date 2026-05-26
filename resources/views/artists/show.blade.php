@@ -40,7 +40,8 @@
 @endpush
 
 @section('content')
-<div class="container mx-auto px-4 py-8">
+<div class="{{ $siteBrand->pageContentShellClass() }}">
+    <div class="container mx-auto px-4 py-8 max-w-7xl">
     <!-- Hero Section -->
     <div class="relative h-96 bg-gradient-to-r from-purple-600 to-blue-600 rounded-2xl mb-8 overflow-hidden">
         @php
@@ -84,9 +85,9 @@
         <div class="lg:col-span-2">
             <!-- Bio Section -->
             @if($artist->bio)
-            <div class="bg-white rounded-2xl shadow-lg p-8 mb-8">
-                <h2 class="text-2xl font-bold text-gray-900 mb-4">About</h2>
-                <div class="prose prose-lg text-gray-700">
+            <div class="{{ $siteBrand->detailPanelClass('p-8 mb-8') }}">
+                <h2 class="{{ $siteBrand->detailPanelHeadingClass() }}">About</h2>
+                <div class="prose prose-lg prose-invert max-w-none {{ $siteBrand->detailBodyTextClass() }}">
                     {!! nl2br(e($artist->bio)) !!}
                 </div>
             </div>
@@ -94,8 +95,8 @@
 
             <!-- YouTube Videos -->
             @if($artist->youtubeVideos->count() > 0)
-            <div class="bg-white rounded-2xl shadow-lg p-8 mb-8">
-                <h2 class="text-2xl font-bold text-gray-900 mb-4">Videos</h2>
+            <div class="{{ $siteBrand->detailPanelClass('p-8 mb-8') }}">
+                <h2 class="{{ $siteBrand->detailPanelHeadingClass() }}">Videos</h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     @foreach($artist->youtubeVideos as $video)
                     <x-youtube-video :video="$video" />
@@ -105,27 +106,27 @@
             @endif
 
             <!-- Upcoming Events -->
-            <div class="bg-white rounded-2xl shadow-lg p-8">
-                <h2 class="text-2xl font-bold text-gray-900 mb-6">Upcoming Events</h2>
+            <div class="{{ $siteBrand->detailPanelClass('p-8') }}">
+                <h2 class="{{ $siteBrand->detailPanelHeadingClass() }} mb-6">Upcoming Events</h2>
                 @if(isset($upcomingEvents) && $upcomingEvents->count() > 0)
                 <div class="space-y-4">
                     @foreach($upcomingEvents as $event)
-                    <a href="{{ route('events.show', $event) }}" class="block border border-gray-200 rounded-xl p-4 hover:bg-gray-50 transition">
+                    <a href="{{ route('events.show', $event) }}" class="block {{ $siteBrand->isRogues ? 'border border-slate-700' : 'border border-white/10' }} rounded-xl p-4 {{ $siteBrand->isRogues ? 'hover:bg-slate-800' : 'hover:bg-black/40' }} transition">
                         <div class="flex items-center justify-between">
                             <div>
-                                <h3 class="text-lg font-semibold text-gray-900">{{ $event->name }}</h3>
-                                <p class="text-sm text-gray-600">{{ $event->date->format('M d, Y') }}{{ $event->time ? ' · '.$event->time->format('H:i') : '' }}</p>
+                                <h3 class="text-lg font-semibold text-white">{{ $event->name }}</h3>
+                                <p class="text-sm {{ $siteBrand->detailMutedTextClass() }}">{{ $event->date->format('M d, Y') }}{{ $event->time ? ' · '.$event->time->format('H:i') : '' }}</p>
                                 @if($event->venue)
-                                    <p class="text-xs text-gray-500">{{ $event->venue->name }}</p>
+                                    <p class="text-xs text-slate-500">{{ $event->venue->name }}</p>
                                 @endif
                             </div>
-                            <span class="text-xs px-2 py-1 rounded-full bg-green-100 text-green-700">Upcoming</span>
+                            <span class="text-xs px-2 py-1 rounded-full bg-green-500/20 text-green-300">Upcoming</span>
                         </div>
                     </a>
                     @endforeach
                 </div>
                 @else
-                <div class="text-center py-8 text-gray-500">
+                <div class="text-center py-8 {{ $siteBrand->detailMutedTextClass() }}">
                     <p>No upcoming events scheduled.</p>
                 </div>
                 @endif
@@ -135,22 +136,22 @@
         <!-- Sidebar -->
         <div class="space-y-6">
             <!-- Artist Info -->
-            <div class="bg-white rounded-2xl shadow-lg p-6">
-                <h3 class="text-xl font-bold text-gray-900 mb-4">Artist Info</h3>
+            <div class="{{ $siteBrand->detailPanelClass() }}">
+                <h3 class="{{ $siteBrand->detailSubheadingClass() }}">Artist Info</h3>
                 <div class="space-y-3">
                     @if($artist->genre)
                     <div class="flex justify-between">
-                        <span class="text-gray-500">Genre:</span>
-                        <span class="font-medium text-gray-900">{{ $artist->genre }}</span>
+                        <span class="{{ $siteBrand->detailMutedTextClass() }}">Genre:</span>
+                        <span class="font-medium text-white">{{ $artist->genre }}</span>
                     </div>
                     @endif
                     <div class="flex justify-between">
-                        <span class="text-gray-500">Page status:</span>
+                        <span class="{{ $siteBrand->detailMutedTextClass() }}">Page status:</span>
                         <x-page-ownership-badge :entity="$artist" variant="inline" />
                     </div>
                     <div class="flex justify-between">
-                        <span class="text-gray-500">Rating:</span>
-                        <span class="font-medium text-yellow-600">★ {{ number_format($ratingAvg, 1) }}</span>
+                        <span class="{{ $siteBrand->detailMutedTextClass() }}">Rating:</span>
+                        <span class="font-medium text-yellow-400">★ {{ number_format($ratingAvg, 1) }}</span>
                     </div>
                 </div>
             </div>

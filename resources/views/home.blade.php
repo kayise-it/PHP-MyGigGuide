@@ -22,28 +22,28 @@
 
 
 @section('content')
-<div class="min-h-screen bg-gradient-to-br from-purple-50 via-white to-blue-50">
+<div class="{{ $siteBrand->pageContentShellClass() }}">
   
   <!-- Clean Hero Section -->
   <section class="relative py-8 lg:py-12">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="text-center">
         <!-- Clean Title with Rotating Words -->
-        <h1 class="text-4xl md:text-6xl font-bold text-gray-900 mb-6">
+        <h1 class="{{ $siteBrand->heroTitleClass() }}">
           Discover Amazing 
           <span class="relative inline-block min-w-[200px] md:min-w-[300px]" id="rotating-words-container">
-            <span class="absolute top-0 left-0 bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent transition-all duration-1000 ease-in-out transform opacity-100 translate-y-0 scale-100" id="word-0">Events</span>
-            <span class="absolute top-0 left-0 bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent transition-all duration-1000 ease-in-out transform opacity-0 translate-y-4 scale-95" id="word-1">Artists</span>
-            <span class="absolute top-0 left-0 bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent transition-all duration-1000 ease-in-out transform opacity-0 translate-y-4 scale-95" id="word-2">Concerts</span>
-            <span class="absolute top-0 left-0 bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent transition-all duration-1000 ease-in-out transform opacity-0 translate-y-4 scale-95" id="word-3">Festivals</span>
+            <span class="absolute top-0 left-0 {{ $siteBrand->accentGradientClass() }} transition-all duration-1000 ease-in-out transform opacity-100 translate-y-0 scale-100" id="word-0">Events</span>
+            <span class="absolute top-0 left-0 {{ $siteBrand->accentGradientClass() }} transition-all duration-1000 ease-in-out transform opacity-0 translate-y-4 scale-95" id="word-1">Artists</span>
+            <span class="absolute top-0 left-0 {{ $siteBrand->accentGradientClass() }} transition-all duration-1000 ease-in-out transform opacity-0 translate-y-4 scale-95" id="word-2">Concerts</span>
+            <span class="absolute top-0 left-0 {{ $siteBrand->accentGradientClass() }} transition-all duration-1000 ease-in-out transform opacity-0 translate-y-4 scale-95" id="word-3">Festivals</span>
             <!-- Invisible placeholder to maintain consistent width -->
-            <span class="opacity-0 select-none bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
+            <span class="opacity-0 select-none {{ $siteBrand->accentGradientClass() }}">
               Festivals
             </span>
           </span>
         </h1>
         
-        <p class="text-xl md:text-2xl text-gray-600 mb-6 max-w-3xl mx-auto">
+        <p class="{{ $siteBrand->subtitleClass() }}">
           Find the best concerts, festivals, and events happening in your area
         </p>
         <div class="relative">
@@ -61,7 +61,7 @@
         <div class="mt-6 flex flex-col sm:flex-row gap-4 justify-center items-center">
           <a 
             href="{{ route('events.index') }}"
-            class="bg-white border border-purple-200 text-purple-700 hover:bg-purple-50 px-8 py-3 rounded-xl font-medium transition-all duration-300 flex items-center space-x-2 shadow-sm hover:shadow-md"
+            class="btn-outline px-8 py-3 rounded-xl font-medium transition-all duration-300 flex items-center space-x-2 shadow-sm hover:shadow-md"
           >
             <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
@@ -70,7 +70,7 @@
           </a>
           <a 
             href="{{ route('artists.index') }}"
-            class="bg-purple-600 hover:bg-purple-700 text-white px-8 py-3 rounded-xl font-medium transition-all duration-300 flex items-center space-x-2 shadow-sm hover:shadow-md"
+            class="btn-primary px-8 py-3 rounded-xl font-medium transition-all duration-300 flex items-center space-x-2 shadow-sm hover:shadow-md"
           >
             <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
@@ -123,7 +123,7 @@
   </section> -->
 
   <!-- Featured (Paid) Sections -->
-  <section class="py-4 bg-white">
+  <section class="py-4 {{ $siteBrand->sectionSurfaceClass() }}">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
       <!-- Featured Events - Modern Design -->
@@ -131,10 +131,10 @@
       <section class="py-8">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div class="text-center mb-8">
-            <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+            <h2 class="{{ $siteBrand->headingClass() }}">
             What We're About
             </h2>
-            <p class="text-lg text-gray-600 max-w-2xl mx-auto">
+            <p class="{{ $siteBrand->bodyTextClass() }}">
               Building a community of music lovers, one gig at a time
             </p>
           </div>
@@ -147,7 +147,7 @@
           
           <div class="text-center">
             <a href="{{ route('events.index') }}" 
-               class="inline-flex items-center px-6 py-3 bg-purple-600 hover:bg-purple-700 text-white font-medium rounded-lg transition-colors duration-200 shadow-lg hover:shadow-xl">
+               class="btn-primary inline-flex items-center px-6 py-3 font-medium rounded-lg transition-colors duration-200 shadow-lg hover:shadow-xl">
               <span>View All Events</span>
               <svg class="ml-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
@@ -160,13 +160,13 @@
 
       <!-- Featured Artists - Simple version like React -->
       @if($artists->count() > 0)
-      <section class="py-8 bg-gradient-to-br from-purple-50 via-white to-blue-50">
+      <section class="{{ $siteBrand->sectionAltClass() }}">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div class="text-center mb-8">
-            <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+            <h2 class="{{ $siteBrand->headingClass() }}">
               Featured Artists
             </h2>
-            <p class="text-lg text-gray-600 max-w-2xl mx-auto">
+            <p class="{{ $siteBrand->bodyTextClass() }}">
               Discover talented musicians and performers in your area. From rock to jazz, find your next favorite artist.
             </p>
           </div>
@@ -179,7 +179,7 @@
           
           <div class="text-center">
             <a href="{{ route('artists.index') }}" 
-               class="inline-flex items-center px-6 py-3 bg-purple-600 hover:bg-purple-700 text-white font-medium rounded-lg transition-colors duration-200 shadow-lg hover:shadow-xl">
+               class="btn-primary inline-flex items-center px-6 py-3 font-medium rounded-lg transition-colors duration-200 shadow-lg hover:shadow-xl">
               <span>View All Artists</span>
               <svg class="ml-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
@@ -194,13 +194,13 @@
 
       <!-- Featured Venues - Modern Design -->
       @if($venues->count() > 0)
-      <section class="py-8 bg-gradient-to-br from-green-50 via-white to-teal-50">
+      <section class="{{ $siteBrand->sectionSurfaceClass() }}">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div class="text-center mb-8">
-            <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+            <h2 class="{{ $siteBrand->headingClass() }}">
               Popular Venues
             </h2>
-            <p class="text-lg text-gray-600 max-w-2xl mx-auto">
+            <p class="{{ $siteBrand->bodyTextClass() }}">
               Discover amazing venues where the magic happens. From intimate clubs to grand concert halls, find the perfect setting for your next event.
             </p>
           </div>
@@ -213,7 +213,7 @@
           
           <div class="text-center">
             <a href="{{ route('venues.index') }}" 
-               class="inline-flex items-center px-6 py-3 bg-purple-600 hover:bg-purple-700 text-white font-medium rounded-lg transition-colors duration-200 shadow-lg hover:shadow-xl">
+               class="btn-primary inline-flex items-center px-6 py-3 font-medium rounded-lg transition-colors duration-200 shadow-lg hover:shadow-xl">
               <span>View All Venues</span>
               <svg class="ml-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
@@ -226,17 +226,17 @@
     </div>
 
   <!-- Simple CTA Section -->
-  <section class="py-8 bg-gradient-to-r from-purple-50 to-blue-50">
+  <section class="{{ $siteBrand->ctaSectionClass() }}">
     <div class="max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8">
-      <h2 class="text-3xl font-bold text-gray-900 mb-3">
+      <h2 class="text-3xl font-bold text-white mb-3">
         Ready to Experience Something Amazing?
       </h2>
-      <p class="text-lg text-gray-600 mb-6">
+      <p class="text-lg text-slate-400 mb-6">
         Join thousands of music lovers discovering the best events in their city
       </p>
       <a
         href="{{ route('events.index') }}"
-        class="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white px-8 py-4 rounded-2xl font-semibold text-lg transition-all duration-300 shadow-sm hover:shadow-md hover:scale-105"
+        class="btn-primary px-8 py-4 rounded-2xl font-semibold text-lg transition-all duration-300 shadow-sm hover:shadow-md hover:scale-105"
       >
         Start Exploring
       </a>

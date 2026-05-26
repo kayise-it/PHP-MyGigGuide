@@ -1,3 +1,5 @@
+@props(['event'])
+
 @php
 // Combine date and time for the event
 $startDateTime = null;
@@ -62,13 +64,10 @@ $appleCalendarUrl = "webcal://{$calendarUrl}";
 $icsUrl = route('events.calendar', $event->id);
 @endphp
 
-@props(['event'])
-
-<div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-    <h3 class="text-lg font-semibold text-gray-900 mb-4">Add to Calendar</h3>
+<div class="{{ $siteBrand->detailPanelClass() }}">
+    <h3 class="text-lg font-semibold text-white mb-4">Add to Calendar</h3>
     
     <div class="grid grid-cols-1 sm:grid-cols-4 gap-3">
-        <!-- Google Calendar -->
         <a href="{{ $googleCalendarUrl }}" 
            target="_blank" 
            rel="noopener noreferrer"
@@ -79,7 +78,6 @@ $icsUrl = route('events.calendar', $event->id);
             Google
         </a>
 
-        <!-- Outlook -->
         <a href="{{ $outlookUrl }}" 
            target="_blank" 
            rel="noopener noreferrer"
@@ -90,19 +88,17 @@ $icsUrl = route('events.calendar', $event->id);
             Outlook
         </a>
 
-        <!-- Apple Calendar -->
         <a href="{{ $appleCalendarUrl }}" 
-           class="inline-flex items-center justify-center px-3 py-3 bg-gray-800 text-white rounded-lg font-medium hover:bg-gray-900 transition-colors text-sm">
+           class="inline-flex items-center justify-center px-3 py-3 {{ $siteBrand->isRogues ? 'bg-slate-700 hover:bg-slate-600' : 'bg-slate-800 hover:bg-slate-700' }} text-white rounded-lg font-medium transition-colors text-sm">
             <svg class="h-5 w-5 mr-1" fill="currentColor" viewBox="0 0 24 24">
                 <path d="M18.5 3H6c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM6 5h12v2H6V5zm12 14H6V9h12v10zm-4-7h4v2h-4v-2zm0 3h4v2h-4v-2z"/>
             </svg>
             Apple
         </a>
 
-        <!-- Download ICS -->
         <a href="{{ $icsUrl }}" 
            download="{{ $event->name }}.ics"
-           class="inline-flex items-center justify-center px-3 py-3 bg-purple-600 text-white rounded-lg font-medium hover:bg-purple-700 transition-colors text-sm">
+           class="inline-flex items-center justify-center px-3 py-3 {{ $siteBrand->isRogues ? 'bg-sky-500 hover:bg-sky-400 text-slate-950' : 'bg-indigo-500 hover:bg-indigo-400' }} text-white rounded-lg font-medium transition-colors text-sm">
             <svg class="h-5 w-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
             </svg>
@@ -110,7 +106,7 @@ $icsUrl = route('events.calendar', $event->id);
         </a>
     </div>
     
-    <p class="text-xs text-gray-500 mt-3 text-center">
+    <p class="text-xs {{ $siteBrand->detailMutedTextClass() }} mt-3 text-center">
         Click any button to add this event to your calendar app
     </p>
 </div>

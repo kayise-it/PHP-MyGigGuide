@@ -4,7 +4,7 @@
             <!-- Logo -->
             <div class="flex items-center relative">
                 <a href="{{ route('home') }}" class="flex items-center space-x-3">
-                    <span class="relative inline-flex h-10 shrink-0 items-center justify-center rounded-lg overflow-hidden {{ $siteBrand->isRogues ? 'bg-slate-800 ring-1 ring-sky-500/30' : 'border border-gray-200 bg-white' }}">
+                    <span class="relative inline-flex h-10 shrink-0 items-center justify-center rounded-lg overflow-hidden {{ $siteBrand->navLogoWrapClass() }}">
                         <img src="{{ $siteBrand->logoUrl() }}" alt="{{ $siteBrand->name }}" class="h-10 w-auto max-w-[140px] object-contain px-1">
                         @auth
                             @if(isset($unreadNotificationCount) && $unreadNotificationCount > 0)
@@ -30,7 +30,7 @@
                 
                 @auth
                     @if(auth()->user()->hasRole(['admin', 'superuser']))
-                        <div class="border-l {{ $siteBrand->isRogues ? 'border-slate-700' : 'border-gray-300' }} h-6 mx-2"></div>
+                        <div class="border-l {{ $siteBrand->navDividerClass() }} h-6 mx-2"></div>
                         <a href="{{ route('admin.dashboard') }}" class="{{ $siteBrand->navLinkClass(request()->routeIs('admin.*')) }}">Admin Panel</a>
                     @endif
                 @endauth
@@ -41,7 +41,7 @@
                 @auth
                     <!-- Notifications (bell with dot when unread) -->
                     <div class="relative" x-data="{ notificationOpen: false }" @click.outside="notificationOpen = false">
-                        <button type="button" @click="notificationOpen = !notificationOpen" class="relative p-2 {{ $siteBrand->isRogues ? 'text-slate-300 hover:text-white hover:bg-slate-800' : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100' }} rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 transition-colors" aria-label="Notifications">
+                        <button type="button" @click="notificationOpen = !notificationOpen" class="relative p-2 {{ $siteBrand->navIconButtonClass() }} rounded-lg focus:outline-none focus:ring-2 {{ $siteBrand->focusRingClass() }} focus:ring-offset-2 transition-colors" aria-label="Notifications">
                             <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
                             </svg>
@@ -57,30 +57,30 @@
                              x-transition:leave-start="transform opacity-100 scale-100"
                              x-transition:leave-end="transform opacity-0 scale-95"
                              x-cloak
-                             class="absolute right-0 mt-2 w-80 max-h-96 overflow-hidden bg-white rounded-lg shadow-xl border border-gray-200 z-50">
-                            <div class="px-4 py-3 border-b border-gray-200 bg-gray-50">
-                                <h3 class="text-sm font-semibold text-gray-900">Notifications</h3>
+                             class="{{ $siteBrand->dropdownPanelClass() }}">
+                            <div class="{{ $siteBrand->dropdownHeaderClass() }}">
+                                <h3 class="{{ $siteBrand->dropdownTitleClass() }}">Notifications</h3>
                             </div>
                             <div class="max-h-72 overflow-y-auto">
                                 @if(isset($navbarNotifications) && $navbarNotifications->isNotEmpty())
                                     @foreach($navbarNotifications as $notification)
                                         @php $data = is_array($notification->data) ? $notification->data : []; @endphp
-                                        <a href="{{ route('notifications.read', $notification->id) }}" class="block px-4 py-3 hover:bg-purple-50 border-b border-gray-100 last:border-b-0 transition-colors">
-                                            <p class="text-sm text-gray-800">{{ $data['message'] ?? 'New notification' }}</p>
+                                        <a href="{{ route('notifications.read', $notification->id) }}" class="{{ $siteBrand->dropdownItemClass() }}">
+                                            <p class="text-sm text-slate-200">{{ $data['message'] ?? 'New notification' }}</p>
                                             @if(!empty($data['requested_at']))
-                                                <p class="text-xs text-gray-500 mt-0.5">{{ \Carbon\Carbon::parse($data['requested_at'])->diffForHumans() }}</p>
+                                                <p class="text-xs text-slate-500 mt-0.5">{{ \Carbon\Carbon::parse($data['requested_at'])->diffForHumans() }}</p>
                                             @endif
                                         </a>
                                     @endforeach
                                 @else
-                                    <div class="px-4 py-6 text-center text-sm text-gray-500">No new notifications</div>
+                                    <div class="px-4 py-6 text-center text-sm text-slate-500">No new notifications</div>
                                 @endif
                             </div>
                         </div>
                     </div>
 
                     <div class="relative" x-data="{ open: false }" @click.outside="open = false">
-                        <button @click="open = !open" class="flex items-center space-x-3 {{ $siteBrand->isRogues ? 'text-slate-200 hover:text-white' : 'text-gray-700 hover:text-gray-900' }} focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 rounded-lg px-3 py-2 transition-colors duration-200">
+                        <button @click="open = !open" class="flex items-center space-x-3 {{ $siteBrand->navUserButtonClass() }} focus:outline-none focus:ring-2 {{ $siteBrand->focusRingClass() }} focus:ring-offset-2 rounded-lg px-3 py-2 transition-colors duration-200">
                             <div class="relative">
                                 @php
                                     $userProfileImage = null;
@@ -122,7 +122,7 @@
                              x-transition:leave="transition ease-in duration-75"
                              x-transition:leave-start="transform opacity-100 scale-100"
                              x-transition:leave-end="transform opacity-0 scale-95"
-                             class="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-xl py-2 z-50 border border-gray-200">
+                             class="{{ $siteBrand->dropdownMenuClass() }}">
                             @if(auth()->user()->hasRole(['admin', 'superuser']))
                                 <a href="{{ route('admin.dashboard') }}" class="dropdown-item">
                                     <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -144,7 +144,7 @@
                                 </svg>
                                 Profile
                             </a>
-                            <div class="border-t border-gray-100 my-1"></div>
+                            <div class="border-t border-slate-700 my-1"></div>
                             <form method="POST" action="{{ route('logout') }}" class="block">
                                 @csrf
                                 <button type="submit" class="dropdown-item w-full text-left text-red-600 hover:text-red-700 hover:bg-red-50">
@@ -164,7 +164,7 @@
 
             <!-- Mobile menu button -->
             <div class="md:hidden flex items-center ml-4">
-                <button @click="mobileMenuOpen = !mobileMenuOpen" class="{{ $siteBrand->isRogues ? 'text-slate-200 hover:text-white' : 'text-gray-700 hover:text-gray-900' }} focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 rounded-lg p-2 transition-colors duration-200">
+                <button @click="mobileMenuOpen = !mobileMenuOpen" class="{{ $siteBrand->navIconButtonClass() }} focus:outline-none focus:ring-2 {{ $siteBrand->focusRingClass() }} focus:ring-offset-2 rounded-lg p-2 transition-colors duration-200">
                     <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
                     </svg>

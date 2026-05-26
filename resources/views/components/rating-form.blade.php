@@ -13,15 +13,14 @@
 @endphp
 
 @auth
-<div class="rating-section bg-white rounded-lg border border-gray-200 p-4">
-    <!-- Compact Rating Header -->
+<div class="rating-section {{ $siteBrand->detailPanelClass('p-4') }}">
     <div class="flex items-center justify-between mb-3">
-        <h3 class="text-sm font-medium text-gray-900">
+        <h3 class="text-sm font-medium text-white">
             {{ $existingRating ? 'Update your rating' : 'Rate this ' . ucfirst($type) }}
         </h3>
         <div class="flex items-center space-x-1" id="star-rating">
             @for($i = 1; $i <= 5; $i++)
-                <button type="button" class="star-btn transition-colors {{ $existingRating && $i <= $existingRating->rating ? 'text-yellow-400' : 'text-gray-300' }} hover:text-yellow-400" data-rating="{{ $i }}">
+                <button type="button" class="star-btn transition-colors {{ $existingRating && $i <= $existingRating->rating ? 'text-yellow-400' : 'text-slate-600' }} hover:text-yellow-400" data-rating="{{ $i }}">
                     <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
                         <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.888c-.783.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
                     </svg>
@@ -30,8 +29,7 @@
         </div>
     </div>
 
-    <!-- Inline Review Form (Hidden Initially, or shown if existing rating) -->
-    <div id="review-form-container" class="{{ $existingRating ? '' : 'hidden' }} mt-3 pt-3 border-t border-gray-100">
+    <div id="review-form-container" class="{{ $existingRating ? '' : 'hidden' }} mt-3 pt-3 {{ $siteBrand->isRogues ? 'border-t border-slate-700' : 'border-t border-white/10' }}">
         <form id="rating-form" class="space-y-3">
             @csrf
             <input type="hidden" name="rateable_type" value="{{ get_class($model) }}">
@@ -39,19 +37,18 @@
             <input type="hidden" name="rating" id="rating-input" value="{{ $existingRating ? $existingRating->rating : '' }}">
             
             <div>
-                <label for="review" class="block text-xs font-medium text-gray-700 mb-1">Your Review (Optional)</label>
+                <label for="review" class="{{ $siteBrand->formLabelClass() }} text-xs">Your Review (Optional)</label>
                 <textarea id="review" name="review" rows="3" 
-                          class="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-1 focus:ring-purple-500 focus:border-purple-500"
+                          class="{{ $siteBrand->formInputClass() }} text-sm"
                           placeholder="Share your experience...">{{ $existingRating ? $existingRating->review : '' }}</textarea>
             </div>
             
             <div class="flex items-center justify-between">
                 <button type="button" id="cancel-rating" 
-                        class="text-sm text-gray-600 hover:text-gray-800 transition-colors">
+                        class="text-sm {{ $siteBrand->detailMutedTextClass() }} hover:text-white transition-colors">
                     {{ $existingRating ? 'Close' : 'Cancel' }}
                 </button>
-                <button type="submit" 
-                        class="px-4 py-1.5 text-sm bg-purple-600 text-white rounded-md hover:bg-purple-700 focus:ring-2 focus:ring-purple-500 focus:ring-offset-1 transition-colors font-medium">
+                <button type="submit" class="btn-primary px-4 py-1.5 text-sm font-medium">
                     {{ $existingRating ? 'Update Rating' : 'Submit' }}
                 </button>
             </div>
@@ -59,8 +56,8 @@
     </div>
 </div>
 @else
-<div class="bg-white rounded-2xl shadow-sm border border-purple-100 p-6 text-center">
-    <p class="text-gray-600 mb-4">Please <a href="{{ route('login') }}" class="text-purple-600 hover:text-purple-700 font-medium">login</a> to rate this {{ $type }}.</p>
+<div class="{{ $siteBrand->detailPanelClass() }} text-center">
+    <p class="{{ $siteBrand->detailMutedTextClass() }} mb-4">Please <a href="{{ route('login') }}" class="{{ $siteBrand->isRogues ? 'text-sky-400 hover:text-sky-300' : 'text-indigo-400 hover:text-indigo-300' }} font-medium">login</a> to rate this {{ $type }}.</p>
 </div>
 @endauth
 
@@ -106,11 +103,11 @@ document.addEventListener('DOMContentLoaded', function() {
     function updateStarDisplay(rating) {
         starButtons.forEach((star, index) => {
             if (index < rating) {
-                star.classList.remove('text-gray-300');
+                star.classList.remove('text-slate-600');
                 star.classList.add('text-yellow-400');
             } else {
                 star.classList.remove('text-yellow-400');
-                star.classList.add('text-gray-300');
+                star.classList.add('text-slate-600');
             }
         });
     }

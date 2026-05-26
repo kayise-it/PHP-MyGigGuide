@@ -22,7 +22,7 @@
     $subtitle = trim(($artist->genre ?? '') . (isset($artist->user) && isset($artist->user->username) ? ' • @' . $artist->user->username : ''));
 @endphp
 
-<div class="group relative block overflow-hidden rounded-2xl shadow-lg bg-gray-100 aspect-[4/5]">
+<div class="group relative block overflow-hidden rounded-2xl shadow-lg aspect-[4/5] {{ $siteBrand->isRogues ? 'bg-slate-900 border border-slate-700' : 'bg-[#12121A] border border-white/10' }}">
     <a href="{{ $targetUrl }}" class="block w-full h-full">
         <img src="{{ $image }}" alt="{{ $displayName }}" class="w-full h-full object-cover transition-transform duration-300 ease-out group-hover:scale-[1.04]" loading="lazy">
         

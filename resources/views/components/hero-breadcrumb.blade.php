@@ -32,11 +32,11 @@
 @endphp
 
 <div class="relative z-20 pointer-events-auto">
-    <div class="inline-flex items-center bg-white/90 rounded-lg shadow px-4 py-2 space-x-2 text-xs font-medium text-gray-700"
+    <div class="{{ $siteBrand->breadcrumbBarClass() }}"
         style="backdrop-filter: blur(2px); font-size: 0.8rem;">
         
         @if($showBack)
-            <a href="{{ route($indexRoute) }}" class="flex items-center hover:underline text-purple-600">
+            <a href="{{ route($indexRoute) }}" class="{{ $siteBrand->breadcrumbLinkClass() }}">
                 <svg class="h-4 w-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
                 </svg>

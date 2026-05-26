@@ -1,6 +1,6 @@
 @props(['event'])
 
-<a href="{{ route('events.show', $event) }}" class="group relative bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden cursor-pointer hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 block">
+<a href="{{ route('events.show', $event) }}" class="{{ $siteBrand->directoryCardClass() }}">
     <!-- Event Image Background -->
     <div class="relative h-48 w-full overflow-hidden">
         @if($event->poster)

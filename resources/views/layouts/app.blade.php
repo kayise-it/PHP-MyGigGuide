@@ -45,7 +45,7 @@
     }
     </style>
 </head>
-<body class="font-sans antialiased bg-gray-50 {{ $siteBrand->bodyClass() }}">
+<body class="font-sans antialiased {{ $siteBrand->pageShellClass() }} {{ $siteBrand->bodyClass() }}">
     <div id="app" x-data="{ mobileMenuOpen: false }">
         @include('layouts.navigation')
         

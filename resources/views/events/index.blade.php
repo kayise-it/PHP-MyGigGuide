@@ -4,13 +4,13 @@
 @section('description', 'Discover amazing events happening around you.')
 
 @section('content')
-<div class="min-h-screen bg-gradient-to-br from-purple-50 via-white to-blue-50">
+<div class="{{ $siteBrand->pageContentShellClass() }}">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div class="mb-8">
             <div class="flex items-center justify-between">
                 <div>
-                    <h1 class="text-3xl font-bold text-gray-900">Events</h1>
-                    <p class="text-gray-600 mt-2">Discover amazing events happening around you</p>
+                    <h1 class="{{ $siteBrand->pageTitleClass() }}">Events</h1>
+                    <p class="{{ $siteBrand->pageSubtitleClass() }}">Discover amazing events happening around you</p>
                 </div>
                 <div class="flex items-center space-x-4">
                     <x-view-switcher :current-view="request('view', 'cards')" />
@@ -27,7 +27,7 @@
         </div>
 
         <!-- Search and Filters -->
-        <div class="bg-white rounded-2xl shadow-sm border border-purple-100 p-6 mb-8">
+        <div class="{{ $siteBrand->filterPanelClass() }}">
             <form method="GET" action="{{ route('events.index') }}" id="ajax-search-form">
                 @if(request('view'))
                     <input type="hidden" name="view" value="{{ request('view') }}">
@@ -35,20 +35,20 @@
                 <div class="flex flex-wrap gap-4 items-end">
                     <!-- Search Input -->
                     <div class="flex-1 min-w-64">
-                        <label for="search" class="block text-sm font-medium text-gray-700 mb-2">Search Events</label>
+                        <label for="search" class="{{ $siteBrand->formLabelClass() }}">Search Events</label>
                         <input
                             type="text"
                             id="search"
                             name="search"
                             value="{{ request('search') }}"
                             placeholder="Search events..."
-                            class="block w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                            class="{{ $siteBrand->formInputClass() }}"
                         />
                     </div>
                     
                     <!-- Category Filter -->
                     <div class="min-w-48">
-                        <label for="category" class="block text-sm font-medium text-gray-700 mb-2">Category</label>
+                        <label for="category" class="{{ $siteBrand->formLabelClass() }}">Category</label>
                         <x-category-select 
                             name="category" 
                             id="category" 
@@ -56,19 +56,18 @@
                             placeholder="All Categories"
                             :multiple="false"
                             :useIds="false"
-                            class="block w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                         />
                     </div>
                     
                     <!-- Date Filter -->
                     <div class="min-w-40">
-                        <label for="date_from" class="block text-sm font-medium text-gray-700 mb-2">From Date</label>
+                        <label for="date_from" class="{{ $siteBrand->formLabelClass() }}">From Date</label>
                         <input
                             type="date"
                             id="date_from"
                             name="date_from"
                             value="{{ request('date_from') }}"
-                            class="block w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                            class="{{ $siteBrand->formInputClass() }}"
                         />
                     </div>
                     
@@ -88,7 +87,7 @@
                         <a 
                             href="#" 
                             onclick="event.preventDefault(); if(window.ajaxSearchInstance) { window.ajaxSearchInstance.clearFilters(); } else { window.location.href = '{{ route('events.index') }}'; }"
-                            class="text-purple-600 hover:text-purple-800 px-4 py-2 flex items-center font-medium transition-colors duration-200"
+                            class="{{ $siteBrand->accentLinkClass() }}"
                         >
                             Clear Filters
                         </a>

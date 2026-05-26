@@ -97,7 +97,7 @@
 @endpush
 
 @section('content')
-<div class="min-h-screen bg-gray-50">
+<div class="{{ $siteBrand->pageContentShellClass() }}">
     <!-- Hero Section -->
     <div class="relative h-96 md:h-[500px] overflow-hidden">
         @php
@@ -291,32 +291,32 @@
             <!-- Left Column - Main Info -->
             <div class="lg:col-span-2 space-y-6">
                 <!-- About Section -->
-                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-                    <h2 class="text-2xl font-bold text-gray-900 mb-4">About This Event</h2>
+                <div class="{{ $siteBrand->detailPanelClass() }}">
+                    <h2 class="{{ $siteBrand->detailPanelHeadingClass() }}">About This Event</h2>
                     @if($event->description)
                     <div class="space-y-4">
-                        <p class="text-gray-700 leading-relaxed text-lg">{{ $event->description }}</p>
+                        <p class="text-slate-300 leading-relaxed text-lg">{{ $event->description }}</p>
                         <div class="flex flex-wrap gap-2">
                             <span
-                                class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-purple-100 text-purple-800">
+                                class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium {{ $siteBrand->isRogues ? 'bg-sky-500/20 text-sky-300' : 'bg-indigo-500/20 text-indigo-300' }}">
                                 {{ $event->category ?: 'General' }}
                             </span>
                             <span
-                                class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800">
+                                class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-500/20 text-blue-300">
                                 {{ $event->capacity ? $event->capacity . ' capacity' : 'Open event' }}
                             </span>
                             <span
-                                class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800">
+                                class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-500/20 text-green-300">
                                 {{ $event->status ?: 'Active' }}
                             </span>
                         </div>
                     </div>
                     @else
                     <div class="space-y-4">
-                        <p class="text-gray-500 italic">No description provided for this event.</p>
+                        <p class="text-slate-500 italic">No description provided for this event.</p>
                         <div class="flex flex-wrap gap-2">
                             <span
-                                class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-purple-100 text-purple-800">
+                                class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium {{ $siteBrand->isRogues ? 'bg-sky-500/20 text-sky-300' : 'bg-indigo-500/20 text-indigo-300' }}">
                                 {{ $event->category ?: 'General' }}
                             </span>
                         </div>
@@ -326,8 +326,8 @@
 
                 <!-- Booked Artists -->
                 @if($event->artists->count() > 0)
-                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-                    <h2 class="text-2xl font-bold text-gray-900 mb-4">Booked Artists</h2>
+                <div class="{{ $siteBrand->detailPanelClass() }}">
+                    <h2 class="{{ $siteBrand->detailPanelHeadingClass() }}">Booked Artists</h2>
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                         @foreach($event->artists as $artist)
                         @php
@@ -337,20 +337,20 @@
                         !str_contains($avatarPath, 'tmp.php');
                         $avatarUrl = $avatarValid && Storage::disk('public')->exists($avatarPath) ? Storage::disk('public')->url($avatarPath) : null;
                         @endphp
-                        <a href="{{ route('artists.show', $artist) }}" class="flex items-center p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+                        <a href="{{ route('artists.show', $artist) }}" class="{{ $siteBrand->detailInsetClass() }}">
                             @if($avatarUrl)
                             <img src="{{ $avatarUrl }}" alt="{{ $artist->stage_name }}"
                                 class="h-12 w-12 rounded-full object-cover">
                             @else
-                            <div class="h-12 w-12 bg-purple-100 rounded-full flex items-center justify-center">
+                            <div class="h-12 w-12 {{ $siteBrand->isRogues ? 'bg-sky-500/20' : 'bg-indigo-500/20' }} rounded-full flex items-center justify-center">
                                 <span
-                                    class="text-purple-600 font-semibold">{{ substr($artist->stage_name, 0, 1) }}</span>
+                                    class="{{ $siteBrand->isRogues ? 'text-sky-300' : 'text-indigo-300' }} font-semibold">{{ substr($artist->stage_name, 0, 1) }}</span>
                             </div>
                             @endif
                             <div class="ml-4">
-                                <p class="text-sm font-medium text-gray-900">{{ $artist->stage_name }}</p>
+                                <p class="text-sm font-medium text-white">{{ $artist->stage_name }}</p>
                                 @if($artist->genre)
-                                <p class="text-sm text-gray-500">{{ $artist->genre }}</p>
+                                <p class="text-sm text-slate-500">{{ $artist->genre }}</p>
                                 @endif
                             </div>
                         </a>
@@ -373,8 +373,8 @@
                         }
                     }
                 @endphp
-                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-                    <h2 class="text-2xl font-bold text-gray-900 mb-4">Event Gallery</h2>
+                <div class="{{ $siteBrand->detailPanelClass() }}">
+                    <h2 class="{{ $siteBrand->detailPanelHeadingClass() }}">Event Gallery</h2>
                     <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
                         @foreach($galleryImages as $index => $image)
                             @php
@@ -415,8 +415,8 @@
                     }
                 @endphp
                 @if($youtubeVideos && $youtubeVideos->count() > 0)
-                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-                    <h2 class="text-2xl font-bold text-gray-900 mb-4">Videos</h2>
+                <div class="{{ $siteBrand->detailPanelClass() }}">
+                    <h2 class="{{ $siteBrand->detailPanelHeadingClass() }}">Videos</h2>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         @foreach($youtubeVideos as $video)
                         @php
@@ -444,24 +444,24 @@
                     </div>
                 </div>
 
-                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-6">
-                    <h2 class="text-2xl font-bold text-gray-900 mb-4">Location</h2>
+                <div class="{{ $siteBrand->detailPanelClass() }} mb-6">
+                    <h2 class="{{ $siteBrand->detailPanelHeadingClass() }}">Location</h2>
                     @if($event->venue && $event->venue->latitude && $event->venue->longitude)
                     <x-map :latitude="$event->venue->latitude" :longitude="$event->venue->longitude"
                         :address="$event->venue->address" class="w-full h-64 rounded-lg overflow-hidden" />
                     @if($event->venue->address)
-                    <p class="mt-2 text-gray-700 text-sm">
+                    <p class="mt-2 text-slate-300 text-sm">
                         <span class="font-semibold">Address:</span> {{ $event->venue->address }}
                     </p>
                     @endif
                     @else
-                    <p class="text-gray-500">Location details are not available for this event.</p>
+                    <p class="text-slate-500">Location details are not available for this event.</p>
                     @endif
                 </div>
 
                 <!-- What to Expect -->
-                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-                    <h2 class="text-2xl font-bold text-gray-900 mb-4">What to Expect</h2>
+                <div class="{{ $siteBrand->detailPanelClass() }}">
+                    <h2 class="{{ $siteBrand->detailPanelHeadingClass() }}">What to Expect</h2>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div class="flex items-start space-x-3">
                             <svg class="h-6 w-6 text-green-500 mt-1" fill="none" stroke="currentColor"
@@ -470,8 +470,8 @@
                                     d="M5 13l4 4L19 7"></path>
                             </svg>
                             <div>
-                                <p class="font-semibold text-gray-900">Live Performance</p>
-                                <p class="text-gray-600 text-sm">Experience amazing live entertainment</p>
+                                <p class="font-semibold text-white">Live Performance</p>
+                                <p class="text-slate-400 text-sm">Experience amazing live entertainment</p>
                             </div>
                         </div>
                         <div class="flex items-start space-x-3">
@@ -481,8 +481,8 @@
                                     d="M5 13l4 4L19 7"></path>
                             </svg>
                             <div>
-                                <p class="font-semibold text-gray-900">Great Atmosphere</p>
-                                <p class="text-gray-600 text-sm">Connect with fellow music lovers</p>
+                                <p class="font-semibold text-white">Great Atmosphere</p>
+                                <p class="text-slate-400 text-sm">Connect with fellow music lovers</p>
                             </div>
                         </div>
                         <div class="flex items-start space-x-3">
@@ -492,8 +492,8 @@
                                     d="M5 13l4 4L19 7"></path>
                             </svg>
                             <div>
-                                <p class="font-semibold text-gray-900">Quality Sound</p>
-                                <p class="text-gray-600 text-sm">Professional audio equipment</p>
+                                <p class="font-semibold text-white">Quality Sound</p>
+                                <p class="text-slate-400 text-sm">Professional audio equipment</p>
                             </div>
                         </div>
                         <div class="flex items-start space-x-3">
@@ -503,8 +503,8 @@
                                     d="M5 13l4 4L19 7"></path>
                             </svg>
                             <div>
-                                <p class="font-semibold text-gray-900">Memorable Experience</p>
-                                <p class="text-gray-600 text-sm">Create lasting memories</p>
+                                <p class="font-semibold text-white">Memorable Experience</p>
+                                <p class="text-slate-400 text-sm">Create lasting memories</p>
                             </div>
                         </div>
                     </div>
@@ -514,17 +514,17 @@
             <!-- Right Column - Details & Actions -->
             <div class="lg:col-span-2 space-y-6">
                 <!-- Ticket Purchase Card -->
-                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 top-8">
+                <div class="{{ $siteBrand->detailPanelClass() }} top-8">
                     <div class="text-center space-y-4">
                         <div>
-                            <div class="text-4xl font-bold text-gray-900">
+                            <div class="text-4xl font-bold text-white">
                                 @if($event->price && $event->price > 0)
                                 R{{ number_format($event->price, 2) }}
                                 @else
                                 Free
                                 @endif
                             </div>
-                            <div class="text-gray-600">per ticket</div>
+                            <div class="text-slate-400">per ticket</div>
                         </div>
 
                         @if($event->ticket_url)
@@ -550,7 +550,7 @@
                         @endif
 
                         @if($event->capacity)
-                        <p class="text-sm text-gray-600">{{ $event->capacity }} spots available</p>
+                        <p class="text-sm text-slate-400">{{ $event->capacity }} spots available</p>
                         @endif
                     </div>
                 </div>
@@ -561,21 +561,21 @@
                 <!-- Event Details Grid -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <!-- Date & Time -->
-                    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
+                    <div class="{{ $siteBrand->detailPanelClass('p-4') }}">
                         <div class="flex items-center space-x-3 mb-2">
                             <svg class="h-5 w-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z">
                                 </path>
                             </svg>
-                            <span class="font-semibold text-gray-900">Date & Time</span>
+                            <span class="font-semibold text-white">Date & Time</span>
                         </div>
-                        <p class="text-gray-700">{{ $event->date->format('l, F j, Y') }}</p>
-                        <p class="text-gray-600">{{ $event->time ?: 'TBD' }}</p>
+                        <p class="text-slate-300">{{ $event->date->format('l, F j, Y') }}</p>
+                        <p class="text-slate-400">{{ $event->time ?: 'TBD' }}</p>
                     </div>
 
                     <!-- Location -->
-                    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
+                    <div class="{{ $siteBrand->detailPanelClass('p-4') }}">
                         <div class="flex items-center space-x-3 mb-2">
                             <svg class="h-5 w-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -584,84 +584,84 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
                             </svg>
-                            <span class="font-semibold text-gray-900">Location</span>
+                            <span class="font-semibold text-white">Location</span>
                         </div>
-                        <p class="text-gray-700">{{ $event->venue->name ?? 'Venue TBD' }}</p>
+                        <p class="text-slate-300">{{ $event->venue->name ?? 'Venue TBD' }}</p>
                         @if($event->venue && $event->venue->address)
-                        <p class="text-gray-600 text-sm">{{ $event->venue->address }}</p>
+                        <p class="text-slate-400 text-sm">{{ $event->venue->address }}</p>
                         @endif
                     </div>
 
                     <!-- Category & Status -->
-                    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
+                    <div class="{{ $siteBrand->detailPanelClass('p-4') }}">
                         <div class="flex items-center space-x-3 mb-2">
                             <svg class="h-5 w-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z">
                                 </path>
                             </svg>
-                            <span class="font-semibold text-gray-900">Category</span>
+                            <span class="font-semibold text-white">Category</span>
                         </div>
                         <span
-                            class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-purple-100 text-purple-800">
+                            class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium {{ $siteBrand->isRogues ? 'bg-sky-500/20 text-sky-300' : 'bg-indigo-500/20 text-indigo-300' }}">
                             {{ $event->category ?: 'General' }}
                         </span>
                     </div>
 
                     <!-- Social Sharing -->
-                    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-                        <h3 class="text-lg font-semibold text-gray-900 mb-4">Share this event</h3>
+                    <div class="{{ $siteBrand->detailPanelClass() }}">
+                        <h3 class="text-lg font-semibold text-white mb-4">Share this event</h3>
                         <x-social-share-icons :event="$event" />
                     </div>
                 </div>
 
                 <!-- Event Tips -->
-                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-                    <h2 class="text-2xl font-bold text-gray-900 mb-4">Event Tips</h2>
+                <div class="{{ $siteBrand->detailPanelClass() }}">
+                    <h2 class="{{ $siteBrand->detailPanelHeadingClass() }}">Event Tips</h2>
                     <div class="space-y-3">
                         <div class="flex items-start space-x-3">
                             <div
-                                class="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
-                                <svg class="h-4 w-4 text-green-600" fill="none" stroke="currentColor"
+                                class="w-6 h-6 bg-green-500/20 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                                <svg class="h-4 w-4 text-green-400" fill="none" stroke="currentColor"
                                     viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M5 13l4 4L19 7"></path>
                                 </svg>
                             </div>
-                            <p class="text-gray-700 text-sm">Arrive 15-30 minutes early for the best seats</p>
+                            <p class="text-slate-300 text-sm">Arrive 15-30 minutes early for the best seats</p>
                         </div>
                         <div class="flex items-start space-x-3">
                             <div
-                                class="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
-                                <svg class="h-4 w-4 text-green-600" fill="none" stroke="currentColor"
+                                class="w-6 h-6 bg-green-500/20 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                                <svg class="h-4 w-4 text-green-400" fill="none" stroke="currentColor"
                                     viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M5 13l4 4L19 7"></path>
                                 </svg>
                             </div>
-                            <p class="text-gray-700 text-sm">Bring a valid ID for age verification</p>
+                            <p class="text-slate-300 text-sm">Bring a valid ID for age verification</p>
                         </div>
                         <div class="flex items-start space-x-3">
                             <div
-                                class="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
-                                <svg class="h-4 w-4 text-green-600" fill="none" stroke="currentColor"
+                                class="w-6 h-6 bg-green-500/20 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                                <svg class="h-4 w-4 text-green-400" fill="none" stroke="currentColor"
                                     viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M5 13l4 4L19 7"></path>
                                 </svg>
                             </div>
-                            <p class="text-gray-700 text-sm">Check venue parking options in advance</p>
+                            <p class="text-slate-300 text-sm">Check venue parking options in advance</p>
                         </div>
                         <div class="flex items-start space-x-3">
                             <div
-                                class="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
-                                <svg class="h-4 w-4 text-green-600" fill="none" stroke="currentColor"
+                                class="w-6 h-6 bg-green-500/20 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                                <svg class="h-4 w-4 text-green-400" fill="none" stroke="currentColor"
                                     viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M5 13l4 4L19 7"></path>
                                 </svg>
                             </div>
-                            <p class="text-gray-700 text-sm">Follow the event on social media for updates</p>
+                            <p class="text-slate-300 text-sm">Follow the event on social media for updates</p>
                         </div>
                     </div>
                 </div>
@@ -671,17 +671,17 @@
     <!-- Event Reviews -->
     @if($event->ratings->count() > 0)
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-            <h2 class="text-2xl font-bold text-gray-900 mb-4">Event Reviews</h2>
+        <div class="{{ $siteBrand->detailPanelClass() }}">
+            <h2 class="{{ $siteBrand->detailPanelHeadingClass() }}">Event Reviews</h2>
             <div class="space-y-4">
                 @foreach($event->ratings->take(3) as $rating)
                 <div class="flex items-center space-x-4">
-                    <div class="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center">
-                        <span class="text-purple-600 font-semibold">{{ substr($rating->user->name, 0, 1) }}</span>
+                    <div class="w-10 h-10 {{ $siteBrand->isRogues ? 'bg-sky-500/20' : 'bg-indigo-500/20' }} rounded-full flex items-center justify-center">
+                        <span class="{{ $siteBrand->isRogues ? 'text-sky-300' : 'text-indigo-300' }} font-semibold">{{ substr($rating->user->name, 0, 1) }}</span>
                     </div>
                     <div class="flex-1">
                         <div class="flex items-center space-x-2 mb-1">
-                            <span class="font-semibold text-gray-900">{{ $rating->user->name }}</span>
+                            <span class="font-semibold text-white">{{ $rating->user->name }}</span>
                             <div class="flex items-center space-x-1">
                                 @for($i = 1; $i <= 5; $i++) <svg
                                     class="h-4 w-4 {{ $i <= $rating->rating ? 'text-yellow-400' : 'text-gray-300' }}"
@@ -693,12 +693,12 @@
                                     @endfor
                             </div>
                         </div>
-                        <p class="text-gray-600 text-sm">{{ $rating->review ?: 'Great event!' }}</p>
+                        <p class="text-slate-400 text-sm">{{ $rating->review ?: 'Great event!' }}</p>
                     </div>
                 </div>
                 @endforeach
                 @if($event->ratings->count() > 3)
-                <button class="w-full text-center py-2 text-purple-600 hover:text-purple-700 font-medium">
+                <button class="w-full text-center py-2 {{ $siteBrand->isRogues ? 'text-sky-400 hover:text-sky-300' : 'text-indigo-400 hover:text-indigo-300' }} font-medium">
                     View All Reviews
                 </button>
                 @endif

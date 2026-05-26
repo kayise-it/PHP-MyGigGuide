@@ -107,9 +107,64 @@
   }
 }
 
-/* Rogues hostname skin (Phase A — shared pages, same data) */
+/* ── Public dark theme: My Gig Guide (indigo on black) ── */
+.brand-mygigguide {
+  color-scheme: dark;
+}
+
+.brand-mygigguide .btn-primary {
+  @apply bg-indigo-500 text-white hover:bg-indigo-400 focus:ring-indigo-500;
+}
+
+.brand-mygigguide .btn-secondary {
+  @apply bg-slate-800 text-slate-100 border border-white/10 hover:bg-slate-700 focus:ring-indigo-500;
+}
+
+.brand-mygigguide .btn-outline {
+  @apply border-indigo-400 text-indigo-300 hover:bg-indigo-500/10 focus:ring-indigo-500;
+}
+
+.brand-mygigguide .text-gradient {
+  @apply bg-gradient-to-r from-indigo-400 to-violet-400 bg-clip-text text-transparent;
+}
+
+.brand-mygigguide .bg-gradient-primary {
+  @apply bg-gradient-to-br from-black via-[#0a0a12] to-black;
+}
+
+.brand-mygigguide .card,
+.brand-mygigguide .card-event {
+  @apply bg-[#12121A] border-white/10 text-slate-100;
+}
+
+.brand-mygigguide .form-input {
+  @apply bg-black border-white/15 text-slate-100 placeholder:text-slate-500 focus:ring-indigo-500;
+}
+
+.brand-mygigguide .form-label {
+  @apply text-slate-300;
+}
+
+.brand-mygigguide .dropdown-item {
+  @apply text-slate-200 hover:bg-indigo-500/10 hover:text-white;
+}
+
+.brand-mygigguide select,
+.brand-mygigguide select option {
+  @apply bg-black text-slate-100;
+}
+
+/* ── Public dark theme: Rogues (cyan on slate) ── */
+.brand-rogues {
+  color-scheme: dark;
+}
+
 .brand-rogues .btn-primary {
   @apply bg-sky-400 text-slate-950 hover:bg-sky-300 focus:ring-sky-400;
+}
+
+.brand-rogues .btn-secondary {
+  @apply bg-slate-800 text-slate-100 border border-slate-600 hover:bg-slate-700 focus:ring-sky-400;
 }
 
 .brand-rogues .btn-outline {
@@ -122,6 +177,70 @@
 
 .brand-rogues .bg-gradient-primary {
   @apply bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900;
+}
+
+.brand-rogues .card,
+.brand-rogues .card-event {
+  @apply bg-slate-900 border-slate-700 text-slate-100;
+}
+
+.brand-rogues .form-input {
+  @apply bg-slate-950 border-slate-600 text-slate-100 placeholder:text-slate-500 focus:ring-sky-400;
+}
+
+.brand-rogues .form-label {
+  @apply text-slate-300;
+}
+
+.brand-rogues .dropdown-item {
+  @apply text-slate-200 hover:bg-slate-800 hover:text-white;
+}
+
+.brand-rogues select,
+.brand-rogues select option {
+  @apply bg-slate-950 text-slate-100;
+}
+
+/* Google Maps popup chrome on dark public pages */
+.brand-mygigguide .gm-style .gm-style-iw-c,
+.brand-rogues .gm-style .gm-style-iw-c {
+  background-color: #12121A !important;
+  padding: 0 !important;
+}
+
+.brand-mygigguide .gm-style .gm-style-iw-d,
+.brand-rogues .gm-style .gm-style-iw-d {
+  overflow: hidden !important;
+}
+
+.brand-mygigguide .gm-style .gm-style-iw-tc::after,
+.brand-rogues .gm-style .gm-style-iw-tc::after {
+  background: #12121A !important;
+}
+
+/* Google Maps zoom / fullscreen controls on dark public pages */
+.brand-mygigguide .gm-style .gmnoprint button,
+.brand-mygigguide .gm-style .gm-control-active,
+.brand-mygigguide .gm-style .gm-fullscreen-control,
+.brand-rogues .gm-style .gmnoprint button,
+.brand-rogues .gm-style .gm-control-active,
+.brand-rogues .gm-style .gm-fullscreen-control {
+  background-color: #12121A !important;
+  color: #e2e8f0 !important;
+}
+
+.brand-rogues .gm-style .gmnoprint button,
+.brand-rogues .gm-style .gm-control-active {
+  background-color: #0f172a !important;
+}
+
+.brand-mygigguide .gm-style .gm-style-cc,
+.brand-mygigguide .gm-style .gm-style-cc span,
+.brand-mygigguide .gm-style .gm-style-cc a,
+.brand-rogues .gm-style .gm-style-cc,
+.brand-rogues .gm-style .gm-style-cc span,
+.brand-rogues .gm-style .gm-style-cc a {
+  color: #64748b !important;
 }
 
 /* Owl Carousel Custom Styles */

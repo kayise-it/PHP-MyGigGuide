@@ -97,54 +97,52 @@
         ->values();
 @endphp
 
-{{-- Time Filter Buttons --}}
 @if(!$compact)
 <div class="mb-4">
     <div class="flex flex-wrap gap-2 items-center justify-between">
         <div class="flex flex-wrap gap-2 items-center">
-            <span class="text-sm font-medium text-gray-700 mr-2">Show events:</span>
+            <span class="text-sm font-medium text-slate-300 mr-2">Show events:</span>
             <button 
                 data-filter="all" 
-                class="time-filter-btn px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 bg-gradient-to-r from-purple-600 to-blue-600 text-white shadow-md hover:shadow-lg"
+                class="{{ $siteBrand->mapFilterActiveClass() }}"
             >
                 All Events
             </button>
             <button 
                 data-filter="today" 
-                class="time-filter-btn px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 bg-white text-gray-700 border border-gray-300 hover:border-purple-400 hover:bg-purple-50"
+                class="{{ $siteBrand->mapFilterInactiveClass() }}"
             >
                 Today
             </button>
             <button 
                 data-filter="tomorrow" 
-                class="time-filter-btn px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 bg-white text-gray-700 border border-gray-300 hover:border-purple-400 hover:bg-purple-50"
+                class="{{ $siteBrand->mapFilterInactiveClass() }}"
             >
                 Tomorrow
             </button>
             <button 
                 data-filter="this-week" 
-                class="time-filter-btn px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 bg-white text-gray-700 border border-gray-300 hover:border-purple-400 hover:bg-purple-50"
+                class="{{ $siteBrand->mapFilterInactiveClass() }}"
             >
                 This Week
             </button>
             <button 
                 data-filter="this-month" 
-                class="time-filter-btn px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 bg-white text-gray-700 border border-gray-300 hover:border-purple-400 hover:bg-purple-50"
+                class="{{ $siteBrand->mapFilterInactiveClass() }}"
             >
                 This Month
             </button>
             <button 
                 data-filter="next-month" 
-                class="time-filter-btn px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 bg-white text-gray-700 border border-gray-300 hover:border-purple-400 hover:bg-purple-50"
+                class="{{ $siteBrand->mapFilterInactiveClass() }}"
             >
                 Next Month
             </button>
-            <span id="filtered-count-{{ $attributes->get('id', 'default') }}" class="ml-2 text-sm text-gray-600"></span>
+            <span id="filtered-count-{{ $attributes->get('id', 'default') }}" class="ml-2 text-sm text-slate-400"></span>
         </div>
         
-        {{-- Right controls: Category filter + Location Button --}}
         <div class="flex items-center gap-2">
-            <select id="category-filter-{{ $attributes->get('id', 'default') }}" class="px-3 py-2 rounded-lg text-sm bg-white text-gray-700 border border-gray-300 hover:border-purple-400">
+            <select id="category-filter-{{ $attributes->get('id', 'default') }}" class="{{ $siteBrand->formSelectClass() }} text-sm py-2">
                 <option value="all">All categories</option>
                 @foreach($categoryOptions as $category)
                     <option value="{{ $category['slug'] }}">{{ $category['name'] }}</option>
@@ -152,12 +150,12 @@
             </select>
             <button
                 id="get-location-btn-{{ $attributes->get('id', 'default') }}"
-                class="px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 bg-white text-gray-700 border border-gray-300 hover:border-blue-400 hover:bg-blue-50"
+                class="{{ $siteBrand->mapFilterInactiveClass() }}"
                 title="Get my location"
             >
                 <div class="flex items-center">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="mr-2">
-                        <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" fill="#3b82f6"/>
+                        <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" fill="{{ $siteBrand->mapUserLocationHex() }}"/>
                     </svg>
                     My Location
                 </div>
@@ -167,30 +165,27 @@
 </div>
 @endif
 
-<div class="w-full rounded-2xl overflow-hidden shadow-sm border border-purple-100 relative" style="height: {{ $height }}; width: {{ $width }};">
-    {{-- Map Legend --}}
+<div class="{{ $siteBrand->mapFrameClass() }}" style="height: {{ $height }}; width: {{ $width }};">
     @if($showLegend && !$compact)
-    <div class="absolute top-4 left-4 z-10 bg-white rounded-lg shadow-lg p-3 border border-gray-200">
-        <h3 class="text-sm font-semibold text-gray-900 mb-2">Map Legend</h3>
+    <div class="{{ $siteBrand->mapLegendClass() }}">
+        <h3 class="text-sm font-semibold text-white mb-2">Map Legend</h3>
         <div class="space-y-2">
             <div class="flex items-center">
-                            <div class="w-5 h-5 bg-blue-500 rounded-full mr-2 flex items-center justify-center relative shadow-[0_0_8px_rgba(59,130,246,0.6)]">
-                                <div class="w-2.5 h-2.5 bg-white rounded-full"></div>
-                            </div>
-                <span class="text-xs text-gray-700">Your Location</span>
+                <div class="w-5 h-5 rounded-full mr-2 flex items-center justify-center relative" style="background: {{ $siteBrand->mapUserLocationHex() }}; box-shadow: 0 0 8px {{ $siteBrand->mapUserLocationHex() }}80;">
+                    <div class="w-2.5 h-2.5 bg-white rounded-full"></div>
+                </div>
+                <span class="text-xs text-slate-300">Your Location</span>
             </div>
             <div class="flex items-center">
-                <div class="w-4 h-4 bg-purple-500 rounded mr-2 flex items-center justify-center">
+                <div class="w-4 h-4 rounded mr-2 flex items-center justify-center" style="background: {{ $siteBrand->mapMarkerHex() }};">
                     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" fill="#ffffff"/>
-                        <circle cx="12" cy="9" r="2" fill="#7c3aed"/>
+                        <circle cx="12" cy="9" r="2" fill="#ffffff"/>
                     </svg>
                 </div>
-                <span class="text-xs text-gray-700">Live Gigs ({{ $uniqueVenueCount }})</span>
+                <span class="text-xs text-slate-300">Live Gigs ({{ $uniqueVenueCount }})</span>
             </div>
         </div>
     </div>
-    
     @endif
 
 
@@ -198,26 +193,24 @@
     <div id="google-map-{{ $attributes->get('id', 'default') }}" class="w-full h-full"></div>
 
 
-    {{-- Loading State --}}
-    <div id="map-loading-{{ $attributes->get('id', 'default') }}" class="absolute inset-0 w-full h-full flex items-center justify-center bg-gradient-to-br from-purple-50 to-blue-50">
+    <div id="map-loading-{{ $attributes->get('id', 'default') }}" class="{{ $siteBrand->mapLoadingClass() }}">
         <div class="text-center">
-            <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto mb-4"></div>
-            <p class="text-gray-600">Loading map...</p>
+            <div class="animate-spin rounded-full h-12 w-12 border-b-2 {{ $siteBrand->isRogues ? 'border-sky-400' : 'border-indigo-500' }} mx-auto mb-4"></div>
+            <p class="{{ $siteBrand->detailMutedTextClass() }}">Loading map...</p>
         </div>
     </div>
 
-    {{-- No Events State --}}
     @if($eventsWithCoordinates->count() === 0)
-    <div class="absolute inset-0 w-full h-full flex items-center justify-center bg-gradient-to-br from-gray-50 to-blue-50">
-        <div class="text-center">
-            <div class="text-gray-400 mb-2">
+    <div class="absolute inset-0 w-full h-full flex items-center justify-center {{ $siteBrand->isRogues ? 'bg-slate-950' : 'bg-black' }}">
+        <div class="text-center px-4">
+            <div class="text-slate-600 mb-2">
                 <svg class="h-12 w-12 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                 </svg>
             </div>
-            <p class="text-gray-600 mb-2">No upcoming events found</p>
-            <p class="text-gray-500 text-sm">Check back later for new events</p>
+            <p class="text-slate-300 mb-2">No upcoming events found</p>
+            <p class="text-slate-500 text-sm">Check back later for new events</p>
         </div>
     </div>
     @endif
@@ -290,7 +283,14 @@ document.addEventListener('DOMContentLoaded', function() {
         compact: {{ $compact ? 'true' : 'false' }},
         zoomDelta: {{ $zoomDelta }},
         apiKey: '{{ config('services.google_maps.api_key') }}',
-        radiusKm: {{ (int) $radiusKm }}
+        radiusKm: {{ (int) $radiusKm }},
+        styles: {!! $siteBrand->googleMapStylesJson() !!},
+        markerHex: @json($siteBrand->mapMarkerHex()),
+        userLocationHex: @json($siteBrand->mapUserLocationHex()),
+        ui: {
+            filterActiveClass: @json($siteBrand->mapFilterActiveClass()),
+            filterInactiveClass: @json($siteBrand->mapFilterInactiveClass()),
+        },
     };
 
     console.log('Map config:', mapConfig);
@@ -325,6 +325,43 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
 
+        function createMap(center, zoom) {
+            return new google.maps.Map(mapElement, {
+                center: center,
+                zoom: zoom,
+                styles: mapConfig.styles,
+                colorScheme: 'DARK',
+                disableDefaultUI: mapConfig.compact,
+                zoomControl: !mapConfig.compact,
+                streetViewControl: false,
+                mapTypeControl: false,
+                fullscreenControl: !mapConfig.compact,
+                gestureHandling: mapConfig.compact ? 'none' : 'auto',
+            });
+        }
+
+        function userLocationIcon() {
+            const hex = mapConfig.userLocationHex;
+            return {
+                url: 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(`
+                    <svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="12" cy="12" r="10" fill="${hex}" opacity="0.3">
+                            <animate attributeName="r" values="8;12;8" dur="2s" repeatCount="indefinite"/>
+                            <animate attributeName="opacity" values="0.3;0.1;0.3" dur="2s" repeatCount="indefinite"/>
+                        </circle>
+                        <circle cx="12" cy="12" r="8" fill="#ffffff" stroke="${hex}" stroke-width="2"/>
+                        <circle cx="12" cy="12" r="4" fill="${hex}"/>
+                    </svg>
+                `),
+                scaledSize: new google.maps.Size(24, 24),
+                anchor: new google.maps.Point(12, 12)
+            };
+        }
+
+        function userLocationInfoHtml() {
+            return `<div style="padding:10px;font-family:system-ui,sans-serif;text-align:center;"><h3 style="font-weight:700;color:#fff;margin:0 0 6px;">Your Location</h3><p style="font-size:13px;color:#94a3b8;margin:0;">You are here</p></div>`;
+        }
+
             // Try to get user location first
             function initializeMapWithLocation() {
                 if (navigator.geolocation) {
@@ -336,108 +373,27 @@ document.addEventListener('DOMContentLoaded', function() {
                             };
                             console.log('User location found:', userLocation);
                             
-                            // Create map centered on user location
-                            const map = new google.maps.Map(mapElement, {
-                                center: userLocation,
-                                zoom: 13,
-                                styles: [
-                                    {
-                                        featureType: 'all',
-                                        elementType: 'geometry.fill',
-                                        stylers: [{ color: '#fefefe' }]
-                                    },
-                                    {
-                                        featureType: 'water',
-                                        elementType: 'geometry',
-                                        stylers: [{ color: '#e3f2fd' }]
-                                    },
-                                    {
-                                        featureType: 'road',
-                                        elementType: 'geometry.stroke',
-                                        stylers: [{ color: '#e8eaf6' }]
-                                    }
-                                ],
-                                disableDefaultUI: mapConfig.compact,
-                                zoomControl: !mapConfig.compact,
-                                streetViewControl: false,
-                                mapTypeControl: false,
-                                fullscreenControl: !mapConfig.compact,
-                                gestureHandling: mapConfig.compact ? 'none' : 'auto',
-                            });
+                            const map = createMap(userLocation, 13);
                             
-                            // Create user location marker automatically
                             userLocationMarker = new google.maps.Marker({
                                 position: userLocation,
                                 map: map,
                                 title: 'Your Location',
-                                icon: {
-                                    url: 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(`
-                                        <svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                            <!-- Pulsing outer ring -->
-                                            <circle cx="12" cy="12" r="10" fill="#3b82f6" opacity="0.3">
-                                                <animate attributeName="r" values="8;12;8" dur="2s" repeatCount="indefinite"/>
-                                                <animate attributeName="opacity" values="0.3;0.1;0.3" dur="2s" repeatCount="indefinite"/>
-                                            </circle>
-                                            <!-- White background circle -->
-                                            <circle cx="12" cy="12" r="8" fill="#ffffff" stroke="#3b82f6" stroke-width="2"/>
-                                            <!-- Inner blue dot -->
-                                            <circle cx="12" cy="12" r="4" fill="#3b82f6"/>
-                                        </svg>
-                                    `),
-                                    scaledSize: new google.maps.Size(24, 24),
-                                    anchor: new google.maps.Point(12, 12)
-                                },
+                                icon: userLocationIcon(),
                                 zIndex: 9999
                             });
                             
-                            // Add info window for user location
                             userLocationMarker.addListener('click', function() {
-                                const userInfoContent = `
-                                    <div class="p-3 text-center">
-                                        <h3 class="font-bold text-gray-900 mb-2">Your Location</h3>
-                                        <p class="text-sm text-gray-600">You are here</p>
-                                    </div>
-                                `;
                                 const infoWindow = new google.maps.InfoWindow({ disableAutoPan: true, maxWidth: 240 });
-                                infoWindow.setContent(userInfoContent);
+                                infoWindow.setContent(userLocationInfoHtml());
                                 infoWindow.open(map, userLocationMarker);
                             });
                             
-                            // Continue with map initialization
                             initializeMapFeatures(map);
                         },
                         function(error) {
                             console.log('Location access denied or failed, using default center');
-                            // Fallback to default center
-                            const map = new google.maps.Map(mapElement, {
-                                center: mapConfig.center,
-                                zoom: mapConfig.zoom + mapConfig.zoomDelta,
-                                styles: [
-                                    {
-                                        featureType: 'all',
-                                        elementType: 'geometry.fill',
-                                        stylers: [{ color: '#fefefe' }]
-                                    },
-                                    {
-                                        featureType: 'water',
-                                        elementType: 'geometry',
-                                        stylers: [{ color: '#e3f2fd' }]
-                                    },
-                                    {
-                                        featureType: 'road',
-                                        elementType: 'geometry.stroke',
-                                        stylers: [{ color: '#e8eaf6' }]
-                                    }
-                                ],
-                                disableDefaultUI: mapConfig.compact,
-                                zoomControl: !mapConfig.compact,
-                                streetViewControl: false,
-                                mapTypeControl: false,
-                                fullscreenControl: !mapConfig.compact,
-                                gestureHandling: mapConfig.compact ? 'none' : 'auto',
-                            });
-                            
-                            // Continue with map initialization
+                            const map = createMap(mapConfig.center, mapConfig.zoom + mapConfig.zoomDelta);
                             initializeMapFeatures(map);
                         },
                         {
@@ -448,36 +404,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     );
                 } else {
                     console.log('Geolocation not supported, using default center');
-                    // Fallback to default center
-        const map = new google.maps.Map(mapElement, {
-            center: mapConfig.center,
-            zoom: mapConfig.zoom + mapConfig.zoomDelta,
-            styles: [
-                {
-                    featureType: 'all',
-                    elementType: 'geometry.fill',
-                    stylers: [{ color: '#fefefe' }]
-                },
-                {
-                    featureType: 'water',
-                    elementType: 'geometry',
-                    stylers: [{ color: '#e3f2fd' }]
-                },
-                {
-                    featureType: 'road',
-                    elementType: 'geometry.stroke',
-                    stylers: [{ color: '#e8eaf6' }]
-                }
-            ],
-            disableDefaultUI: mapConfig.compact,
-            zoomControl: !mapConfig.compact,
-            streetViewControl: false,
-            mapTypeControl: false,
-            fullscreenControl: !mapConfig.compact,
-            gestureHandling: mapConfig.compact ? 'none' : 'auto',
-        });
-
-                    // Continue with map initialization
+                    const map = createMap(mapConfig.center, mapConfig.zoom + mapConfig.zoomDelta);
                     initializeMapFeatures(map);
                 }
             }
@@ -518,24 +445,13 @@ document.addEventListener('DOMContentLoaded', function() {
                 : null;
 
             return `
-                <div class="p-2.5 max-w-[240px]">
-                    <h3 class="font-semibold text-gray-900 mb-1.5 text-[11px] leading-tight line-clamp-2">${event.name}</h3>
-                    <div class="space-y-1 text-[10px] text-gray-600 mb-2">
-                        <div class="flex items-center gap-1.5">
-                            <svg class="h-3 w-3 text-purple-600 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                            </svg>
-                            <span class="truncate">${formatDate(eventDate)} • ${event.time || eventDate.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
-                        </div>
-                        <div class="flex items-center gap-1.5">
-                            <svg class="h-3 w-3 text-purple-600 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                            </svg>
-                            <span class="truncate">${event.venue.name}</span>
-                        </div>
+                <div style="padding:10px;max-width:240px;font-family:system-ui,sans-serif;">
+                    <h3 style="font-weight:600;color:#fff;margin:0 0 6px;font-size:11px;line-height:1.3;">${event.name}</h3>
+                    <div style="font-size:10px;color:#94a3b8;margin-bottom:8px;">
+                        <div>${formatDate(eventDate)} • ${event.time || eventDate.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</div>
+                        <div>${event.venue.name}</div>
                     </div>
-                    <a href="/events/${event.id}" class="block w-full text-center bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white px-3 py-2 rounded-md text-xs font-semibold transition-all duration-200 shadow-sm hover:shadow-md">View Details</a>
+                    <a href="/events/${event.id}" style="display:block;text-align:center;background:${mapConfig.markerHex};color:#fff;padding:8px 12px;border-radius:6px;font-size:12px;font-weight:600;text-decoration:none;">View Details</a>
                 </div>
             `;
         }
@@ -567,11 +483,11 @@ document.addEventListener('DOMContentLoaded', function() {
                                     </feMerge>
                                 </filter>
                             </defs>
-                            <circle cx="12" cy="12" r="10" fill="#7c3aed" opacity="0.3" filter="url(#glow)">
+                            <circle cx="12" cy="12" r="10" fill="${mapConfig.markerHex}" opacity="0.3" filter="url(#glow)">
                                 <animate attributeName="r" values="10;14;10" dur="2s" repeatCount="indefinite"/>
                                 <animate attributeName="opacity" values="0.3;0.1;0.3" dur="2s" repeatCount="indefinite"/>
                             </circle>
-                            <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" fill="#7c3aed" stroke="#ffffff" stroke-width="1"/>
+                            <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" fill="${mapConfig.markerHex}" stroke="#ffffff" stroke-width="1"/>
                             <circle cx="12" cy="9" r="2.5" fill="#ffffff"/>
                         </svg>
                     `),
@@ -692,12 +608,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 
                 // Update button styles
                 filterButtons.forEach(b => {
-                    b.classList.remove('bg-gradient-to-r', 'from-purple-600', 'to-blue-600', 'text-white', 'shadow-md', 'hover:shadow-lg');
-                    b.classList.add('bg-white', 'text-gray-700', 'border', 'border-gray-300', 'hover:border-purple-400', 'hover:bg-purple-50');
+                    b.className = mapConfig.ui.filterInactiveClass;
                 });
                 
-                this.classList.remove('bg-white', 'text-gray-700', 'border', 'border-gray-300', 'hover:border-purple-400', 'hover:bg-purple-50');
-                this.classList.add('bg-gradient-to-r', 'from-purple-600', 'to-blue-600', 'text-white', 'shadow-md', 'hover:shadow-lg');
+                this.className = mapConfig.ui.filterActiveClass;
                 
                 // Apply filter
                 filterMarkers(currentDateFilter);
@@ -741,35 +655,12 @@ document.addEventListener('DOMContentLoaded', function() {
                                 position: userLocation,
                                 map: map,
                                 title: 'Your Location',
-                                icon: {
-                                    url: 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(`
-                                        <svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                            <!-- Pulsing outer ring -->
-                                            <circle cx="12" cy="12" r="10" fill="#3b82f6" opacity="0.3">
-                                                <animate attributeName="r" values="8;12;8" dur="2s" repeatCount="indefinite"/>
-                                                <animate attributeName="opacity" values="0.3;0.1;0.3" dur="2s" repeatCount="indefinite"/>
-                                            </circle>
-                                            <!-- White background circle -->
-                                            <circle cx="12" cy="12" r="8" fill="#ffffff" stroke="#3b82f6" stroke-width="2"/>
-                                            <!-- Inner blue dot -->
-                                            <circle cx="12" cy="12" r="4" fill="#3b82f6"/>
-                                        </svg>
-                                    `),
-                                    scaledSize: new google.maps.Size(24, 24),
-                                    anchor: new google.maps.Point(12, 12)
-                                },
+                                icon: userLocationIcon(),
                                 zIndex: 9999
                             });
                             
-                            // Add info window for user location
                             userLocationMarker.addListener('click', function() {
-                                const userInfoContent = `
-                                    <div class="p-3 text-center">
-                                        <h3 class="font-bold text-gray-900 mb-2">Your Location</h3>
-                                        <p class="text-sm text-gray-600">You are here</p>
-                                    </div>
-                                `;
-                                infoWindow.setContent(userInfoContent);
+                                infoWindow.setContent(userLocationInfoHtml());
                                 infoWindow.open(map, userLocationMarker);
                             });
                             

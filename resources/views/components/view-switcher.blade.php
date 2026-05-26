@@ -1,12 +1,12 @@
 @props(['currentView' => 'cards'])
 
 <div class="flex items-center space-x-2">
-    <span class="text-sm text-gray-500 mr-2">View:</span>
+    <span class="{{ $siteBrand->viewSwitcherLabelClass() }}">View:</span>
     
     <!-- Cards View Button -->
     <button 
         onclick="switchView('cards')"
-        class="p-2 rounded-lg transition-colors {{ $currentView === 'cards' ? 'bg-purple-100 text-purple-700' : 'text-gray-400 hover:text-gray-600 hover:bg-gray-100' }}"
+        class="{{ $currentView === 'cards' ? $siteBrand->viewSwitcherActiveClass() : $siteBrand->viewSwitcherInactiveClass() }}"
         title="Card View"
     >
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -17,7 +17,7 @@
     <!-- Table View Button -->
     <button 
         onclick="switchView('table')"
-        class="p-2 rounded-lg transition-colors {{ $currentView === 'table' ? 'bg-purple-100 text-purple-700' : 'text-gray-400 hover:text-gray-600 hover:bg-gray-100' }}"
+        class="{{ $currentView === 'table' ? $siteBrand->viewSwitcherActiveClass() : $siteBrand->viewSwitcherInactiveClass() }}"
         title="Table View"
     >
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -28,16 +28,12 @@
 
 <script>
 function switchView(view) {
-    // Store view preference in localStorage
     localStorage.setItem('events_view', view);
-    
-    // Reload the page with the new view parameter
     const url = new URL(window.location);
     url.searchParams.set('view', view);
     window.location.href = url.toString();
 }
 
-// Set initial view from localStorage or URL parameter
 document.addEventListener('DOMContentLoaded', function() {
     const urlParams = new URLSearchParams(window.location.search);
     const urlView = urlParams.get('view');
@@ -52,4 +48,3 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 </script>
-

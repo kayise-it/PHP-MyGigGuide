@@ -6,19 +6,13 @@
     'required' => false,
     'multiple' => true,
     'class' => '',
-    'useIds' => true, // If false, uses category slugs as values
+    'useIds' => true,
 ])
 
 @php
-    // Fetch all active categories from the database
     $categories = \App\Models\Category::where('is_active', true)->orderBy('sort_order')->orderBy('name')->get();
-    
-    // Determine if this is a multiple select
     $selectName = $multiple ? $name . '[]' : $name;
-    
-    // Base classes for the select element
-    $baseClasses = 'px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent';
-    $finalClasses = trim($baseClasses . ' ' . $class);
+    $finalClasses = trim($siteBrand->formSelectClass() . ' ' . $class);
 @endphp
 
 <select 
@@ -54,7 +48,3 @@
         </option>
     @endforeach
 </select>
-
-
-
-

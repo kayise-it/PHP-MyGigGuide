@@ -1,7 +1,7 @@
 @props(['venue', 'isOwned' => false])
 
 <a href="{{ route('venues.show', $venue) }}" 
-   class="group relative bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden cursor-pointer transition-all duration-300 transform hover:-translate-y-1 block {{ $isOwned ? 'border-purple-500 ring-2 ring-purple-200 shadow-xl scale-[1.02]' : 'hover:shadow-lg' }}">
+   class="{{ $siteBrand->directoryCardClass() }} {{ $isOwned ? 'border-purple-500 ring-2 ring-purple-500/40 shadow-xl scale-[1.02]' : '' }}">
     <!-- Venue Image Background -->
     <div class="relative h-48 w-full overflow-hidden">
         @if($venue->main_picture)

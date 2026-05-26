@@ -3,14 +3,14 @@
 @section('title', 'Venues - My Gig Guide')
 
 @section('content')
-<div class="min-h-screen bg-gray-50">
+<div class="{{ $siteBrand->pageContentShellClass() }}">
     <!-- Header -->
-    <div class="bg-white border-b border-gray-200">
+    <div class="{{ $siteBrand->listingHeaderBarClass() }}">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
             <div class="flex flex-col md:flex-row md:items-center md:justify-between">
                 <div>
-                    <h1 class="text-3xl font-bold text-gray-900">Venues</h1>
-                    <p class="mt-2 text-gray-600">Discover amazing venues for your next event</p>
+                    <h1 class="{{ $siteBrand->pageTitleClass() }}">Venues</h1>
+                    <p class="{{ $siteBrand->pageSubtitleClass() }}">Discover amazing venues for your next event</p>
                 </div>
                 
                 @auth
@@ -32,30 +32,30 @@
     </div>
 
     <!-- Search and Filters -->
-    <div class="bg-white border-b border-gray-200">
+    <div class="{{ $siteBrand->listingHeaderBarClass() }}">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
             <form method="GET" action="{{ route('venues.index') }}" id="ajax-search-form">
                 <div class="flex flex-wrap gap-4 items-end">
                     <!-- Search Input -->
                     <div class="flex-1 min-w-64">
-                        <label for="search" class="block text-sm font-medium text-gray-700 mb-2">Search Venues</label>
+                        <label for="search" class="{{ $siteBrand->formLabelClass() }}">Search Venues</label>
                         <input
                             type="text"
                             id="search"
                             name="search"
                             value="{{ request('search') }}"
                             placeholder="Search venues..."
-                            class="block w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                            class="{{ $siteBrand->formInputClass() }}"
                         />
                     </div>
                     
                     <!-- Capacity Filter -->
                     <div class="min-w-48">
-                        <label for="capacity_filter" class="block text-sm font-medium text-gray-700 mb-2">Capacity</label>
+                        <label for="capacity_filter" class="{{ $siteBrand->formLabelClass() }}">Capacity</label>
                         <select
                             id="capacity_filter"
                             name="capacity_filter"
-                            class="block w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                            class="{{ $siteBrand->formSelectClass() }}"
                         >
                             <option value="">All Venues</option>
                             <option value="large" {{ request('capacity_filter') == 'large' ? 'selected' : '' }}>Large (500+ capacity)</option>
@@ -66,11 +66,11 @@
                     
                     <!-- Sort Filter -->
                     <div class="min-w-40">
-                        <label for="sort" class="block text-sm font-medium text-gray-700 mb-2">Sort by</label>
+                        <label for="sort" class="{{ $siteBrand->formLabelClass() }}">Sort by</label>
                         <select
                             id="sort"
                             name="sort"
-                            class="block w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                            class="{{ $siteBrand->formSelectClass() }}"
                         >
                             <option value="newest" {{ request('sort') == 'newest' ? 'selected' : '' }}>Newest First</option>
                             <option value="name" {{ request('sort') == 'name' ? 'selected' : '' }}>Name A-Z</option>
@@ -95,7 +95,7 @@
                         <a 
                             href="#" 
                             onclick="event.preventDefault(); if(window.ajaxSearchInstance) { window.ajaxSearchInstance.clearFilters(); } else { window.location.href = '{{ route('venues.index') }}'; }"
-                            class="text-purple-600 hover:text-purple-800 px-4 py-2 flex items-center font-medium transition-colors duration-200"
+                            class="{{ $siteBrand->accentLinkClass() }}"
                         >
                             Clear Filters
                         </a>

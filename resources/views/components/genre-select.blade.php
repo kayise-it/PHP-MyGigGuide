@@ -6,19 +6,13 @@
     'required' => false,
     'multiple' => false,
     'class' => '',
-    'useNames' => false, // If true, uses genre names as values instead of IDs (for backward compatibility)
+    'useNames' => false,
 ])
 
 @php
-    // Fetch all active genres from the database
     $genres = \App\Models\Genre::where('is_active', true)->orderBy('name')->get();
-    
-    // Determine if this is a multiple select
     $selectName = $multiple ? $name . '[]' : $name;
-    
-    // Base classes for the select element
-    $baseClasses = 'px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent';
-    $finalClasses = trim($baseClasses . ' ' . $class);
+    $finalClasses = trim($siteBrand->formSelectClass() . ' ' . $class);
 @endphp
 
 <select 
@@ -52,4 +46,3 @@
         </option>
     @endforeach
 </select>
-

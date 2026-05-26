@@ -3,45 +3,45 @@
 @section('title', 'Artists - My Gig Guide')
 
 @section('content')
+<div class="{{ $siteBrand->pageContentShellClass() }}">
 <div class="max-w-7xl mx-auto px-4 py-10">
-    <h1 class="text-2xl font-semibold mb-6">Artists</h1>
+    <h1 class="{{ $siteBrand->pageTitleClass() }} mb-6">Artists</h1>
 
     <!-- Search and Filter Form -->
-    <form method="GET" action="{{ route('artists.index') }}" id="ajax-search-form" class="mb-8 bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+    <form method="GET" action="{{ route('artists.index') }}" id="ajax-search-form" class="mb-8 {{ $siteBrand->listingCardShellClass() }}">
         <div class="flex flex-wrap gap-4 items-end">
             <!-- Search Input -->
             <div class="flex-1 min-w-64">
-                <label for="search" class="block text-sm font-medium text-gray-700 mb-2">Search Artists</label>
+                <label for="search" class="{{ $siteBrand->formLabelClass() }}">Search Artists</label>
                 <input 
                     type="text" 
                     id="search" 
                     name="search" 
                     value="{{ request('search') }}"
                     placeholder="Search by name..." 
-                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    class="{{ $siteBrand->formInputClass() }}"
                 >
             </div>
 
             <!-- Genre Filter -->
             <div class="min-w-48">
-                <label for="genre" class="block text-sm font-medium text-gray-700 mb-2">Genre</label>
+                <label for="genre" class="{{ $siteBrand->formLabelClass() }}">Genre</label>
                 <x-genre-select 
                     id="genre" 
                     name="genre" 
                     :value="request('genre')" 
                     placeholder="All Genres"
                     use-names
-                    class="w-full"
                 />
             </div>
 
             <!-- Sort By -->
             <div class="min-w-40">
-                <label for="sort" class="block text-sm font-medium text-gray-700 mb-2">Sort By</label>
+                <label for="sort" class="{{ $siteBrand->formLabelClass() }}">Sort By</label>
                 <select 
                     id="sort" 
                     name="sort" 
-                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    class="{{ $siteBrand->formSelectClass() }}"
                 >
                     <option value="name" {{ request('sort', 'name') == 'name' ? 'selected' : '' }}>Name A-Z</option>
                     <option value="newest" {{ request('sort') == 'newest' ? 'selected' : '' }}>Newest First</option>
@@ -66,7 +66,7 @@
                 <a 
                     href="#" 
                     onclick="event.preventDefault(); if(window.ajaxSearchInstance) { window.ajaxSearchInstance.clearFilters(); } else { window.location.href = '{{ route('artists.index') }}'; }"
-                    class="text-purple-600 hover:text-purple-800 px-4 py-2 flex items-center font-medium transition-colors duration-200"
+                    class="{{ $siteBrand->accentLinkClass() }}"
                 >
                     Clear Filters
                 </a>
@@ -78,6 +78,7 @@
     <div id="ajax-results">
         @include('artists._results', ['artists' => $artists])
     </div>
+</div>
 </div>
 
 @push('scripts')
