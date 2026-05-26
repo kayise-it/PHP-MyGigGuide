@@ -4,7 +4,7 @@
 @section('description', 'View ' . $organiser->organisation_name . ' profile and upcoming events.')
 
 @section('content')
-<div class="min-h-screen bg-gradient-to-br from-purple-50 via-white to-blue-50">
+<div class="{{ $siteBrand->pageContentShellClass() }} min-h-screen">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <!-- Organiser Profile -->
         <div class="bg-white rounded-2xl shadow-sm border border-purple-100 p-8 mb-8">

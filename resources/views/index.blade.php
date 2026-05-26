@@ -4,7 +4,7 @@
 @section('description', 'Discover amazing events happening around you.')
 
 @section('content')
-<div class="min-h-screen bg-gradient-to-br from-purple-50 via-white to-blue-50">
+<div class="{{ $siteBrand->pageContentShellClass() }} min-h-screen">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div class="mb-8">
             <div class="flex items-center justify-between">

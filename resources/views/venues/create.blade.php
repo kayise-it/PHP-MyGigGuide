@@ -9,7 +9,7 @@
         z-index: 10000 !important;
     }
 </style>
-<div class="min-h-screen bg-gradient-to-br from-purple-50 via-white to-blue-50 py-8">
+<div class="{{ $siteBrand->pageContentShellClass() }} min-h-screen py-8">
     <div class="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="bg-white rounded-2xl shadow-sm border border-purple-100 p-8">
             <div class="mb-8">

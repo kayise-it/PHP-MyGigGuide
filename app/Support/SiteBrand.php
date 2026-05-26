@@ -586,6 +586,72 @@ final class SiteBrand
         return $this->isRogues ? '#38bdf8' : '#818cf8';
     }
 
+    public function authPageClass(): string
+    {
+        return $this->pageContentShellClass().' flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8';
+    }
+
+    public function authCardClass(): string
+    {
+        return $this->detailPanelClass('p-8').' rounded-2xl';
+    }
+
+    public function authHeaderIconWrapClass(): string
+    {
+        return $this->isRogues
+            ? 'bg-gradient-to-r from-sky-500 to-cyan-500 p-3 rounded-xl shadow-sm'
+            : 'bg-gradient-to-r from-indigo-600 to-violet-600 p-3 rounded-xl shadow-sm';
+    }
+
+    public function authInputClass(): string
+    {
+        return $this->isRogues
+            ? 'block w-full pl-10 pr-3 py-3 bg-slate-950 border border-slate-600 rounded-xl text-slate-100 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-sky-400 focus:border-transparent'
+            : 'block w-full pl-10 pr-3 py-3 bg-black border border-white/15 rounded-xl text-slate-100 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent';
+    }
+
+    public function authSelectClass(): string
+    {
+        return $this->authInputClass();
+    }
+
+    public function authIconClass(): string
+    {
+        return $this->isRogues ? 'h-5 w-5 text-sky-400' : 'h-5 w-5 text-indigo-400';
+    }
+
+    public function authSecondaryButtonClass(): string
+    {
+        return $this->isRogues
+            ? 'w-full flex items-center justify-center gap-3 py-3 px-4 border border-slate-600 rounded-xl shadow-sm text-sm font-medium text-slate-200 bg-slate-800 hover:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-sky-400 transition-all duration-300'
+            : 'w-full flex items-center justify-center gap-3 py-3 px-4 border border-white/15 rounded-xl shadow-sm text-sm font-medium text-slate-200 bg-black hover:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all duration-300';
+    }
+
+    public function authDividerLineClass(): string
+    {
+        return $this->isRogues ? 'border-slate-700' : 'border-white/10';
+    }
+
+    public function authDividerLabelClass(): string
+    {
+        return $this->isRogues
+            ? 'px-2 bg-slate-900 text-slate-400'
+            : 'px-2 bg-[#12121A] text-slate-400';
+    }
+
+    public function authCheckboxClass(): string
+    {
+        return $this->isRogues
+            ? 'h-4 w-4 text-sky-400 focus:ring-sky-400 border-slate-600 rounded bg-slate-950'
+            : 'h-4 w-4 text-indigo-500 focus:ring-indigo-500 border-white/20 rounded bg-black';
+    }
+
+    /** Authenticated user dashboard / profile outer wrapper. */
+    public function dashboardShellClass(): string
+    {
+        return $this->pageContentShellClass().' dashboard-shell min-h-screen';
+    }
+
     public function footerBrandTitle(): string
     {
         return $this->isRogues ? $this->name : 'My Gig Guide';

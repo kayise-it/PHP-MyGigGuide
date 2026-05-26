@@ -19,32 +19,32 @@
     @stack('head')
     <!-- Minimal fallback styles in case Vite assets are not built -->
     <style>
-        .btn{display:inline-flex;align-items:center;gap:.5rem;padding:.5rem .9rem;border-radius:.5rem;border:1px solid #e5e7eb;background:#f9fafb;color:#111827;font-weight:500}
-        .btn:hover{background:#f3f4f6}
-        .btn-primary{background:#7c3aed;color:#fff;border-color:#7c3aed}
-        .btn-primary:hover{background:#6d28d9;border-color:#6d28d9}
-        .btn-secondary{background:#e5e7eb;color:#111827;border-color:#e5e7eb}
-        .btn-secondary:hover{background:#d1d5db;border-color:#d1d5db}
+        .btn{display:inline-flex;align-items:center;gap:.5rem;padding:.5rem .9rem;border-radius:.5rem;border:1px solid rgba(255,255,255,.12);background:#1e293b;color:#e2e8f0;font-weight:500}
+        .btn:hover{background:#334155}
+        .btn-primary{background:#6366f1;color:#fff;border-color:#6366f1}
+        .btn-primary:hover{background:#4f46e5;border-color:#4f46e5}
+        .btn-secondary{background:#1e293b;color:#e2e8f0;border-color:rgba(255,255,255,.12)}
+        .btn-secondary:hover{background:#334155;border-color:rgba(255,255,255,.18)}
         .btn-danger{background:#dc2626;color:#fff;border-color:#dc2626}
         .btn-danger:hover{background:#b91c1c;border-color:#b91c1c}
         .btn-sm{padding:.25rem .6rem;font-size:.875rem}
-        .input{width:100%;padding:.5rem .75rem;border:1px solid #e5e7eb;border-radius:.5rem}
+        .input{width:100%;padding:.5rem .75rem;border:1px solid rgba(255,255,255,.15);border-radius:.5rem;background:#0a0a10;color:#e2e8f0}
         .alert{padding:.5rem .75rem;border-radius:.5rem}
-        .alert-success{background:#ecfdf5;border:1px solid #a7f3d0;color:#065f46}
-        .alert-danger{background:#fef2f2;border:1px solid #fecaca;color:#991b1b}
-        .nav-item{display:flex;align-items:center;gap:.6rem;padding:.6rem .75rem;border-radius:.5rem;color:#374151}
-        .nav-item:hover{background:#f3f4f6;color:#111827}
-        .nav-item-active{background:#ede9fe;color:#5b21b6}
+        .alert-success{background:rgba(34,197,94,.12);border:1px solid rgba(34,197,94,.35);color:#86efac}
+        .alert-danger{background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.35);color:#fca5a5}
+        .nav-item{display:flex;align-items:center;gap:.6rem;padding:.6rem .75rem;border-radius:.5rem;color:#cbd5e1}
+        .nav-item:hover{background:rgba(99,102,241,.1);color:#a5b4fc}
+        .nav-item-active{background:rgba(99,102,241,.15);color:#a5b4fc}
         table{width:100%;border-collapse:separate;border-spacing:0}
-        thead th{font-size:.875rem;color:#6b7280;border-bottom:1px solid #e5e7eb}
-        tbody td{font-size:.9375rem;color:#111827}
-        tr.border-t td{border-top:1px solid #e5e7eb}
+        thead th{font-size:.875rem;color:#94a3b8;border-bottom:1px solid rgba(255,255,255,.1)}
+        tbody td{font-size:.9375rem;color:#e2e8f0}
+        tr.border-t td{border-top:1px solid rgba(255,255,255,.1)}
     </style>
 </head>
-<body class="font-sans antialiased bg-gray-50">
+<body class="font-sans antialiased admin-shell brand-mygigguide bg-[#0a0a10] text-slate-100">
     <div id="app" x-data="{ sidebarOpen: false }">
         <!-- Sidebar -->
-        <div class="fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-lg transform transition-transform duration-300 ease-in-out lg:translate-x-0" 
+        <div class="fixed inset-y-0 left-0 z-50 w-64 bg-[#12121A] border-r border-white/10 shadow-lg transform transition-transform duration-300 ease-in-out lg:translate-x-0" 
              :class="{ '-translate-x-full': !sidebarOpen, 'translate-x-0': sidebarOpen }">
             <!-- Logo -->
             <div class="flex items-center justify-center h-16 px-4 bg-gradient-to-r from-purple-600 to-blue-600">
@@ -184,7 +184,7 @@
                     </a>
 
                     <!-- Divider -->
-                    <div class="border-t border-gray-200 my-4"></div>
+                    <div class="border-t border-white/10 my-4"></div>
 
                     <!-- Settings -->
                     <a href="{{ route('admin.settings.index') }}" 
@@ -226,10 +226,10 @@
         <!-- Main Content -->
         <div class="lg:pl-64">
             <!-- Top Bar -->
-            <div class="sticky top-0 z-40 bg-white shadow-sm border-b border-gray-200">
+            <div class="sticky top-0 z-40 bg-[#12121A]/95 backdrop-blur shadow-sm border-b border-white/10">
                 <div class="flex items-center justify-between h-16 px-4 sm:px-6 lg:px-8">
                     <!-- Mobile menu button -->
-                    <button @click="sidebarOpen = !sidebarOpen" class="lg:hidden p-2 rounded-md text-gray-600 hover:text-gray-900 hover:bg-gray-100">
+                    <button @click="sidebarOpen = !sidebarOpen" class="lg:hidden p-2 rounded-md text-slate-400 hover:text-white hover:bg-white/5">
                         <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
                         </svg>
@@ -237,13 +237,13 @@
 
                     <!-- Page Title -->
                     <div class="flex-1">
-                        <h1 class="text-xl font-semibold text-gray-900">@yield('page-title', 'Dashboard')</h1>
+                        <h1 class="text-xl font-semibold text-white">@yield('page-title', 'Dashboard')</h1>
                     </div>
 
                     <!-- User Menu -->
                     <div class="flex items-center space-x-4">
                         <div class="relative" x-data="{ open: false }" @click.outside="open = false">
-                            <button @click="open = !open" class="flex items-center space-x-3 text-gray-700 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 rounded-lg px-3 py-2 transition-colors duration-200">
+                            <button @click="open = !open" class="flex items-center space-x-3 text-slate-300 hover:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-[#12121A] rounded-lg px-3 py-2 transition-colors duration-200">
                                 <div class="h-8 w-8 rounded-full bg-gradient-to-r from-purple-500 to-blue-500 flex items-center justify-center shadow-sm">
                                     <span class="text-white text-sm font-semibold">{{ substr(auth()->user()->name, 0, 1) }}</span>
                                 </div>
@@ -260,17 +260,17 @@
                                  x-transition:leave="transition ease-in duration-75"
                                  x-transition:leave-start="transform opacity-100 scale-100"
                                  x-transition:leave-end="transform opacity-0 scale-95"
-                                 class="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-xl py-2 z-50 border border-gray-200">
+                                 class="absolute right-0 mt-2 w-56 bg-[#12121A] rounded-lg shadow-xl py-2 z-50 border border-white/10">
                                 <a href="{{ route('home') }}" class="dropdown-item">
                                     <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
                                     </svg>
                                     View Site
                                 </a>
-                                <div class="border-t border-gray-100 my-1"></div>
+                                <div class="border-t border-white/10 my-1"></div>
                                 <form method="POST" action="{{ route('admin.logout') }}" class="block">
                                     @csrf
-                                    <button type="submit" class="dropdown-item w-full text-left text-red-600 hover:text-red-700 hover:bg-red-50">
+                                    <button type="submit" class="dropdown-item w-full text-left text-red-400 hover:text-red-300 hover:bg-red-500/10">
                                         <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
                                         </svg>
@@ -339,10 +339,10 @@
              style="backdrop-filter: blur(8px);"></div>
         <div id="admin-modal"
              class="fixed inset-0 z-50 flex items-center justify-center p-4 hidden">
-            <div class="bg-white rounded-2xl shadow-xl max-w-4xl w-full relative overflow-hidden">
+            <div class="bg-[#12121A] rounded-2xl shadow-xl max-w-4xl w-full relative overflow-hidden border border-white/10">
                 <button type="button"
                         id="admin-modal-close"
-                        class="absolute top-3 right-3 inline-flex items-center justify-center rounded-full p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 focus:outline-none">
+                        class="absolute top-3 right-3 inline-flex items-center justify-center rounded-full p-1.5 text-slate-400 hover:text-white hover:bg-white/5 focus:outline-none">
                     <span class="sr-only">Close</span>
                     <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
@@ -350,7 +350,7 @@
                 </button>
                 <div id="admin-modal-body" class="max-h-[80vh] overflow-y-auto p-6">
                     <!-- Content injected dynamically -->
-                    <div class="flex items-center justify-center py-12 text-gray-400 text-sm">
+                    <div class="flex items-center justify-center py-12 text-slate-400 text-sm">
                         Loading...
                     </div>
                 </div>
@@ -365,7 +365,7 @@
              x-transition:leave="transition-opacity ease-linear duration-300"
              x-transition:leave-start="opacity-100"
              x-transition:leave-end="opacity-0"
-             class="fixed inset-0 z-40 bg-gray-600 bg-opacity-75 lg:hidden"
+             class="fixed inset-0 z-40 bg-black/70 lg:hidden"
              @click="sidebarOpen = false">
         </div>
     </div>

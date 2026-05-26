@@ -201,6 +201,275 @@
   @apply bg-slate-950 text-slate-100;
 }
 
+/* ── Admin panel shell ── */
+.admin-shell {
+  color-scheme: dark;
+}
+
+.admin-shell .nav-item {
+  @apply text-slate-300 hover:text-indigo-300 hover:bg-indigo-500/10;
+}
+
+.admin-shell .nav-item-active {
+  @apply text-indigo-300 bg-indigo-500/15;
+}
+
+.admin-shell .form-input,
+.admin-shell .input {
+  @apply bg-black border-white/15 text-slate-100 placeholder:text-slate-500 focus:ring-indigo-500;
+}
+
+.admin-shell .form-label {
+  @apply text-slate-300;
+}
+
+.admin-shell .btn-secondary {
+  @apply bg-slate-800 text-slate-100 border border-white/10 hover:bg-slate-700 focus:ring-indigo-500;
+}
+
+.admin-shell .dropdown-item {
+  @apply text-slate-200 hover:bg-indigo-500/10 hover:text-white;
+}
+
+.admin-shell select,
+.admin-shell select option,
+.admin-shell textarea {
+  @apply bg-black text-slate-100 border-white/15;
+}
+
+/* ── Legacy light Tailwind utilities → dark (dashboard, profile, forms, admin) ── */
+.brand-mygigguide .text-gray-900,
+.brand-rogues .text-gray-900,
+.admin-shell .text-gray-900 {
+  color: #f8fafc !important;
+}
+
+.brand-mygigguide .text-gray-800,
+.brand-rogues .text-gray-800,
+.admin-shell .text-gray-800 {
+  color: #f1f5f9 !important;
+}
+
+.brand-mygigguide .text-gray-700,
+.brand-rogues .text-gray-700,
+.admin-shell .text-gray-700 {
+  color: #cbd5e1 !important;
+}
+
+.brand-mygigguide .text-gray-600,
+.brand-rogues .text-gray-600,
+.admin-shell .text-gray-600 {
+  color: #94a3b8 !important;
+}
+
+.brand-mygigguide .text-gray-500,
+.brand-rogues .text-gray-500,
+.admin-shell .text-gray-500 {
+  color: #64748b !important;
+}
+
+.brand-mygigguide .text-gray-400,
+.brand-rogues .text-gray-400,
+.admin-shell .text-gray-400 {
+  color: #475569 !important;
+}
+
+.brand-mygigguide .bg-white,
+.brand-rogues .bg-white,
+.admin-shell .bg-white {
+  background-color: #12121A !important;
+}
+
+.brand-rogues .bg-white {
+  background-color: #0f172a !important;
+}
+
+.brand-mygigguide .bg-gray-50,
+.brand-rogues .bg-gray-50,
+.admin-shell .bg-gray-50 {
+  background-color: #0a0a10 !important;
+}
+
+.brand-mygigguide .bg-gray-100,
+.brand-rogues .bg-gray-100,
+.admin-shell .bg-gray-100 {
+  background-color: #1e293b !important;
+}
+
+.brand-mygigguide .border-gray-100,
+.brand-rogues .border-gray-100,
+.admin-shell .border-gray-100,
+.brand-mygigguide .border-gray-200,
+.brand-rogues .border-gray-200,
+.admin-shell .border-gray-200,
+.brand-mygigguide .border-purple-100,
+.brand-rogues .border-purple-100,
+.admin-shell .border-purple-100,
+.brand-mygigguide .border-purple-200,
+.brand-rogues .border-purple-200,
+.admin-shell .border-purple-200 {
+  border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+.brand-rogues .border-gray-200,
+.brand-rogues .border-purple-100,
+.brand-rogues .border-purple-200 {
+  border-color: rgba(148, 163, 184, 0.25) !important;
+}
+
+.brand-mygigguide .divide-gray-100 > :not([hidden]) ~ :not([hidden]),
+.brand-rogues .divide-gray-100 > :not([hidden]) ~ :not([hidden]),
+.admin-shell .divide-gray-100 > :not([hidden]) ~ :not([hidden]),
+.brand-mygigguide .divide-gray-200 > :not([hidden]) ~ :not([hidden]),
+.brand-rogues .divide-gray-200 > :not([hidden]) ~ :not([hidden]),
+.admin-shell .divide-gray-200 > :not([hidden]) ~ :not([hidden]) {
+  border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+.brand-mygigguide .hover\:bg-gray-50:hover,
+.brand-rogues .hover\:bg-gray-50:hover,
+.admin-shell .hover\:bg-gray-50:hover,
+.brand-mygigguide .hover\:bg-gray-100:hover,
+.brand-rogues .hover\:bg-gray-100:hover,
+.admin-shell .hover\:bg-gray-100:hover {
+  background-color: rgba(255, 255, 255, 0.05) !important;
+}
+
+.brand-mygigguide .from-purple-50,
+.admin-shell .from-purple-50 {
+  --tw-gradient-from: #0a0a10 !important;
+  --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to) !important;
+}
+
+.brand-rogues .from-purple-50 {
+  --tw-gradient-from: #020617 !important;
+  --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to) !important;
+}
+
+.brand-mygigguide .via-white,
+.admin-shell .via-white {
+  --tw-gradient-via: #12121A !important;
+  --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-via), var(--tw-gradient-to) !important;
+}
+
+.brand-rogues .via-white {
+  --tw-gradient-via: #0f172a !important;
+  --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-via), var(--tw-gradient-to) !important;
+}
+
+.brand-mygigguide .to-blue-50,
+.admin-shell .to-blue-50 {
+  --tw-gradient-to: #0a0a10 !important;
+}
+
+.brand-rogues .to-blue-50 {
+  --tw-gradient-to: #020617 !important;
+}
+
+.brand-mygigguide .bg-purple-50,
+.admin-shell .bg-purple-50 {
+  background-color: rgba(99, 102, 241, 0.12) !important;
+}
+
+.brand-rogues .bg-purple-50 {
+  background-color: rgba(56, 189, 248, 0.12) !important;
+}
+
+.brand-mygigguide .bg-purple-100,
+.admin-shell .bg-purple-100 {
+  background-color: rgba(99, 102, 241, 0.18) !important;
+}
+
+.brand-mygigguide .bg-blue-100,
+.admin-shell .bg-blue-100 {
+  background-color: rgba(59, 130, 246, 0.18) !important;
+}
+
+.brand-mygigguide .bg-green-50,
+.admin-shell .bg-green-50 {
+  background-color: rgba(34, 197, 94, 0.12) !important;
+}
+
+.brand-mygigguide .bg-green-100,
+.admin-shell .bg-green-100 {
+  background-color: rgba(34, 197, 94, 0.18) !important;
+}
+
+.brand-mygigguide .bg-red-50,
+.admin-shell .bg-red-50 {
+  background-color: rgba(239, 68, 68, 0.12) !important;
+}
+
+.brand-mygigguide .bg-red-100,
+.admin-shell .bg-red-100 {
+  background-color: rgba(239, 68, 68, 0.18) !important;
+}
+
+.brand-mygigguide .bg-amber-100,
+.admin-shell .bg-amber-100 {
+  background-color: rgba(245, 158, 11, 0.18) !important;
+}
+
+.brand-mygigguide .bg-yellow-50,
+.admin-shell .bg-yellow-50 {
+  background-color: rgba(234, 179, 8, 0.12) !important;
+}
+
+.brand-mygigguide .text-purple-800,
+.admin-shell .text-purple-800 {
+  color: #c4b5fd !important;
+}
+
+.brand-mygigguide .text-purple-700,
+.admin-shell .text-purple-700 {
+  color: #a78bfa !important;
+}
+
+.brand-mygigguide .text-green-800,
+.admin-shell .text-green-800 {
+  color: #86efac !important;
+}
+
+.brand-mygigguide .text-red-800,
+.admin-shell .text-red-800 {
+  color: #fca5a5 !important;
+}
+
+.brand-mygigguide .text-amber-800,
+.admin-shell .text-amber-800 {
+  color: #fcd34d !important;
+}
+
+.brand-mygigguide .border-green-200,
+.admin-shell .border-green-200 {
+  border-color: rgba(34, 197, 94, 0.35) !important;
+}
+
+.brand-mygigguide .border-red-200,
+.admin-shell .border-red-200 {
+  border-color: rgba(239, 68, 68, 0.35) !important;
+}
+
+.brand-mygigguide .hover\:text-purple-600:hover,
+.admin-shell .hover\:text-purple-600:hover {
+  color: #a78bfa !important;
+}
+
+.brand-mygigguide .hover\:bg-purple-50:hover,
+.admin-shell .hover\:bg-purple-50:hover {
+  background-color: rgba(99, 102, 241, 0.12) !important;
+}
+
+.brand-mygigguide .hover\:text-red-700:hover,
+.admin-shell .hover\:text-red-700:hover {
+  color: #fca5a5 !important;
+}
+
+.brand-mygigguide .hover\:bg-red-50:hover,
+.admin-shell .hover\:bg-red-50:hover {
+  background-color: rgba(239, 68, 68, 0.12) !important;
+}
+
 /* Google Maps popup chrome on dark public pages */
 .brand-mygigguide .gm-style .gm-style-iw-c,
 .brand-rogues .gm-style .gm-style-iw-c {
