@@ -56,7 +56,7 @@
                 <ul class="space-y-2">
                     <li><a href="{{ route('about') }}" class="text-gray-400 hover:text-white transition-colors duration-200">Help Center</a></li>
                     <li><a href="{{ route('contact.index') }}" class="text-gray-400 hover:text-white transition-colors duration-200">Contact Us</a></li>
-                    <li><a href="{{ route('popia') }}" class="text-gray-400 hover:text-white transition-colors duration-200">POPIA Policy</a></li>
+                    <li><a href="{{ route('popia') }}" class="text-gray-400 hover:text-white transition-colors duration-200">Privacy Policy (POPIA)</a></li>
                     <li><a href="{{ route('terms') }}" class="text-gray-400 hover:text-white transition-colors duration-200">Terms of Service</a></li>
                 </ul>
             </div>

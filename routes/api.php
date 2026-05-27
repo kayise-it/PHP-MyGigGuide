@@ -24,7 +24,7 @@ Route::prefix('v1')->group(function () {
     Route::get('categories', [CategoryController::class, 'index']);
 
     Route::get('events', [EventController::class, 'index']);
-    Route::get('events/{event}', [EventController::class, 'show']);
+    Route::get('events/{event}', [EventController::class, 'show'])->whereNumber('event');
 
     Route::get('venues', [VenueController::class, 'index']);
     Route::get('venues/{venue}', [VenueController::class, 'show']);
@@ -54,14 +54,23 @@ Route::prefix('v1')->group(function () {
         Route::delete('me/favorites/{type}/{id}', [MeController::class, 'removeFavorite'])
             ->whereNumber('id');
 
+        Route::post('events/parse-poster', [EventController::class, 'parsePoster'])
+            ->middleware('api.permission:create-events');
+
         Route::post('events', [EventController::class, 'store'])
             ->middleware('api.permission:create-events');
 
         Route::post('events/{event}', [EventController::class, 'update'])
-            ->middleware('api.permission:create-events');
+            ->middleware('api.permission:create-events')
+            ->whereNumber('event');
 
         Route::match(['put', 'patch'], 'events/{event}', [EventController::class, 'update'])
-            ->middleware('api.permission:create-events');
+            ->middleware('api.permission:create-events')
+            ->whereNumber('event');
+
+        Route::delete('events/{event}', [EventController::class, 'destroy'])
+            ->middleware('api.permission:delete-events')
+            ->whereNumber('event');
 
         Route::post('artists', [ArtistController::class, 'store'])
             ->middleware('api.permission:create-events');

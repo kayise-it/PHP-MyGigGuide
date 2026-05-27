@@ -37,8 +37,10 @@ All endpoints return **JSON**. No authentication required for these read-only ro
 | GET | `/api/v1/me/favorites` | Current user favorites (events, venues, artists, organisers). Events/venues/artists rows include optional **`image_url`** (poster / main picture / profile photo). |
 | POST | `/api/v1/me/favorites/{type}/{id}` | Add favorite (`type`: events\|venues\|artists\|organisers) |
 | DELETE | `/api/v1/me/favorites/{type}/{id}` | Remove favorite |
+| POST | `/api/v1/events/parse-poster` | **Read poster** — Groq vision via internal bridge (see below) |
 | POST | `/api/v1/events` | **Create event** (requires `create-events` permission; see below) |
 | PUT/PATCH | `/api/v1/events/{id}` | **Update own event** (same permission + ownership; see below) |
+| DELETE | `/api/v1/events/{id}` | **Delete own event** (requires `delete-events` + ownership; see below) |
 | POST | `/api/v1/artists` | **Quick-create artist** (same auth; for add-event crowd-source) |
 | POST | `/api/v1/venues` | **Quick-create venue** (same auth; for add-event crowd-source) |
 | POST | `/api/v1/ratings` | **Submit or update rating** (requires `rate-content`; 1–5 stars + optional review) |
@@ -105,6 +107,50 @@ Artist / venue **`show`** also include ownership fields when a bearer token is s
 
 **Errors:** `401` unauthenticated · `403` missing permission or unverified account at login · `422` validation (e.g. missing `venue_id`)
 
+### Parse poster (`POST /api/v1/events/parse-poster`)
+
+**Auth:** same as create event (`Authorization: Bearer {access_token}`).
+
+**Permission:** `create-events`.
+
+**Body:** `multipart/form-data`
+
+| Field | Type | Notes |
+|-------|------|--------|
+| `file` | file | Poster image (jpeg/png/webp/gif, max 8MB) |
+| `hint` | string | Optional — extra text to help the vision model (e.g. typed description) |
+
+Laravel forwards the upload to **miggs-bridge** on the VPS (`MIGGS_BRIDGE_URL`, default `http://127.0.0.1:8787`). The Groq API key stays on the bridge; the app never calls Groq directly.
+
+**Success:** `200 OK` — bridge JSON, e.g.:
+
+```json
+{
+  "ok": true,
+  "parsed": {
+    "name": "Friday Jazz Night",
+    "artist": "Jazz Trio",
+    "venue": "The Bassline",
+    "date": "2026-06-01",
+    "time": "20:00",
+    "price": "0",
+    "description": "",
+    "categories": ["live-music"]
+  }
+}
+```
+
+**Failure:** `"ok": false` with `"error"` and optional `"poster_hint"` (same shape as the bridge).
+
+**Errors:** `401` · `403` · `422` (missing/invalid file) · `502` (bridge error) · `503` (bridge not configured in Laravel `.env`)
+
+**Server `.env` (VPS):**
+
+```env
+MIGGS_BRIDGE_URL=http://127.0.0.1:8787
+MIGGS_BRIDGE_POSTER_SECRET=same-as-APP_POSTER_SECRET-on-bridge
+```
+
 ### Update event (`PUT` / `PATCH /api/v1/events/{id}`)
 
 **Auth:** same as create (`Authorization: Bearer {access_token}`).
@@ -120,6 +166,20 @@ Artist / venue **`show`** also include ownership fields when a bearer token is s
 **`GET /api/v1/events/{id}`** includes **`user_can_edit`** (bool) when a bearer token is sent — `true` when the authenticated user owns the listing.
 
 **Errors:** `401` · `403` (not owner or missing permission) · `422` validation
+
+### Delete event (`DELETE /api/v1/events/{id}`)
+
+**Auth:** `Authorization: Bearer {access_token}`.
+
+**Permission:** `delete-events` (member roles including plain `user`).
+
+**Ownership:** only the user who posted the event (or admin/superuser) may delete. Others receive **`403`**.
+
+**Success:** `200 OK` — `{ "message": "Event deleted successfully." }`
+
+**App / web:** show delete when **`user_can_edit`** is true (same ownership rule).
+
+**Errors:** `401` · `403` (not owner or missing permission)
 
 ### Firebase ↔ website account linking
 

@@ -50,6 +50,7 @@ Route::get('/test-auth', function () {
 Route::view('/about', 'about')->name('about');
 
 // Legal pages
+Route::redirect('/privacy', '/popia', 301);
 Route::view('/popia', 'popia')->name('popia');
 Route::view('/terms', 'terms')->name('terms');
 

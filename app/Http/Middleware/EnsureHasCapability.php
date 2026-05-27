@@ -10,6 +10,8 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Route;
 use App\Models\Venue;
+use App\Models\Event;
+use App\Services\EventCreationService;
 
 class EnsureHasCapability
 {
@@ -72,6 +74,16 @@ class EnsureHasCapability
                         // ignore
                     }
                 }
+            }
+        }
+
+        // Event routes: poster owns the listing — allow edit/delete without a Laratrust row on legacy installs.
+        if ($routeName && str_starts_with($routeName, 'events.')
+            && in_array($routeName, ['events.edit', 'events.update', 'events.destroy'], true)) {
+            $eventParam = $request->route('event');
+            if ($eventParam instanceof Event
+                && app(EventCreationService::class)->userOwnsEvent($user, $eventParam)) {
+                return $next($request);
             }
         }
 

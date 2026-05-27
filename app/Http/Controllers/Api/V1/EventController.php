@@ -7,6 +7,7 @@ use App\Http\Resources\Api\V1\EventResource;
 use App\Models\Category;
 use App\Models\Event;
 use App\Services\EventCreationService;
+use App\Services\MiggsBridgePosterService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
@@ -109,6 +110,42 @@ class EventController extends Controller
     }
 
     /**
+     * Parse a poster image via internal miggs-bridge (Groq vision). Mobile app only.
+     */
+    public function parsePoster(Request $request, MiggsBridgePosterService $bridge): JsonResponse
+    {
+        if (! $bridge->isConfigured()) {
+            return response()->json([
+                'message' => 'Poster reading is not configured on the server.',
+            ], 503);
+        }
+
+        $request->validate([
+            'file' => [
+                'required',
+                'file',
+                'mimes:jpeg,jpg,png,webp,gif',
+                'max:'.(int) config('miggs_bridge.max_poster_kb', 8192),
+            ],
+            'hint' => ['nullable', 'string', 'max:800'],
+        ]);
+
+        try {
+            $result = $bridge->parsePoster(
+                $request->file('file'),
+                (string) ($request->input('hint') ?? ''),
+                $request->user()?->username,
+            );
+        } catch (\RuntimeException $e) {
+            return response()->json([
+                'message' => $e->getMessage(),
+            ], 502);
+        }
+
+        return response()->json($result);
+    }
+
+    /**
      * Create an event (mobile app). Requires Sanctum token + create-events permission.
      * Multipart when uploading poster/gallery; JSON acceptable without files.
      */
@@ -137,5 +174,15 @@ class EventController extends Controller
         return (new EventResource($updated))
             ->additional(['message' => 'Event updated successfully.'])
             ->response();
+    }
+
+    /**
+     * Delete an event the authenticated user posted.
+     */
+    public function destroy(Request $request, Event $event, EventCreationService $eventCreation): JsonResponse
+    {
+        $eventCreation->deleteForUser($request->user(), $event);
+
+        return response()->json(['message' => 'Event deleted successfully.']);
     }
 }

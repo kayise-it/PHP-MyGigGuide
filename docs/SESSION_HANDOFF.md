@@ -1,25 +1,26 @@
 # Session handoff — resume after reboot
 
-**Updated:** 23 May 2026 — dark indigo app theme tested; logo glow; product/identity notes; reboot handoff
+**Updated:** 27 May 2026 — Read image live; privacy policy; poster API via Laravel
 
 Use this with **[personal.md](./personal.md)**, **[UPDATE_LOG.md](./UPDATE_LOG.md)** (progression history), and **[PRODUCT_CONTINUITY.md](./PRODUCT_CONTINUITY.md)**.
 
-**Prior chats:** Cursor transcripts `97b111b1-f74c-4c01-bb2d-ee5dc7798a89` (ratings/sort/dark) + this session (theme polish, identity advice).
+**Prior chats:** Cursor transcripts `97b111b1-f74c-4c01-bb2d-ee5dc7798a89` (ratings/sort/dark/read-image).
 
 ---
 
 ## ▶ After reboot — pick up here
 
-**Milestone (23 May 2026):** **My Gig Guide dark theme** tested OK on phone — indigo accent, black coverflow, flat dark cards, rounded **logo glow** in header. **Rogues** gets same dark-nav + legibility fixes (cyan accent unchanged).
+**Milestone (27 May 2026):** **Read image** on Add event — app → Laravel `POST /api/v1/events/parse-poster` → miggs-bridge (localhost) → Groq. Tested OK on phone. **Rogues** uses same API (`rogues.mygigguide.co.za`). **Privacy policy** updated for Play: [popia](https://www.mygigguide.co.za/popia) · [/privacy](https://www.mygigguide.co.za/privacy) redirects.
 
-**Dave said next:** **Identity walkthrough** — new user vs existing Laravel user; artist pages + venue claims (discussion only so far; see § Product — Pages model below).
+**Google Play:** Phase B (signed AAB) done; **Phase C** privacy URL ready — next: store assets + Console upload (`mygigguide_app/docs/GOOGLE_PLAY_RELEASE.md`).
 
-**Still to deploy (when ready):**
+**Still open:**
 
-1. **Browse sort API** — rsync block below (if not already on VPS).
-2. Optional: `./scripts/build_apk.sh mygigguide --label=logo-round` if phone not on latest glow build.
+1. **Fixing mail** — on backlog.
+2. **Deploy** latest Laravel commit (poster API, delete event, privacy) if not rsync’d after git push.
+3. **Flutter app** — no git repo on laptop yet; APK builds from `~/development/mygigguide_app` only.
 
-**No git commits** unless Dave asks.
+**VPS bridge note:** `whatsapp_bridge_server.py` + `wa_command_router.py` updated in Docker for `/app/parse-poster`. Do not copy bridge files one at a time again.
 
 ---
 

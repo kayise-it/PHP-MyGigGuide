@@ -169,11 +169,33 @@ class EventCreationService
 
         $user->loadMissing(['artist', 'organiser']);
 
-        return match ($event->owner_type) {
+        $ownerType = $this->normalizeOwnerType($event->owner_type);
+
+        return match ($ownerType) {
             'user' => (int) $event->owner_id === (int) $user->id,
             'artist' => $user->artist && (int) $event->owner_id === (int) $user->artist->id,
             'organiser' => $user->organiser && (int) $event->owner_id === (int) $user->organiser->id,
             default => false,
+        };
+    }
+
+    /**
+     * Legacy imports used FQCN morph types; normalize to short keys used by create flow.
+     */
+    private function normalizeOwnerType(?string $ownerType): ?string
+    {
+        if ($ownerType === null || $ownerType === '') {
+            return null;
+        }
+
+        return match ($ownerType) {
+            'user', 'artist', 'organiser' => $ownerType,
+            'App\Models\User', \App\Models\User::class => 'user',
+            'App\Models\Artist', \App\Models\Artist::class => 'artist',
+            'App\Models\Organiser', \App\Models\Organiser::class => 'organiser',
+            default => class_basename($ownerType) === 'User' ? 'user'
+                : (class_basename($ownerType) === 'Artist' ? 'artist'
+                : (class_basename($ownerType) === 'Organiser' ? 'organiser' : $ownerType)),
         };
     }
 
@@ -261,6 +283,39 @@ class EventCreationService
         }
 
         return $event->fresh(['venue', 'artists', 'owner', 'categories', 'youtubeVideos']);
+    }
+
+    /**
+     * Delete an event the user owns (web + API). Removes poster/gallery files.
+     */
+    public function deleteForUser(User $user, Event $event): void
+    {
+        if (! $this->userOwnsEvent($user, $event)) {
+            abort(403, 'You can only delete events you posted.');
+        }
+
+        $this->deleteEventFiles($event);
+        $event->youtubeVideos()->delete();
+        $event->delete();
+    }
+
+    private function deleteEventFiles(Event $event): void
+    {
+        if ($event->poster && Storage::disk('public')->exists($event->poster)) {
+            Storage::disk('public')->delete($event->poster);
+        }
+
+        $gallery = is_array($event->gallery)
+            ? $event->gallery
+            : (is_string($event->gallery) ? json_decode($event->gallery, true) : []);
+
+        if (is_array($gallery)) {
+            foreach ($gallery as $image) {
+                if ($image && Storage::disk('public')->exists($image)) {
+                    Storage::disk('public')->delete($image);
+                }
+            }
+        }
     }
 
     public function resolveOwnerType(User $user): string

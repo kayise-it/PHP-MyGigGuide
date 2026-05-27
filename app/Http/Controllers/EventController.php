@@ -135,7 +135,7 @@ class EventController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Request $request, Event $event)
+    public function show(Request $request, Event $event, EventCreationService $eventCreation)
     {
 $event->load(['venue', 'artists', 'owner', 'ratings.user', 'youtubeVideos']);
         
@@ -153,25 +153,37 @@ $event->load(['venue', 'artists', 'owner', 'ratings.user', 'youtubeVideos']);
                 ->header('X-Robots-Tag', 'noindex, nofollow');
         }
 
-        return view('events.show', compact('event'));
+        $canManageEvent = auth()->check()
+            && $eventCreation->userOwnsEvent(auth()->user(), $event);
+
+        return view('events.show', compact('event', 'canManageEvent'));
     }
 
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Event $event)
+    public function edit(Event $event, EventCreationService $eventCreation)
     {
+        if (! auth()->check() || ! $eventCreation->userOwnsEvent(auth()->user(), $event)) {
+            abort(403, 'You can only edit events you posted.');
+        }
+
         $venues = Venue::all();
         $artists = Artist::all();
+        $canManageEvent = true;
 
-        return view('events.edit', compact('event', 'venues', 'artists'));
+        return view('events.edit', compact('event', 'venues', 'artists', 'canManageEvent'));
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Event $event)
+    public function update(Request $request, Event $event, EventCreationService $eventCreation)
     {
+        if (! auth()->check() || ! $eventCreation->userOwnsEvent(auth()->user(), $event)) {
+            abort(403, 'You can only edit events you posted.');
+        }
+
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
@@ -280,9 +292,9 @@ $event->load(['venue', 'artists', 'owner', 'ratings.user', 'youtubeVideos']);
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Event $event)
+    public function destroy(Event $event, EventCreationService $eventCreation)
     {
-        $event->delete();
+        $eventCreation->deleteForUser(auth()->user(), $event);
 
         return redirect()->route('events.index')
             ->with('success', 'Event deleted successfully!');

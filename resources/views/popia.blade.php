@@ -29,7 +29,7 @@
                     </div>
                     <div class="ml-3">
                         <p class="text-sm text-blue-700">
-                            <strong>Last Updated:</strong> {{ date('F d, Y') }} | This policy complies with South Africa's Protection of Personal Information Act (POPIA), 2013.
+                            <strong>Last Updated:</strong> May 27, 2026 | This page is our <strong>Privacy Policy</strong> for the My Gig Guide website and mobile app (including Google Play). It complies with South Africa's Protection of Personal Information Act (POPIA), 2013.
                         </p>
                     </div>
                 </div>
@@ -47,10 +47,10 @@
                 </h2>
                 <div class="prose prose-gray max-w-none">
                     <p class="text-gray-700 leading-relaxed">
-                        My Gig Guide ("we," "our," or "us") is committed to protecting your personal information in accordance with South Africa's Protection of Personal Information Act (POPIA), 2013. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our event discovery platform and related services.
+                        My Gig Guide ("we," "our," or "us") is committed to protecting your personal information in accordance with South Africa's Protection of Personal Information Act (POPIA), 2013. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our website (<a href="{{ route('home') }}" class="text-purple-600 hover:text-purple-800 underline">www.mygigguide.co.za</a>), our mobile apps, and related services.
                     </p>
                     <p class="text-gray-700 leading-relaxed mt-4">
-                        By using our website and services, you consent to the collection and use of your personal information as described in this policy. If you do not agree with our policies and practices, please do not use our services.
+                        By using our website or apps, you consent to the collection and use of your personal information as described in this policy. If you do not agree, please do not use our services.
                     </p>
                 </div>
             </section>
@@ -65,22 +65,38 @@
                     <div>
                         <h3 class="text-lg font-semibold text-gray-900 mb-3">2.1 Personal Information</h3>
                         <ul class="list-disc list-inside space-y-2 text-gray-700">
-                            <li><strong>Account Information:</strong> Name, email address, phone number, profile picture, and date of birth</li>
-                            <li><strong>Event Information:</strong> Event attendance history, preferences, and reviews</li>
-                            <li><strong>Artist/Venue Information:</strong> Business details, contact information, and performance history</li>
-                            <li><strong>Payment Information:</strong> Billing address and payment method details (processed securely through third-party providers)</li>
+                            <li><strong>Account information:</strong> Name, username, email address, and password (stored in hashed form). Phone number or profile picture only if you provide them.</li>
+                            <li><strong>Event and listing information:</strong> Events you post or edit, favourites, ratings and reviews, and related preferences.</li>
+                            <li><strong>Artist / venue / organiser pages:</strong> Business or stage details and claim requests when you manage a page on the platform.</li>
+                            <li><strong>Communications:</strong> Messages you send via our contact form or support channels.</li>
                         </ul>
                     </div>
                     
                     <div>
-                        <h3 class="text-lg font-semibold text-gray-900 mb-3">2.2 Technical Information</h3>
+                        <h3 class="text-lg font-semibold text-gray-900 mb-3">2.2 Website technical information</h3>
                         <ul class="list-disc list-inside space-y-2 text-gray-700">
                             <li>IP address, browser type, device information, and operating system</li>
-                            <li>Website usage data, including pages visited, time spent, and click patterns</li>
-                            <li>Location data (with your permission) for finding nearby events</li>
-                            <li>Cookies and similar tracking technologies</li>
+                            <li>Website usage data, including pages visited and general interaction patterns</li>
+                            <li>Cookies and similar technologies (see section 9)</li>
                         </ul>
                     </div>
+
+                    <div>
+                        <h3 class="text-lg font-semibold text-gray-900 mb-3">2.3 Mobile app information</h3>
+                        <p class="text-gray-700 mb-3">When you use the My Gig Guide or white-label apps (e.g. Rogues on Radio), we may also collect:</p>
+                        <ul class="list-disc list-inside space-y-2 text-gray-700">
+                            <li><strong>Sign-in data:</strong> Your account credentials or secure API token so the app can load your profile, favourites, and events you post.</li>
+                            <li><strong>Location (optional):</strong> If you enable location permission, we use it for features such as “Gigs near me” and map distance. You can deny or revoke this in your device settings.</li>
+                            <li><strong>Photos you choose:</strong> Poster and gallery images when you add an event, stored on our servers and shown on public event listings.</li>
+                            <li><strong>Poster “Read image” (optional):</strong> If you tap Read image, the poster (and any description text you typed) is sent to our servers. We process it with automated tools (including a third-party AI service) to suggest event fields. Do not use this feature on images containing personal data you do not want processed.</li>
+                            <li><strong>Device / app data:</strong> App version, flavour (brand), and standard diagnostic data needed to run the app and API.</li>
+                            <li><strong>Push notifications (when enabled):</strong> Device tokens via Google Firebase Cloud Messaging / related services.</li>
+                        </ul>
+                    </div>
+                    
+                    <div>
+                        <h3 class="text-lg font-semibold text-gray-900 mb-3">2.4 Information we do not require</h3>
+                        <p class="text-gray-700">We do not require date of birth to use the platform. We do not sell tickets or process card payments through the app today; if paid features are added later, this policy will be updated.</p>
                 </div>
             </section>
 
@@ -92,12 +108,12 @@
                 </h2>
                 <div class="space-y-4">
                     <ul class="list-disc list-inside space-y-3 text-gray-700">
-                        <li><strong>Service Provision:</strong> To provide and maintain our event discovery platform, process bookings, and facilitate transactions</li>
-                        <li><strong>Personalization:</strong> To customize content, recommend events, and improve user experience</li>
-                        <li><strong>Communication:</strong> To send event updates, newsletters, and important service notifications</li>
-                        <li><strong>Analytics:</strong> To analyze usage patterns, improve our services, and develop new features</li>
-                        <li><strong>Legal Compliance:</strong> To comply with applicable laws, regulations, and legal processes</li>
-                        <li><strong>Security:</strong> To protect against fraud, abuse, and unauthorized access</li>
+                        <li><strong>Service provision:</strong> To run the event discovery platform, mobile apps, and API (listings, search, maps, favourites, posting gigs)</li>
+                        <li><strong>Personalisation:</strong> To remember preferences (e.g. filters, saved events) and improve your experience</li>
+                        <li><strong>Communication:</strong> To respond to enquiries and send important service notices</li>
+                        <li><strong>Automated poster assistance:</strong> To suggest event fields when you choose Read image in the app</li>
+                        <li><strong>Security and abuse prevention:</strong> To protect accounts and platform integrity</li>
+                        <li><strong>Legal compliance:</strong> To comply with applicable laws and lawful requests</li>
                     </ul>
                 </div>
             </section>
@@ -133,11 +149,11 @@
                         We may share your personal information in the following circumstances:
                     </p>
                     <ul class="list-disc list-inside space-y-3 text-gray-700">
-                        <li><strong>Event Organizers:</strong> When you book events, we share necessary information with organizers</li>
-                        <li><strong>Service Providers:</strong> With trusted third parties who assist in operating our platform (payment processors, analytics providers)</li>
-                        <li><strong>Legal Requirements:</strong> When required by law, court order, or to protect our rights and safety</li>
-                        <li><strong>Business Transfers:</strong> In connection with mergers, acquisitions, or asset sales</li>
-                        <li><strong>Consent:</strong> With your explicit consent for any other purpose</li>
+                        <li><strong>Event organisers and page owners:</strong> When you post or claim listings, relevant details appear on public event, artist, or venue pages</li>
+                        <li><strong>Service providers:</strong> Hosting, email delivery, maps (Google), authentication and push messaging (Google Firebase), and automated poster processing (Groq via our secure server). These providers process data only to perform services for us.</li>
+                        <li><strong>Legal requirements:</strong> When required by law, court order, or to protect rights and safety</li>
+                        <li><strong>Business transfers:</strong> In connection with a merger, acquisition, or asset sale (with notice where required)</li>
+                        <li><strong>With your consent:</strong> For any other purpose you explicitly agree to</li>
                     </ul>
                     <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mt-4">
                         <p class="text-sm text-yellow-800">
@@ -197,7 +213,7 @@
                     </div>
                     <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
                         <p class="text-sm text-blue-800">
-                            <strong>To exercise your rights:</strong> Contact us at <a href="mailto:privacy@mygigguide.co.za" class="text-blue-600 hover:text-blue-800 underline">privacy@mygigguide.co.za</a> or use the contact form below.
+                            <strong>To exercise your rights:</strong> Email <a href="mailto:privacy@mygigguide.co.za" class="text-blue-600 hover:text-blue-800 underline">privacy@mygigguide.co.za</a> or <a href="{{ route('contact') }}" class="text-blue-600 hover:text-blue-800 underline">contact us</a>.
                         </p>
                     </div>
                 </div>
@@ -214,10 +230,10 @@
                         We retain your personal information only for as long as necessary to fulfill the purposes outlined in this policy:
                     </p>
                     <ul class="list-disc list-inside space-y-2 text-gray-700">
-                        <li><strong>Account Information:</strong> Until you delete your account or request deletion</li>
-                        <li><strong>Event Data:</strong> For the duration of the event plus 3 years for analytics and legal compliance</li>
-                        <li><strong>Payment Records:</strong> As required by South African tax and accounting laws (typically 5 years)</li>
-                        <li><strong>Marketing Data:</strong> Until you unsubscribe or object to processing</li>
+                        <li><strong>Account information:</strong> Until you delete your account or request deletion</li>
+                        <li><strong>Event listings and uploads:</strong> While the listing is published and for a reasonable period afterward for backups and legal compliance</li>
+                        <li><strong>Poster processing:</strong> Temporary processing of images for Read image; not kept longer than needed to return suggested fields</li>
+                        <li><strong>Support and contact records:</strong> As long as needed to resolve your enquiry</li>
                     </ul>
                 </div>
             </section>
@@ -284,23 +300,19 @@
                 </h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
-                        <h3 class="text-lg font-semibold text-gray-900 mb-3">Data Protection Officer</h3>
+                        <h3 class="text-lg font-semibold text-gray-900 mb-3">Privacy contact</h3>
                         <div class="space-y-2 text-gray-700">
                             <p><strong>Email:</strong> <a href="mailto:privacy@mygigguide.co.za" class="text-purple-600 hover:text-purple-800">privacy@mygigguide.co.za</a></p>
-                            <p><strong>Phone:</strong> +27 (0) 11 123 4567</p>
-                            <p><strong>Address:</strong><br>
-                            My Gig Guide (Pty) Ltd<br>
-                            Privacy Department<br>
-                            Johannesburg, South Africa
-                            </p>
+                            <p><strong>General support:</strong> <a href="mailto:dave@mygigguide.co.za" class="text-purple-600 hover:text-purple-800">dave@mygigguide.co.za</a></p>
+                            <p><strong>Contact form:</strong> <a href="{{ route('contact') }}" class="text-purple-600 hover:text-purple-800">www.mygigguide.co.za/contact</a></p>
                         </div>
                     </div>
                     <div>
-                        <h3 class="text-lg font-semibold text-gray-900 mb-3">General Inquiries</h3>
+                        <h3 class="text-lg font-semibold text-gray-900 mb-3">Operator</h3>
                         <div class="space-y-2 text-gray-700">
-                            <p><strong>Email:</strong> <a href="mailto:info@mygigguide.co.za" class="text-purple-600 hover:text-purple-800">info@mygigguide.co.za</a></p>
+                            <p>My Gig Guide — operated with Kayise IT</p>
                             <p><strong>Website:</strong> <a href="{{ route('home') }}" class="text-purple-600 hover:text-purple-800">www.mygigguide.co.za</a></p>
-                            <p><strong>Response Time:</strong> We aim to respond to all privacy inquiries within 48 hours.</p>
+                            <p><strong>Response time:</strong> We aim to respond to privacy enquiries within 48 hours.</p>
                         </div>
                     </div>
                 </div>

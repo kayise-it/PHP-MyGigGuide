@@ -33,7 +33,7 @@ class EnsureApiPermission
             return $next($request);
         }
 
-        if (in_array($permission, ['create-events', 'rate-content'], true)
+        if (in_array($permission, ['create-events', 'delete-events', 'rate-content'], true)
             && $user->hasRole(self::MEMBER_ROLES)) {
             return $next($request);
         }

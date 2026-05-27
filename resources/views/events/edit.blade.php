@@ -384,6 +384,19 @@
                 </button>
             </div>
         </form>
+
+        <div class="{{ $siteBrand->detailPanelClass() }} mt-8 border-red-500/30">
+            <h2 class="text-xl font-bold text-red-400 mb-2">Delete event</h2>
+            <p class="text-slate-400 text-sm mb-4">Permanently remove this event and its images. This cannot be undone.</p>
+            <form action="{{ route('events.destroy', $event) }}" method="POST"
+                onsubmit="return confirm('Delete this event permanently? This cannot be undone.');">
+                @csrf
+                @method('DELETE')
+                <button type="submit" class="btn-danger">
+                    Delete event
+                </button>
+            </form>
+        </div>
     </div>
 </div>
 

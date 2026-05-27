@@ -271,11 +271,20 @@
                                 </svg>
                             </button>
                             @auth
-                            @if(auth()->id() == $event->owner_id)
+                            @if($canManageEvent ?? false)
                             <a href="{{ route('events.edit', $event) }}"
                                 class="px-6 py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-lg font-medium transition-all">
                                 Edit Event
                             </a>
+                            <form action="{{ route('events.destroy', $event) }}" method="POST" class="inline"
+                                onsubmit="return confirm('Delete this event permanently? This cannot be undone.');">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit"
+                                    class="px-6 py-3 bg-red-600/90 hover:bg-red-600 text-white rounded-lg font-medium transition-all">
+                                    Delete Event
+                                </button>
+                            </form>
                             @endif
                             @endauth
                         </div>
@@ -290,6 +299,27 @@
         <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
             <!-- Left Column - Main Info -->
             <div class="lg:col-span-2 space-y-6">
+                @auth
+                @if($canManageEvent ?? false)
+                <div class="{{ $siteBrand->detailPanelClass() }} border {{ $siteBrand->isRogues ? 'border-sky-500/30' : 'border-indigo-500/30' }}">
+                    <h2 class="{{ $siteBrand->detailPanelHeadingClass() }}">Manage this event</h2>
+                    <p class="text-slate-400 text-sm mb-4">You posted this listing.</p>
+                    <div class="flex flex-wrap gap-3">
+                        <a href="{{ route('events.edit', $event) }}" class="btn-primary">
+                            Edit event
+                        </a>
+                        <form action="{{ route('events.destroy', $event) }}" method="POST" class="inline"
+                            onsubmit="return confirm('Delete this event permanently? This cannot be undone.');">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" class="btn-danger">
+                                Delete event
+                            </button>
+                        </form>
+                    </div>
+                </div>
+                @endif
+                @endauth
                 <!-- About Section -->
                 <div class="{{ $siteBrand->detailPanelClass() }}">
                     <h2 class="{{ $siteBrand->detailPanelHeadingClass() }}">About This Event</h2>

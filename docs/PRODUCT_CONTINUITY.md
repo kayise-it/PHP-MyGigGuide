@@ -19,7 +19,7 @@ Short-lived **memory for humans and agents**: what exists, how it fits together,
 ### Add event poster (mobile)
 
 - **Choose image** or **Paste image** (clipboard → temp file) on Add event; poster goes up with `POST /api/v1/events` when you post.
-- **Read poster** (miggs-bridge `parse-poster`, needs `BRIDGE_*` at build) is **hidden** — `kShowPosterReader = false` in `add_gig_screen.dart`; bridge is **lower priority** than friend APK testing. Paste **text** not built yet.
+- **Read poster** — **live (May 2026):** app → Laravel `POST /api/v1/events/parse-poster` → internal miggs-bridge → Groq. Config: `MIGGS_BRIDGE_*` in Laravel `.env`. See **API_V1.md**.
 
 **Canonical identity:** Laravel **`users.id`** is SSOT. Web = **session**; mobile = **Sanctum bearer** (not auto SSO to web). App signup → **`user`** immediately; web signup → email verify + **claim match** by email for artist/venue/organiser **Pages**. Posting a gig links to listings; **ownership = claim + verification** (web/admin today). See **SESSION_HANDOFF** § Product — Pages model.
 
