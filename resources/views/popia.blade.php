@@ -213,7 +213,7 @@
                     </div>
                     <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
                         <p class="text-sm text-blue-800">
-                            <strong>To exercise your rights:</strong> Email <a href="mailto:privacy@mygigguide.co.za" class="text-blue-600 hover:text-blue-800 underline">privacy@mygigguide.co.za</a> or <a href="{{ route('contact') }}" class="text-blue-600 hover:text-blue-800 underline">contact us</a>.
+                            <strong>To exercise your rights:</strong> Email <a href="mailto:privacy@mygigguide.co.za" class="text-blue-600 hover:text-blue-800 underline">privacy@mygigguide.co.za</a> or <a href="{{ route('contact.index') }}" class="text-blue-600 hover:text-blue-800 underline">contact us</a>.
                         </p>
                     </div>
                 </div>
@@ -304,7 +304,7 @@
                         <div class="space-y-2 text-gray-700">
                             <p><strong>Email:</strong> <a href="mailto:privacy@mygigguide.co.za" class="text-purple-600 hover:text-purple-800">privacy@mygigguide.co.za</a></p>
                             <p><strong>General support:</strong> <a href="mailto:dave@mygigguide.co.za" class="text-purple-600 hover:text-purple-800">dave@mygigguide.co.za</a></p>
-                            <p><strong>Contact form:</strong> <a href="{{ route('contact') }}" class="text-purple-600 hover:text-purple-800">www.mygigguide.co.za/contact</a></p>
+                            <p><strong>Contact form:</strong> <a href="{{ route('contact.index') }}" class="text-purple-600 hover:text-purple-800">www.mygigguide.co.za/contact</a></p>
                         </div>
                     </div>
                     <div>
