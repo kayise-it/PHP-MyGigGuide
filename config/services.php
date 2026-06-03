@@ -46,8 +46,11 @@ return [
     ],
 
     'firebase' => [
-        /** Web API Key — used to verify mobile Firebase ID tokens (Identity Toolkit). */
+        /** Web API Key — verify ID tokens server-side and initialize Firebase JS on the website. */
         'web_api_key' => env('FIREBASE_WEB_API_KEY'),
+        'project_id' => env('FIREBASE_PROJECT_ID', 'my-gig-guide-43138'),
+        'auth_domain' => env('FIREBASE_AUTH_DOMAIN', 'my-gig-guide-43138.firebaseapp.com'),
+        'web_app_id' => env('FIREBASE_WEB_APP_ID', '1:929498924637:web:8d691f0f25d1cd9f72afb4'),
     ],
 
 ];

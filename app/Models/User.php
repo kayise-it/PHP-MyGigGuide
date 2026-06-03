@@ -31,6 +31,7 @@ class User extends Authenticatable implements LaratrustUser
         'profile_picture',
         'settings',
         'email_verified_at',
+        'last_login_at',
         'is_active',
     ];
 
@@ -53,6 +54,7 @@ class User extends Authenticatable implements LaratrustUser
     {
         return [
             'email_verified_at' => 'datetime',
+            'last_login_at' => 'datetime',
             'password' => 'hashed',
             'settings' => 'array',
             'is_active' => 'boolean',

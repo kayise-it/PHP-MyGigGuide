@@ -4,6 +4,7 @@
 @section('description', 'Sign in with your username to access your My Gig Guide account.')
 
 @section('content')
+@include('components.firebase-web-config')
 <div class="{{ $siteBrand->authPageClass() }}">
     <div class="max-w-md w-full space-y-8">
         <div class="text-center">
@@ -14,11 +15,17 @@
                     </svg>
                 </div>
             </div>
-            <h2 class="{{ $siteBrand->pageTitleClass() }} mb-2">Login with username</h2>
-            <p class="{{ $siteBrand->pageSubtitleClass() }} mb-0">Sign in with your username and password</p>
+            <h2 class="{{ $siteBrand->pageTitleClass() }} mb-2">Sign in</h2>
+            <p class="{{ $siteBrand->pageSubtitleClass() }} mb-0">One account for the app and website — username or Google</p>
         </div>
 
         <div class="{{ $siteBrand->authCardClass() }}">
+            @if(\App\Support\FirebaseWeb::isConfigured())
+            <div class="mb-6">
+                <x-firebase-google-sign-in :continue="request('continue')" />
+            </div>
+            @endif
+
             @if(\App\Models\SiteSetting::isFacebookLoginEnabled())
             <div class="mb-6">
                 <a href="{{ route('facebook.login', request()->has('continue') ? ['continue' => request('continue')] : []) }}"
@@ -29,7 +36,9 @@
                     Continue with Facebook
                 </a>
             </div>
+            @endif
 
+            @if(\App\Support\FirebaseWeb::isConfigured() || \App\Models\SiteSetting::isFacebookLoginEnabled())
             <div class="relative mb-6">
                 <div class="absolute inset-0 flex items-center">
                     <div class="w-full border-t {{ $siteBrand->authDividerLineClass() }}"></div>

@@ -126,6 +126,7 @@ Route::middleware(['auth', 'capability'])->group(function () {
 // Authentication routes
 Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [AuthController::class, 'login']);
+Route::post('/auth/firebase', [AuthController::class, 'firebaseWebLogin'])->name('auth.firebase');
 Route::get('/auth/app-session', [AppWebSessionController::class, 'consume'])
     ->name('auth.app-session');
 

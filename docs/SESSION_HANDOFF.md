@@ -10,17 +10,34 @@ Use this with **[personal.md](./personal.md)**, **[UPDATE_LOG.md](./UPDATE_LOG.m
 
 ## ▶ After reboot — pick up here
 
-**Milestone (27 May 2026):** **Read image** on Add event — app → Laravel `POST /api/v1/events/parse-poster` → miggs-bridge (localhost) → Groq. Tested OK on phone. **Rogues** uses same API (`rogues.mygigguide.co.za`). **Privacy policy** updated for Play: [popia](https://www.mygigguide.co.za/popia) · [/privacy](https://www.mygigguide.co.za/privacy) redirects.
+**Milestone (3 Jun 2026):** **Web Google sign-in** aligned with mobile app — Firebase on `/login` + `/register`, deferred email verify (first session OK, verify before next login), signup always `user` role. **Tested OK** on www + Rogues. Deploy: rsync + `npm run build` + migration `last_login_at` + `FIREBASE_*` in `.env`. Cosmetic auth polish **pinned for later**.
 
-**Google Play:** Phase B (signed AAB) done; **Phase C** privacy URL ready — next: store assets + Console upload (`mygigguide_app/docs/GOOGLE_PLAY_RELEASE.md`).
+**Previous (27 May 2026):** **Read image** on Add event — app → Laravel `POST /api/v1/events/parse-poster` → miggs-bridge → Groq. **Rogues** same API. Privacy policy for Play.
+
+**Google Play:** **Pinned (May 2026)** — personal vs Kee Consulting (D-U-N-S); resume Phase E in `mygigguide_app/docs/GOOGLE_PLAY_RELEASE.md`. **Not blocking app work.**
 
 **Still open:**
 
-1. **Fixing mail** — on backlog.
-2. **Deploy** latest Laravel commit (poster API, delete event, privacy) if not rsync’d after git push.
-3. **Flutter app** — no git repo on laptop yet; APK builds from `~/development/mygigguide_app` only.
+1. ~~**Mail**~~ **Done (May 2026):** RainLoop send; `privacy@` alias OK. **Pinned:** `/admin/mail-accounts` — `docs/MAIL_ADMIN_DB_SETUP.md`.
+2. **Deploy** latest Laravel commit to VPS if not rsync'd after `git push` (auth milestone now on GitHub after this commit).
+3. **Flutter app** — no git repo on laptop yet; APK from `~/development/mygigguide_app`.
+4. **Auth cosmetic polish** — dashboard verify banner, logged-in users redirect off `/login`; optional Rogues-aware SSO URL + `SESSION_DOMAIN=.mygigguide.co.za`.
 
-**VPS bridge note:** `whatsapp_bridge_server.py` + `wa_command_router.py` updated in Docker for `/app/parse-poster`. Do not copy bridge files one at a time again.
+**VPS bridge note:** `whatsapp_bridge_server.py` + `wa_command_router.py` in Docker for `/app/parse-poster`.
+
+---
+
+## ▶ Web Google auth (Jun 2026) — deployed + tested
+
+| Item | Detail |
+|------|--------|
+| **Google on web** | Firebase JS → `POST /auth/firebase` → session cookie (same project as app) |
+| **Signup** | Always `user` role; auto-login; verify email before **next** sign-in |
+| **Rogues** | Same auth pages; hostname branding only |
+| **VPS** | `FIREBASE_WEB_API_KEY` + optional `FIREBASE_*`; Firebase Console authorized domains |
+| **Build** | `npm run build` on VPS (or rsync `public/build` from PC) |
+
+**Deploy (PC → VPS):** see [DEPLOY_VPS.md](./DEPLOY_VPS.md). After rsync: `php artisan migrate --force`, `npm run build`, `php artisan config:clear`.
 
 ---
 

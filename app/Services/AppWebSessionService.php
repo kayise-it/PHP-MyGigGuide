@@ -70,6 +70,12 @@ class AppWebSessionService
         }
 
         if (str_starts_with($redirect, '/') && ! str_starts_with($redirect, '//')) {
+            $path = parse_url($redirect, PHP_URL_PATH) ?? $redirect;
+
+            if ($this->isAuthScreenRedirect($path)) {
+                return $fallback;
+            }
+
             return $redirect;
         }
 
@@ -90,8 +96,22 @@ class AppWebSessionService
 
         $path = $parsed['path'] ?? '/';
         $query = isset($parsed['query']) ? '?'.$parsed['query'] : '';
+        $target = $path.$query;
 
-        return $path.$query;
+        if ($this->isAuthScreenRedirect($path)) {
+            return $fallback;
+        }
+
+        return $target;
+    }
+
+    private function isAuthScreenRedirect(string $path): bool
+    {
+        $path = '/'.ltrim($path, '/');
+
+        return in_array($path, ['/login', '/register', '/forgot-password', '/activation-required'], true)
+            || str_starts_with($path, '/auth/')
+            || str_starts_with($path, '/email/verify');
     }
 
     public function buildLoginUrl(string $plainToken, string $redirect): string

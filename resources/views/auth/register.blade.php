@@ -4,6 +4,7 @@
 @section('description', 'Create your My Gig Guide account to discover amazing events and connect with the music community.')
 
 @section('content')
+@include('components.firebase-web-config')
 <div class="{{ $siteBrand->authPageClass() }}">
     <div class="max-w-md w-full space-y-8">
         <div class="text-center">
@@ -14,14 +15,20 @@
                     </svg>
                 </div>
             </div>
-            <h2 class="{{ $siteBrand->pageTitleClass() }} mb-2">Join {{ $siteBrand->footerBrandTitle() }}</h2>
-            <p class="{{ $siteBrand->pageSubtitleClass() }} mb-0">Create your account to start discovering amazing events</p>
+            <h2 class="{{ $siteBrand->pageTitleClass() }} mb-2">Create your account</h2>
+            <p class="{{ $siteBrand->pageSubtitleClass() }} mb-0">One account for the app and website. Claim artist or venue pages later.</p>
         </div>
 
         <div class="{{ $siteBrand->authCardClass() }}">
+            @if(\App\Support\FirebaseWeb::isConfigured())
+            <div class="mb-6">
+                <x-firebase-google-sign-in :continue="request('continue')" />
+            </div>
+            @endif
+
             @if(\App\Models\SiteSetting::isFacebookLoginEnabled())
             <div class="mb-6">
-                <a href="{{ route('facebook.login', ['role' => request('role')]) }}"
+                <a href="{{ route('facebook.login') }}"
                    class="{{ $siteBrand->authSecondaryButtonClass() }}">
                     <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                         <path fill-rule="evenodd" d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z" clip-rule="evenodd" />
@@ -29,13 +36,15 @@
                     Continue with Facebook
                 </a>
             </div>
+            @endif
 
+            @if(\App\Support\FirebaseWeb::isConfigured() || \App\Models\SiteSetting::isFacebookLoginEnabled())
             <div class="relative mb-6">
                 <div class="absolute inset-0 flex items-center">
                     <div class="w-full border-t {{ $siteBrand->authDividerLineClass() }}"></div>
                 </div>
                 <div class="relative flex justify-center text-sm">
-                    <span class="{{ $siteBrand->authDividerLabelClass() }}">Or continue with email</span>
+                    <span class="{{ $siteBrand->authDividerLabelClass() }}">Or sign up with email</span>
                 </div>
             </div>
             @endif
@@ -110,25 +119,6 @@
                         <input id="password_confirmation" type="password" name="password_confirmation" required autocomplete="new-password"
                             class="{{ $siteBrand->authInputClass() }}" placeholder="Confirm your password" />
                     </div>
-                </div>
-
-                <div>
-                    <label for="role" class="{{ $siteBrand->formLabelClass() }}">Account Type</label>
-                    <div class="relative">
-                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none z-10">
-                            <svg class="{{ $siteBrand->authIconClass() }}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                            </svg>
-                        </div>
-                        <select id="role" name="role" required class="{{ $siteBrand->authSelectClass() }} @error('role') border-red-400 @enderror">
-                            <option value="">Select your account type</option>
-                            <option value="user" {{ old('role') == 'user' ? 'selected' : '' }}>Fan - Discover events and connect with the community</option>
-                            <option value="artist" {{ old('role') == 'artist' ? 'selected' : '' }}>Artist - Showcase your music and manage performances</option>
-                            <option value="organiser" {{ old('role') == 'organiser' ? 'selected' : '' }}>Event Organiser - Create and manage events</option>
-                        </select>
-                    </div>
-                    @error('role')<p class="mt-2 text-sm text-red-400">{{ $message }}</p>@enderror
-                    <p class="mt-1 text-xs {{ $siteBrand->detailMutedTextClass() }}">Choose the account type that best describes you</p>
                 </div>
 
                 <div class="flex items-start">

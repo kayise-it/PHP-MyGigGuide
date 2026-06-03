@@ -37,12 +37,19 @@ Goal: trust labels on web → richer `/me` → claims from app → SSO.
 | **2** | `GET /me` — `owned_pages`, `claimable_pages` + app banner | **Deployed** (Laravel); app **coded** | Banner when email matches `contact_email` |
 | **3** | `POST /me/claims/initiate` + app **Claim now** | **Tested** | Dave claimed Shades1 on phone |
 | **4** | App → website SSO (one-time session link) | **Tested** | Settings → Account on website |
+| **4b** | Web Google sign-in (Firebase, same project as app) | **Tested + deployed** | www + Rogues; deferred email verify |
 | **5** | Manual claim (no email match) | **Tested** | `POST /me/claims/request`; admin approve via disputes |
 | **6** | Edit own events (app) | **Planned** | Mirror web edit; API `PUT/PATCH` + app screen — see SESSION_HANDOFF pinned § |
 
 ---
 
 ## Log (newest first)
+
+### 3 Jun 2026 — Web Google auth aligned with app (tested + deployed)
+
+- **Laravel:** Firebase Google on `/login` + `/register`; `POST /auth/firebase`; `last_login_at` + deferred email verify (first web session OK); signup always `user` role; auth modal real Google button.
+- **VPS:** `FIREBASE_WEB_API_KEY` + Firebase authorized domains; `npm run build`; migration `last_login_at`.
+- **Status:** **Tested** — www + Rogues Google sign-in; dashboard redirect. App → web SSO unchanged. Cosmetic polish pinned.
 
 ### 19 May 2026 — Phase 5: manual claims (coded)
 

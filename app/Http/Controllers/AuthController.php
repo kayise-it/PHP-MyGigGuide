@@ -10,7 +10,11 @@ use App\Models\Organiser;
 use App\Mail\EmailVerificationMail;
 use App\Mail\ArtistClaimWarningMail;
 use App\Mail\PendingClaimNoticeMail;
+use App\Services\AppWebSessionService;
 use App\Services\ClaimService;
+use App\Services\UserFirebaseLinkService;
+use App\Support\FirebaseWeb;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -20,6 +24,9 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
+use InvalidArgumentException;
+use RuntimeException;
 use Laravel\Socialite\Facades\Socialite;
 use App\Rules\UniqueNormalizedName;
 use App\Helpers\NameNormalizer;
@@ -28,8 +35,11 @@ class AuthController extends Controller
 {
     protected ClaimService $claimService;
 
-    public function __construct(ClaimService $claimService)
-    {
+    public function __construct(
+        ClaimService $claimService,
+        private readonly UserFirebaseLinkService $firebaseLink,
+        private readonly AppWebSessionService $webSession,
+    ) {
         $this->claimService = $claimService;
     }
 
@@ -60,34 +70,31 @@ $credentials = $user
         $remember = $request->boolean('remember');
 
         $attemptOk = Auth::attempt($credentials, $remember);
-if ($attemptOk) {
-            $request->session()->regenerate();
-
+        if ($attemptOk) {
             $user = Auth::user();
 
-            // Check if user has verified email
-            if (!$user->hasVerifiedEmail()) {
+            $blocked = $this->guardUnverifiedRepeatLogin($user);
+            if ($blocked) {
                 Auth::logout();
                 $request->session()->invalidate();
                 $request->session()->regenerateToken();
+                session(['pending_verification_email' => $user->email]);
 
-                // Check for unclaimed artist
-                $unclaimedArtist = Artist::whereNull('user_id')
-                    ->whereRaw('LOWER(contact_email) = ?', [strtolower($user->email)])
-                    ->first();
-
-                if ($unclaimedArtist) {
-                    return redirect()->route('verification.notice')
-                        ->with('error', 'Please verify your email to claim your artist profile and access your account. A verification email has been sent to ' . $user->email . '.');
-                }
-
-                return redirect()->route('verification.notice')
-                    ->with('error', 'Please verify your email address before logging in. A verification email has been sent to ' . $user->email . '.');
+                return $blocked;
             }
 
-            // Handle continue parameter to redirect user back to where they were
+            $request->session()->regenerate();
+            $this->recordWebLogin($user);
+
+            if (! $user->hasVerifiedEmail()) {
+                session()->flash(
+                    'warning',
+                    'Please verify your email when you can — you will need to verify before your next sign-in.',
+                );
+            }
+
             if ($request->has('continue')) {
-                return redirect($request->get('continue'));
+                return redirect($this->webSession->sanitizeRedirect($request->get('continue')));
             }
 
             return redirect()->intended(route('dashboard'));
@@ -165,19 +172,15 @@ if ($attemptOk) {
                 
                 $successMessage = "Account created! We found {$entityCount} profile(s) ({$entityNames}) linked to your email. Please verify your email to claim your profile(s).{$gracePeriodText}";
             } else {
-                // Assign default role as 'user'
                 $user->addRole('user');
-                $successMessage = 'Account created successfully! Please verify your email to complete registration.';
+                $successMessage = 'Account created successfully! You are signed in. One account works on the app and website.';
             }
 
             // Create user folder and settings
             $user->getOrCreateFolderSettings();
 
-            // Don't auto-login - require email verification first
-            // Store email in session for resend functionality
             session(['pending_verification_email' => $user->email]);
             
-            // Send verification email with artist info (graceful failure if mail server rejects)
             try {
                 Mail::to($user->email)->send(new EmailVerificationMail($user, $unclaimedArtist));
             } catch (\Throwable $e) {
@@ -186,13 +189,9 @@ if ($attemptOk) {
                     'email' => $user->email,
                     'error' => $e->getMessage(),
                 ]);
-                return redirect()->route('verification.notice')
-                    ->with('success', $successMessage)
-                    ->with('warning', 'Account created, but we could not send the verification email. Please use the form below to request a new one.');
             }
 
-            // Redirect to verification notice
-            return redirect()->route('verification.notice')->with('success', $successMessage);
+            return $this->finishWebRegistration($request, $user, $successMessage);
         }
 
         // Handle full registration with additional fields
@@ -201,7 +200,6 @@ if ($attemptOk) {
             'username' => 'required|string|max:255|unique:users',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:8|confirmed',
-            'role' => 'required|string|in:user,artist,organiser,venue_owner',
             'terms' => 'required|accepted',
         ]);
 
@@ -218,17 +216,15 @@ if ($attemptOk) {
         $unclaimedArtist = $unclaimedEntities->first(fn($e) => $e instanceof Artist);
         $hasPendingEntities = !empty($claimResults['pending']);
 
-        // Assign selected role (but artist will be added on verification if pending artist exists)
-        $user->addRole($request->role);
+        if (! $hasPendingEntities) {
+            $user->addRole('user');
+        }
 
         // Create user folder and settings
         $user->getOrCreateFolderSettings();
 
-        // Don't auto-login - require email verification first
-        // Store email in session for resend functionality
         session(['pending_verification_email' => $user->email]);
         
-        // Send verification email with artist info (graceful failure if mail server rejects)
         try {
             Mail::to($user->email)->send(new EmailVerificationMail($user, $unclaimedArtist));
         } catch (\Throwable $e) {
@@ -237,13 +233,8 @@ if ($attemptOk) {
                 'email' => $user->email,
                 'error' => $e->getMessage(),
             ]);
-            return redirect()->route('verification.notice')
-                ->with('success', $successMessage ?? 'Account created successfully! Please verify your email.')
-                ->with('warning', 'We could not send the verification email. Please use the form below to request a new one.');
         }
 
-        $roleName = ucfirst(str_replace('_', ' ', $request->role));
-        
         if ($hasPendingEntities) {
             $entityNames = collect($claimResults['pending'])->pluck('name')->join(', ');
             $entityCount = count($claimResults['pending']);
@@ -253,13 +244,107 @@ if ($attemptOk) {
             $gracePeriodText = $gracePeriodEnabled 
                 ? " Your claim(s) will be processed after " . Carbon::now()->addHours($gracePeriodHours)->diffForHumans() . "."
                 : "";
-            $successMessage = "Account created as {$roleName}! We found {$entityCount} profile(s) ({$entityNames}) linked to your email. Please verify your email to claim your profile(s).{$gracePeriodText}";
+            $successMessage = "Account created! We found {$entityCount} profile(s) ({$entityNames}) linked to your email. Please verify your email to claim your profile(s).{$gracePeriodText}";
         } else {
-            $successMessage = "Account created as {$roleName}! Please verify your email to complete registration.";
+            $successMessage = 'Account created successfully! You are signed in. One account works on the app and website.';
         }
 
-        // Redirect to verification notice
-        return redirect()->route('verification.notice')->with('success', $successMessage);
+        return $this->finishWebRegistration($request, $user, $successMessage);
+    }
+
+    /**
+     * Sign in on the website with a Firebase ID token (Google — same project as the mobile app).
+     */
+    public function firebaseWebLogin(Request $request): RedirectResponse
+    {
+        if (! FirebaseWeb::isConfigured()) {
+            return redirect()
+                ->route('login')
+                ->with('error', 'Google sign-in is not configured on this site yet.');
+        }
+
+        $validated = $request->validate([
+            'id_token' => ['required', 'string'],
+            'continue' => ['nullable', 'string', 'max:2048'],
+        ]);
+
+        try {
+            $user = $this->firebaseLink->resolveUserForFirebaseLogin($validated['id_token']);
+        } catch (ModelNotFoundException) {
+            return redirect()
+                ->route('login')
+                ->with('error', 'No website account is linked to this Google sign-in. Try username and password, or sign up first.');
+        } catch (InvalidArgumentException|ValidationException $e) {
+            $message = $e instanceof ValidationException
+                ? collect($e->errors())->flatten()->first()
+                : $e->getMessage();
+
+            return redirect()->route('login')->with('error', $message);
+        } catch (RuntimeException $e) {
+            return redirect()->route('login')->with('error', $e->getMessage());
+        }
+
+        if (! $user->is_active) {
+            return redirect()->route('login')->with('error', 'This account is inactive.');
+        }
+
+        $blocked = $this->guardUnverifiedRepeatLogin($user);
+        if ($blocked) {
+            session(['pending_verification_email' => $user->email]);
+
+            return $blocked;
+        }
+
+        Auth::login($user, true);
+        $request->session()->regenerate();
+        $this->recordWebLogin($user);
+
+        $redirect = $this->webSession->sanitizeRedirect($validated['continue'] ?? null);
+
+        return redirect()->to($redirect);
+    }
+
+    private function finishWebRegistration(Request $request, User $user, string $successMessage): RedirectResponse
+    {
+        Auth::login($user);
+        $request->session()->regenerate();
+        $this->recordWebLogin($user);
+
+        $redirect = $request->has('continue')
+            ? $this->webSession->sanitizeRedirect($request->get('continue'))
+            : route('dashboard');
+
+        return redirect()
+            ->to($redirect)
+            ->with('success', $successMessage)
+            ->with(
+                'warning',
+                'We sent a verification email. You can keep browsing now, but you will need to verify before your next sign-in.',
+            );
+    }
+
+    private function guardUnverifiedRepeatLogin(User $user): ?RedirectResponse
+    {
+        if ($user->hasVerifiedEmail() || $user->last_login_at === null) {
+            return null;
+        }
+
+        $unclaimedArtist = Artist::whereNull('user_id')
+            ->whereRaw('LOWER(contact_email) = ?', [strtolower($user->email)])
+            ->first();
+
+        if ($unclaimedArtist) {
+            return redirect()->route('verification.notice')
+                ->with('error', 'Please verify your email to claim your artist profile and access your account. A verification email has been sent to '.$user->email.'.');
+        }
+
+        return redirect()->route('verification.notice')
+            ->with('error', 'Please verify your email address before signing in again. A verification email has been sent to '.$user->email.'.');
+    }
+
+    private function recordWebLogin(User $user): void
+    {
+        $user->forceFill(['last_login_at' => now()])->save();
     }
 
     /**

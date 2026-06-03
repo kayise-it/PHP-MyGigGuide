@@ -33,6 +33,7 @@ class AppWebSessionController extends Controller
 
         Auth::login($user);
         $request->session()->regenerate();
+        $user->forceFill(['last_login_at' => now()])->save();
 
         $redirect = $this->webSession->sanitizeRedirect($validated['redirect'] ?? null);
 
