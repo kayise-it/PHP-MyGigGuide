@@ -1,89 +1,86 @@
-import 'dart:async';
-
-import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
+import 'package:flutter/cupertino.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:xml/xml.dart' as xml;
 
 import '../brand_config.dart';
-import '../services/station_audio_service.dart';
+import '../models/app_icon_data.dart';
+import '../providers/rogues_radio_player_provider.dart';
+import '../services/fm919_site_repository.dart';
+import '../services/risefm_site_repository.dart';
+import '../screens/station_hosts_screen.dart';
 import '../widgets/brand_logo_header.dart';
 import '../widgets/zeno_now_playing_banner.dart';
-import '../widgets/station_poll_section.dart';
 
-/// Radio tab for station-branded app flavors (Rogues, FM919, HOT1027, VOW FM,
-/// Rise FM, Mix 93.8). Vanilla My Gig Guide uses the On Air strip on Home instead.
-class StationRadioTabScreen extends StatefulWidget {
+/// Radio tab for station-branded flavors (Rogues, 919 FM, HOT 1027, VOW FM,
+/// Rise FM, Mix 93.8). Vanilla My Gig Guide uses the Home On Air strip.
+class StationRadioTabScreen extends ConsumerStatefulWidget {
   const StationRadioTabScreen({super.key});
 
   @override
-  State<StationRadioTabScreen> createState() => _StationRadioTabScreenState();
+  ConsumerState<StationRadioTabScreen> createState() =>
+      _StationRadioTabScreenState();
 }
 
-class _StationRadioTabScreenState extends State<StationRadioTabScreen> {
-  final StationAudioService _audio = StationAudioService.instance;
-  StreamSubscription<PlayerState>? _playerSub;
-  bool _playing = false;
-  bool _buffering = false;
-  String? _playerError;
-  RiseStreamQuality _riseQuality = RiseStreamQuality.standard;
+class _StationRadioTabScreenState extends ConsumerState<StationRadioTabScreen> {
+  static const _riseQualityPrefKey = 'rise_fm_stream_quality';
+  String _riseStreamQuality = 'medium';
 
   @override
   void initState() {
     super.initState();
-    _syncFromService();
-    _playerSub = _audio.playerStateStream.listen((_) {
-      if (mounted) _syncFromService();
-    });
+    _loadRiseStreamQuality();
   }
 
-  void _syncFromService() {
-    setState(() {
-      _playing = _audio.isPlayingForCurrentBrand;
-      _buffering = _audio.isBuffering;
-      _playerError = _audio.lastError;
-      _riseQuality = _audio.riseStreamQuality;
-    });
-  }
-
-  @override
-  void dispose() {
-    _playerSub?.cancel();
-    super.dispose();
-  }
-
-  Future<void> _togglePlay() async {
-    setState(() => _playerError = null);
-    try {
-      if (_playing) {
-        await _audio.pause();
-      } else {
-        await _audio.playCurrentBrand(quality: _riseQuality);
-      }
-    } catch (e) {
-      if (mounted) {
-        setState(() => _playerError = e.toString());
-      }
+  Future<void> _loadRiseStreamQuality() async {
+    final prefs = await SharedPreferences.getInstance();
+    final saved = prefs.getString(_riseQualityPrefKey);
+    if (saved == 'medium' || saved == 'high') {
+      if (mounted) setState(() => _riseStreamQuality = saved!);
     }
   }
 
-  Future<void> _onRiseQualityChanged(RiseStreamQuality quality) async {
-    setState(() => _riseQuality = quality);
-    _audio.riseStreamQuality = quality;
-    if (_playing && BrandConfig.isRiseFm) {
-      await _audio.playCurrentBrand(quality: quality);
-    }
+  Future<void> _persistRiseStreamQuality(String quality) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_riseQualityPrefKey, quality);
+  }
+
+  Future<void> _onRiseQualityChanged(String quality) async {
+    setState(() => _riseStreamQuality = quality);
+    await _persistRiseStreamQuality(quality);
+    await ref.read(roguesRadioPlayerProvider.notifier).setRiseStreamQuality(quality);
   }
 
   Future<void> _openUrl(String url) async {
     final uri = Uri.tryParse(url);
     if (uri == null) return;
-    final ok = await launchUrl(uri, mode: LaunchMode.externalApplication);
-    if (!ok && mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Could not open $url')),
-      );
+    final launched = await launchUrl(uri, mode: LaunchMode.externalApplication);
+    if (!launched && mounted) {
+      _showMessage('Could not open link');
     }
+  }
+
+  void _showMessage(String message) {
+    showCupertinoDialog<void>(
+      context: context,
+      builder: (ctx) => CupertinoAlertDialog(
+        content: Text(message),
+        actions: [
+          CupertinoDialogAction(
+            isDefaultAction: true,
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: const Text('OK'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _openHostsScreen() {
+    Navigator.of(context).push(
+      CupertinoPageRoute<void>(builder: (_) => const StationHostsScreen()),
+    );
   }
 
   List<_StationAction> _buildActions() {
@@ -93,7 +90,7 @@ class _StationRadioTabScreenState extends State<StationRadioTabScreen> {
       actions.add(
         _StationAction(
           label: 'Website',
-          icon: Icons.language,
+          icon: CupertinoIcons.globe,
           url: BrandConfig.stationWebsiteUrl,
         ),
       );
@@ -103,12 +100,12 @@ class _StationRadioTabScreenState extends State<StationRadioTabScreen> {
       actions.addAll(const [
         _StationAction(
           label: 'Request a song',
-          icon: Icons.music_note,
+          icon: CupertinoIcons.music_note_2,
           url: 'https://roguesonradio.co.za/#contact',
         ),
         _StationAction(
           label: 'Competitions',
-          icon: Icons.emoji_events_outlined,
+          icon: CupertinoIcons.gift,
           url: 'https://roguesonradio.co.za/',
         ),
       ]);
@@ -118,7 +115,7 @@ class _StationRadioTabScreenState extends State<StationRadioTabScreen> {
       actions.add(
         _StationAction(
           label: 'Facebook',
-          icon: Icons.facebook,
+          faIcon: FontAwesomeIcons.facebook,
           url: BrandConfig.fm919FacebookUrl,
         ),
       );
@@ -128,7 +125,7 @@ class _StationRadioTabScreenState extends State<StationRadioTabScreen> {
       actions.add(
         _StationAction(
           label: 'Instagram',
-          icon: Icons.camera_alt_outlined,
+          faIcon: FontAwesomeIcons.instagram,
           url: BrandConfig.hot1027InstagramUrl,
         ),
       );
@@ -138,7 +135,7 @@ class _StationRadioTabScreenState extends State<StationRadioTabScreen> {
       actions.add(
         _StationAction(
           label: 'WhatsApp',
-          icon: Icons.chat,
+          faIcon: FontAwesomeIcons.whatsapp,
           url: BrandConfig.vowFmWhatsAppUrl,
         ),
       );
@@ -148,12 +145,12 @@ class _StationRadioTabScreenState extends State<StationRadioTabScreen> {
       actions.addAll(const [
         _StationAction(
           label: 'Competitions',
-          icon: Icons.card_giftcard_outlined,
+          icon: CupertinoIcons.gift,
           url: 'https://risefm.co.za/competitions/',
         ),
         _StationAction(
           label: 'RISE Rewind',
-          icon: Icons.history,
+          icon: CupertinoIcons.time,
           url: 'https://risefm.co.za/riserewind/',
         ),
       ]);
@@ -164,7 +161,7 @@ class _StationRadioTabScreenState extends State<StationRadioTabScreen> {
         actions.add(
           _StationAction(
             label: 'Instagram',
-            icon: Icons.camera_alt_outlined,
+            faIcon: FontAwesomeIcons.instagram,
             url: BrandConfig.mix938InstagramUrl,
           ),
         );
@@ -172,7 +169,7 @@ class _StationRadioTabScreenState extends State<StationRadioTabScreen> {
       actions.add(
         _StationAction(
           label: 'Open on Zeno',
-          icon: Icons.open_in_new,
+          icon: CupertinoIcons.arrow_up_right_square,
           url: BrandConfig.mix938ZenoWebUrl,
         ),
       );
@@ -180,7 +177,7 @@ class _StationRadioTabScreenState extends State<StationRadioTabScreen> {
         actions.add(
           _StationAction(
             label: 'WhatsApp',
-            icon: Icons.chat,
+            faIcon: FontAwesomeIcons.whatsapp,
             url: BrandConfig.mix938WhatsAppUrl,
           ),
         );
@@ -192,13 +189,13 @@ class _StationRadioTabScreenState extends State<StationRadioTabScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final accent = BrandConfig.brandAccent;
+    final accent = BrandConfig.stationAccent;
     final actions = _buildActions();
 
-    return Scaffold(
-      backgroundColor: theme.scaffoldBackgroundColor,
-      body: SafeArea(
+    return CupertinoPageScaffold(
+      backgroundColor: CupertinoColors.black,
+      child: SafeArea(
+        bottom: false,
         child: CustomScrollView(
           slivers: [
             SliverToBoxAdapter(
@@ -211,16 +208,10 @@ class _StationRadioTabScreenState extends State<StationRadioTabScreen> {
               ),
             ),
             SliverPadding(
-              padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
+              padding: const EdgeInsets.fromLTRB(16, 12, 16, 28),
               sliver: SliverList(
                 delegate: SliverChildListDelegate([
-                  _StationLivePlayerCard(
-                    playing: _playing,
-                    buffering: _buffering,
-                    error: _playerError,
-                    accent: accent,
-                    onToggle: _togglePlay,
-                  ),
+                  _StationLivePlayerCard(accent: accent),
                   const SizedBox(height: 8),
                   if (BrandConfig.isMix938) ...[
                     ZenoNowPlayingBanner(mountId: BrandConfig.mix938ZenoMountId),
@@ -228,7 +219,7 @@ class _StationRadioTabScreenState extends State<StationRadioTabScreen> {
                   ],
                   if (BrandConfig.isRiseFm) ...[
                     _RiseFmQualityPicker(
-                      value: _riseQuality,
+                      value: _riseStreamQuality,
                       accent: accent,
                       onChanged: _onRiseQualityChanged,
                     ),
@@ -240,21 +231,19 @@ class _StationRadioTabScreenState extends State<StationRadioTabScreen> {
                       runSpacing: 8,
                       children: actions
                           .map(
-                            (a) => _StationActionChip(
-                              action: a,
+                            (action) => _StationActionChip(
+                              action: action,
                               accent: accent,
-                              onTap: () => _openUrl(a.url),
+                              onTap: () => _openUrl(action.url),
                             ),
                           )
                           .toList(),
                     ),
                     const SizedBox(height: 16),
                   ],
-                  if (BrandConfig.stationPollContext.isNotEmpty)
-                    StationPollSection(contextKey: BrandConfig.stationPollContext),
                   if (BrandConfig.isRogues) ...[
                     const SizedBox(height: 8),
-                    _RoguesHostsSection(accent: accent),
+                    _RoguesHostsSection(accent: accent, onViewAll: _openHostsScreen),
                     const SizedBox(height: 12),
                     _RoguesEngagementSection(accent: accent),
                     const SizedBox(height: 12),
@@ -286,7 +275,6 @@ class _StationRadioTabScreenState extends State<StationRadioTabScreen> {
                     const SizedBox(height: 12),
                     _Mix938AboutSection(accent: accent),
                   ],
-                  const SizedBox(height: 32),
                 ]),
               ),
             ),
@@ -362,27 +350,27 @@ const _kRoguesPresenters = <_RoguesPresenterEntry>[
   _RoguesPresenterEntry(
     name: 'Henry',
     shows: 'The Weekend Wake Up',
-    schedule: '7am–10am',
+    schedule: 'Weekends · 7am–10am',
   ),
   _RoguesPresenterEntry(
     name: 'Craigie',
     shows: 'The Lawless Weekend',
-    schedule: '10am–1pm',
+    schedule: 'Weekends · 10am–1pm',
   ),
   _RoguesPresenterEntry(
     name: 'Alusha',
     shows: 'The Lawless Weekend',
-    schedule: '10am–1pm',
+    schedule: 'Weekends · 10am–1pm',
   ),
   _RoguesPresenterEntry(
     name: 'Ayanda',
     shows: 'The Lawless Weekend',
-    schedule: '10am–1pm',
+    schedule: 'Weekends · 10am–1pm',
   ),
   _RoguesPresenterEntry(
     name: 'Chris',
     shows: 'The Weekend Riff',
-    schedule: '1pm–4pm',
+    schedule: 'Weekends · 1pm–4pm',
   ),
   _RoguesPresenterEntry(
     name: 'Cathy',
@@ -392,33 +380,46 @@ const _kRoguesPresenters = <_RoguesPresenterEntry>[
 ];
 
 class _RoguesHostsSection extends StatelessWidget {
-  const _RoguesHostsSection({required this.accent});
+  const _RoguesHostsSection({required this.accent, required this.onViewAll});
 
   final Color accent;
+  final VoidCallback onViewAll;
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          'Our hosts & shows',
-          style: theme.textTheme.titleMedium?.copyWith(
-            fontWeight: FontWeight.w700,
-            color: accent,
-          ),
+        Row(
+          children: [
+            Expanded(
+              child: Text(
+                'Our hosts & shows',
+                style: TextStyle(
+                  color: accent,
+                  fontSize: 18,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ),
+            CupertinoButton(
+              padding: EdgeInsets.zero,
+              onPressed: onViewAll,
+              child: Text(
+                'View all',
+                style: TextStyle(color: accent, fontSize: 14),
+              ),
+            ),
+          ],
         ),
         const SizedBox(height: 4),
-        Text(
+        const Text(
           'Live streaming 24 hours · studio shows weekdays 7am–7pm',
-          style: theme.textTheme.bodySmall?.copyWith(
-            color: theme.textTheme.bodySmall?.color?.withValues(alpha: 0.75),
-          ),
+          style: TextStyle(color: CupertinoColors.systemGrey, fontSize: 13),
         ),
         const SizedBox(height: 12),
         ..._kRoguesPresenters.map(
-          (p) => _RoguesPresenterTile(entry: p, accent: accent),
+          (entry) => _RoguesPresenterTile(entry: entry, accent: accent),
         ),
       ],
     );
@@ -433,37 +434,39 @@ class _RoguesPresenterTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return Card(
+    return Container(
       margin: const EdgeInsets.only(bottom: 8),
-      child: Padding(
-        padding: const EdgeInsets.all(12),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              entry.name,
-              style: theme.textTheme.titleSmall?.copyWith(
-                fontWeight: FontWeight.w700,
-                color: accent,
-              ),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: const Color(0xFF12121A),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            entry.name,
+            style: TextStyle(
+              color: accent,
+              fontSize: 15,
+              fontWeight: FontWeight.w700,
             ),
-            const SizedBox(height: 4),
-            Text(entry.shows, style: theme.textTheme.bodyMedium),
-            const SizedBox(height: 2),
-            Text(
-              entry.schedule,
-              style: theme.textTheme.bodySmall?.copyWith(
-                color: theme.textTheme.bodySmall?.color?.withValues(alpha: 0.7),
-              ),
-            ),
-          ],
-        ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            entry.shows,
+            style: const TextStyle(color: CupertinoColors.white, fontSize: 14),
+          ),
+          const SizedBox(height: 2),
+          Text(
+            entry.schedule,
+            style: const TextStyle(color: CupertinoColors.systemGrey, fontSize: 12),
+          ),
+        ],
       ),
     );
   }
 }
-
 
 class _RoguesEngagementSection extends StatelessWidget {
   const _RoguesEngagementSection({required this.accent});
@@ -472,75 +475,155 @@ class _RoguesEngagementSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           'Play your part',
-          style: theme.textTheme.titleMedium?.copyWith(
-            fontWeight: FontWeight.w700,
+          style: TextStyle(
             color: accent,
+            fontSize: 18,
+            fontWeight: FontWeight.w700,
           ),
         ),
         const SizedBox(height: 8),
-        _RoguesEngagementTile(
+        _RoguesEngagementRow(
+          accent: accent,
+          icon: CupertinoIcons.music_note_2,
           title: 'Request a song',
           body: 'Celebrate yourself or someone special — ask our hosts to add a track.',
-          icon: Icons.music_note,
-          accent: accent,
         ),
-        _RoguesEngagementTile(
+        _RoguesEngagementRow(
+          accent: accent,
+          icon: CupertinoIcons.gift,
           title: 'Competitions',
           body: 'Join the fun on air and online. Terms & conditions apply.',
-          icon: Icons.emoji_events_outlined,
-          accent: accent,
         ),
-        _RoguesEngagementTile(
+        _RoguesEngagementRow(
+          accent: accent,
+          icon: CupertinoIcons.heart,
           title: 'Fundraising',
           body: 'Support community initiatives that listeners can get behind.',
-          icon: Icons.volunteer_activism_outlined,
-          accent: accent,
         ),
       ],
     );
   }
 }
 
-class _RoguesEngagementTile extends StatelessWidget {
-  const _RoguesEngagementTile({
+class _RoguesEngagementRow extends StatelessWidget {
+  const _RoguesEngagementRow({
+    required this.accent,
+    required this.icon,
     required this.title,
     required this.body,
-    required this.icon,
-    required this.accent,
   });
 
+  final Color accent;
+  final IconData icon;
   final String title;
   final String body;
-  final IconData icon;
-  final Color accent;
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     return Padding(
       padding: const EdgeInsets.only(bottom: 10),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(icon, color: accent, size: 22),
-          const SizedBox(width: 12),
+          Icon(icon, color: accent, size: 20),
+          const SizedBox(width: 10),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(title, style: theme.textTheme.titleSmall),
-                Text(body, style: theme.textTheme.bodySmall),
+                Text(
+                  title,
+                  style: const TextStyle(
+                    color: CupertinoColors.white,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                Text(
+                  body,
+                  style: const TextStyle(
+                    color: CupertinoColors.systemGrey,
+                    fontSize: 12,
+                  ),
+                ),
               ],
             ),
           ),
         ],
       ),
+    );
+  }
+}
+
+class _RoguesPartnersSection extends StatelessWidget {
+  const _RoguesPartnersSection({required this.accent});
+
+  final Color accent;
+
+  static const _partners = <String>[
+    'AyobaAlli',
+    'BIE Inspection Services',
+    'Business Capital Group',
+    'Churchill Plumbing',
+    'Consolidated Auto',
+    'Dukes Gold & Diamond Exchange',
+    'Empirical',
+    'Fourways Mall',
+    'Pnet',
+    'Shalkim',
+    'Tic Tac',
+    'Trinity Capital Holdings',
+    'Turnkey Music & Multimedia',
+    'Adapt Signage & Branding',
+    'Bundle Media',
+    'Open Fibre',
+    'Dynamic IT',
+    'Gold Reef City',
+    'Hlasela Group',
+    'Visual Audio',
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Partners & sponsors',
+          style: TextStyle(
+            color: accent,
+            fontSize: 18,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+        const SizedBox(height: 8),
+        Wrap(
+          spacing: 6,
+          runSpacing: 6,
+          children: _partners
+              .map(
+                (name) => Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: accent.withValues(alpha: 0.25)),
+                  ),
+                  child: Text(
+                    name,
+                    style: const TextStyle(
+                      color: CupertinoColors.systemGrey,
+                      fontSize: 11,
+                    ),
+                  ),
+                ),
+              )
+              .toList(),
+        ),
+      ],
     );
   }
 }
@@ -586,23 +669,53 @@ class _Hot1027ShowsSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           'Shows',
-          style: theme.textTheme.titleMedium?.copyWith(
-            fontWeight: FontWeight.w700,
+          style: TextStyle(
             color: accent,
+            fontSize: 18,
+            fontWeight: FontWeight.w700,
           ),
         ),
         const SizedBox(height: 12),
         ..._kHot1027Shows.map(
-          (s) => ListTile(
-            contentPadding: EdgeInsets.zero,
-            title: Text(s.title, style: theme.textTheme.titleSmall),
-            subtitle: Text('${s.host} · ${s.time}'),
+          (show) => Padding(
+            padding: const EdgeInsets.only(bottom: 8),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Icon(
+                  CupertinoIcons.dot_radiowaves_left_right,
+                  color: accent,
+                  size: 18,
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        show.title,
+                        style: const TextStyle(
+                          color: CupertinoColors.white,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      Text(
+                        '${show.host} · ${show.time}',
+                        style: const TextStyle(
+                          color: CupertinoColors.systemGrey,
+                          fontSize: 12,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ],
@@ -621,31 +734,30 @@ class _VowFmCommunitySection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           'Voice of the community',
-          style: theme.textTheme.titleMedium?.copyWith(
-            fontWeight: FontWeight.w700,
+          style: TextStyle(
             color: accent,
+            fontSize: 18,
+            fontWeight: FontWeight.w700,
           ),
         ),
         const SizedBox(height: 8),
-        Text(
+        const Text(
           'VOW FM connects listeners with local news, music, and community stories. '
           'Tune in live or reach out on WhatsApp.',
-          style: theme.textTheme.bodyMedium,
+          style: TextStyle(color: CupertinoColors.white, fontSize: 14),
         ),
       ],
     );
   }
 }
 
-
 // ---------------------------------------------------------------------------
-// Mix 93.8 — dayparts + featured shows (zeno.fm / mix938.com)
+// Mix 93.8 — dayparts + featured shows
 // ---------------------------------------------------------------------------
 
 class _Mix938DaypartEntry {
@@ -701,31 +813,43 @@ class _Mix938DaypartsSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           'Dayparts',
-          style: theme.textTheme.titleMedium?.copyWith(
-            fontWeight: FontWeight.w700,
+          style: TextStyle(
             color: accent,
+            fontSize: 18,
+            fontWeight: FontWeight.w700,
           ),
         ),
         const SizedBox(height: 8),
         ..._kMix938Dayparts.map(
-          (d) => Padding(
+          (entry) => Padding(
             padding: const EdgeInsets.only(bottom: 6),
             child: Row(
               children: [
                 SizedBox(
                   width: 56,
                   child: Text(
-                    d.hours,
-                    style: theme.textTheme.labelMedium?.copyWith(color: accent),
+                    entry.hours,
+                    style: TextStyle(
+                      color: accent,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                 ),
-                Expanded(child: Text(d.title, style: theme.textTheme.bodyMedium)),
+                Expanded(
+                  child: Text(
+                    entry.title,
+                    style: const TextStyle(
+                      color: CupertinoColors.white,
+                      fontSize: 13,
+                    ),
+                  ),
+                ),
               ],
             ),
           ),
@@ -733,26 +857,29 @@ class _Mix938DaypartsSection extends StatelessWidget {
         const SizedBox(height: 12),
         Text(
           'Featured shows & podcasts',
-          style: theme.textTheme.titleSmall?.copyWith(
-            fontWeight: FontWeight.w600,
+          style: TextStyle(
             color: accent,
+            fontSize: 15,
+            fontWeight: FontWeight.w600,
           ),
         ),
         const SizedBox(height: 8),
         ..._kMix938FeaturedShows.map(
           (show) => Padding(
             padding: const EdgeInsets.only(bottom: 4),
-            child: Text('· $show', style: theme.textTheme.bodySmall),
+            child: Text(
+              '· $show',
+              style: const TextStyle(
+                color: CupertinoColors.systemGrey,
+                fontSize: 12,
+              ),
+            ),
           ),
         ),
       ],
     );
   }
 }
-
-// ---------------------------------------------------------------------------
-// Mix 93.8 — about blurb (presenter-free format)
-// ---------------------------------------------------------------------------
 
 class _Mix938AboutSection extends StatelessWidget {
   const _Mix938AboutSection({required this.accent});
@@ -761,28 +888,27 @@ class _Mix938AboutSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           'Real MIX, Real YOU',
-          style: theme.textTheme.titleMedium?.copyWith(
-            fontWeight: FontWeight.w700,
+          style: TextStyle(
             color: accent,
+            fontSize: 18,
+            fontWeight: FontWeight.w700,
           ),
         ),
         const SizedBox(height: 8),
-        Text(
+        const Text(
           'Mix 93.8 streams a curated mix of Pop, Rock, and R&B from the 1950s through '
           'to the 2010s — presenter-free, built on 18 years of FM heritage.',
-          style: theme.textTheme.bodyMedium,
+          style: TextStyle(color: CupertinoColors.white, fontSize: 14),
         ),
       ],
     );
   }
 }
-
 
 class _Fm919ShowEntry {
   const _Fm919ShowEntry({required this.title, required this.time});
@@ -806,24 +932,52 @@ class _Fm919ShowsSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           '919 FM shows',
-          style: theme.textTheme.titleMedium?.copyWith(
-            fontWeight: FontWeight.w700,
+          style: TextStyle(
             color: accent,
+            fontSize: 18,
+            fontWeight: FontWeight.w700,
           ),
         ),
         const SizedBox(height: 12),
         ..._kFm919Shows.map(
-          (s) => ListTile(
-            contentPadding: EdgeInsets.zero,
-            leading: Icon(Icons.radio, color: accent, size: 20),
-            title: Text(s.title),
-            subtitle: Text(s.time),
+          (show) => Padding(
+            padding: const EdgeInsets.only(bottom: 8),
+            child: Row(
+              children: [
+                Icon(
+                  CupertinoIcons.antenna_radiowaves_left_right,
+                  color: accent,
+                  size: 18,
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        show.title,
+                        style: const TextStyle(
+                          color: CupertinoColors.white,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      Text(
+                        show.time,
+                        style: const TextStyle(
+                          color: CupertinoColors.systemGrey,
+                          fontSize: 12,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ],
@@ -831,62 +985,43 @@ class _Fm919ShowsSection extends StatelessWidget {
   }
 }
 
-// ---------------------------------------------------------------------------
-// FM919 news (RSS)
-// ---------------------------------------------------------------------------
-
-class _Fm919NewsSection extends StatefulWidget {
+class _Fm919NewsSection extends ConsumerWidget {
   const _Fm919NewsSection({required this.accent});
 
   final Color accent;
 
   @override
-  State<_Fm919NewsSection> createState() => _Fm919NewsSectionState();
+  Widget build(BuildContext context, WidgetRef ref) {
+    final news = ref.watch(fm919NewsProvider);
+    return news.when(
+      loading: () => _Fm919NewsBody(accent: accent, items: const [], loading: true),
+      error: (_, __) => _Fm919NewsBody(accent: accent, items: const [], error: true),
+      data: (items) => _Fm919NewsBody(accent: accent, items: items),
+    );
+  }
 }
 
-class _Fm919NewsSectionState extends State<_Fm919NewsSection> {
-  List<_NewsItem> _items = const [];
-  bool _loading = true;
-  String? _error;
+class _Fm919NewsBody extends StatelessWidget {
+  const _Fm919NewsBody({
+    required this.accent,
+    required this.items,
+    this.loading = false,
+    this.error = false,
+  });
 
-  @override
-  void initState() {
-    super.initState();
-    _load();
-  }
+  final Color accent;
+  final List<Fm919NewsItem> items;
+  final bool loading;
+  final bool error;
 
-  Future<void> _load() async {
-    setState(() {
-      _loading = true;
-      _error = null;
-    });
-    try {
-      final items = await _fetchRss(BrandConfig.fm919NewsRssUrl);
-      if (mounted) {
-        setState(() {
-          _items = items;
-          _loading = false;
-        });
-      }
-    } catch (e) {
-      if (mounted) {
-        setState(() {
-          _error = e.toString();
-          _loading = false;
-        });
-      }
-    }
-  }
-
-  Future<void> _open(_NewsItem item) async {
-    final uri = Uri.tryParse(item.link);
+  Future<void> _open(Fm919NewsItem item) async {
+    final uri = Uri.tryParse(item.url);
     if (uri == null) return;
     await launchUrl(uri, mode: LaunchMode.externalApplication);
   }
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -895,48 +1030,71 @@ class _Fm919NewsSectionState extends State<_Fm919NewsSection> {
             Expanded(
               child: Text(
                 '919 FM news',
-                style: theme.textTheme.titleMedium?.copyWith(
+                style: TextStyle(
+                  color: accent,
+                  fontSize: 18,
                   fontWeight: FontWeight.w700,
-                  color: widget.accent,
                 ),
               ),
             ),
-            IconButton(
-              icon: const Icon(Icons.refresh, size: 20),
-              onPressed: _loading ? null : _load,
-              tooltip: 'Refresh',
-            ),
+            if (loading) const CupertinoActivityIndicator(radius: 9),
           ],
         ),
-        if (_loading)
-          const Padding(
-            padding: EdgeInsets.symmetric(vertical: 16),
-            child: Center(child: CircularProgressIndicator(strokeWidth: 2)),
-          )
-        else if (_error != null)
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 8),
-            child: Text(
-              'Could not load news.',
-              style: theme.textTheme.bodySmall,
-            ),
-          )
-        else if (_items.isEmpty)
-          Text('No headlines right now.', style: theme.textTheme.bodySmall)
-        else
-          ..._items.take(8).map(
-                (item) => ListTile(
-                  contentPadding: EdgeInsets.zero,
-                  title: Text(
-                    item.title,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
+        const SizedBox(height: 8),
+        if (error)
+          const Text(
+            'Could not load news.',
+            style: TextStyle(color: CupertinoColors.systemGrey, fontSize: 13),
+          ),
+        if (!loading && !error && items.isEmpty)
+          const Text(
+            'No headlines right now.',
+            style: TextStyle(color: CupertinoColors.systemGrey, fontSize: 13),
+          ),
+        ...items.take(8).map(
+              (item) => GestureDetector(
+                onTap: () => _open(item),
+                child: Container(
+                  margin: const EdgeInsets.only(bottom: 8),
+                  padding: const EdgeInsets.symmetric(vertical: 8),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              item.title,
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(
+                                color: CupertinoColors.white,
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            if (item.publishedLabel != null)
+                              Text(
+                                item.publishedLabel!,
+                                style: const TextStyle(
+                                  color: CupertinoColors.systemGrey,
+                                  fontSize: 11,
+                                ),
+                              ),
+                          ],
+                        ),
+                      ),
+                      const Icon(
+                        CupertinoIcons.arrow_up_right,
+                        size: 14,
+                        color: CupertinoColors.systemGrey,
+                      ),
+                    ],
                   ),
-                  subtitle: item.date != null ? Text(item.date!) : null,
-                  trailing: const Icon(Icons.open_in_new, size: 16),
-                  onTap: () => _open(item),
                 ),
               ),
+            ),
       ],
     );
   }
@@ -957,7 +1115,6 @@ class _RiseScheduleEntry {
   final String show;
   final String host;
 }
-
 
 const _kRiseWeekdaySchedule = <_RiseScheduleEntry>[
   _RiseScheduleEntry(time: '04:00', show: 'Pastor Sthembiso Ndlovu', host: 'Gospel message'),
@@ -999,70 +1156,118 @@ List<_RiseScheduleEntry> _riseScheduleForWeekday(int weekday) {
   return _kRiseWeekdaySchedule;
 }
 
-
-class _RiseFmTodaySection extends StatelessWidget {
+class _RiseFmTodaySection extends ConsumerWidget {
   const _RiseFmTodaySection({required this.accent});
 
   final Color accent;
 
   @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final now = DateTime.now();
-    final dayLabel = _weekdayLabel(now.weekday);
-    final entries = _riseScheduleForWeekday(now.weekday);
+  Widget build(BuildContext context, WidgetRef ref) {
+    final schedule = ref.watch(riseFmTodayScheduleProvider);
+    return schedule.when(
+      loading: () => _RiseFmTodayBody(
+        accent: accent,
+        entries: _riseScheduleForWeekday(DateTime.now().weekday),
+        loading: true,
+      ),
+      error: (_, __) => _RiseFmTodayBody(
+        accent: accent,
+        entries: _riseScheduleForWeekday(DateTime.now().weekday),
+      ),
+      data: (slots) {
+        final entries = slots.isEmpty
+            ? _riseScheduleForWeekday(DateTime.now().weekday)
+            : slots
+                .map(
+                  (slot) => _RiseScheduleEntry(
+                    time: slot.timeRange,
+                    show: slot.show,
+                    host: slot.presenter ?? 'RISE team',
+                  ),
+                )
+                .toList();
+        return _RiseFmTodayBody(accent: accent, entries: entries);
+      },
+    );
+  }
+}
 
+String _weekdayLabel(int weekday) {
+  const names = [
+    'Monday',
+    'Tuesday',
+    'Wednesday',
+    'Thursday',
+    'Friday',
+    'Saturday',
+    'Sunday',
+  ];
+  return names[weekday - 1];
+}
+
+class _RiseFmTodayBody extends StatelessWidget {
+  const _RiseFmTodayBody({
+    required this.accent,
+    required this.entries,
+    this.loading = false,
+  });
+
+  final Color accent;
+  final List<_RiseScheduleEntry> entries;
+  final bool loading;
+
+  @override
+  Widget build(BuildContext context) {
+    final day = _weekdayLabel(DateTime.now().weekday);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          'Today on RISE FM',
-          style: theme.textTheme.titleMedium?.copyWith(
-            fontWeight: FontWeight.w700,
-            color: accent,
-          ),
+        Row(
+          children: [
+            Expanded(
+              child: Text(
+                'Today on RISE FM',
+                style: TextStyle(
+                  color: accent,
+                  fontSize: 18,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ),
+            if (loading) const CupertinoActivityIndicator(radius: 9),
+          ],
         ),
         const SizedBox(height: 4),
         Text(
-          dayLabel,
-          style: theme.textTheme.bodySmall?.copyWith(
-            color: theme.textTheme.bodySmall?.color?.withValues(alpha: 0.75),
-          ),
+          day,
+          style: const TextStyle(color: CupertinoColors.systemGrey, fontSize: 13),
         ),
         const SizedBox(height: 12),
-        ...entries.map(
-          (e) => _RiseScheduleRow(entry: e, accent: accent),
-        ),
+        ...entries.map((entry) => _RiseScheduleRow(entry: entry, accent: accent)),
         const SizedBox(height: 12),
         Text(
           'Features & podcasts',
-          style: theme.textTheme.titleSmall?.copyWith(
-            fontWeight: FontWeight.w600,
+          style: TextStyle(
             color: accent,
+            fontSize: 15,
+            fontWeight: FontWeight.w600,
           ),
         ),
         const SizedBox(height: 8),
         ..._kRiseFeatureShows.map(
           (show) => Padding(
             padding: const EdgeInsets.only(bottom: 4),
-            child: Text('· $show', style: theme.textTheme.bodySmall),
+            child: Text(
+              '· $show',
+              style: const TextStyle(
+                color: CupertinoColors.systemGrey,
+                fontSize: 12,
+              ),
+            ),
           ),
         ),
       ],
     );
-  }
-
-  String _weekdayLabel(int weekday) {
-    const names = [
-      'Monday',
-      'Tuesday',
-      'Wednesday',
-      'Thursday',
-      'Friday',
-      'Saturday',
-      'Sunday',
-    ];
-    return names[weekday - 1];
   }
 }
 
@@ -1074,7 +1279,6 @@ class _RiseScheduleRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     return Padding(
       padding: const EdgeInsets.only(bottom: 8),
       child: Row(
@@ -1084,8 +1288,9 @@ class _RiseScheduleRow extends StatelessWidget {
             width: 52,
             child: Text(
               entry.time,
-              style: theme.textTheme.labelLarge?.copyWith(
+              style: TextStyle(
                 color: accent,
+                fontSize: 12,
                 fontWeight: FontWeight.w600,
               ),
             ),
@@ -1096,14 +1301,17 @@ class _RiseScheduleRow extends StatelessWidget {
               children: [
                 Text(
                   entry.show,
-                  style: theme.textTheme.bodyMedium?.copyWith(
+                  style: const TextStyle(
+                    color: CupertinoColors.white,
+                    fontSize: 14,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
                 Text(
                   entry.host,
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    color: theme.textTheme.bodySmall?.color?.withValues(alpha: 0.7),
+                  style: const TextStyle(
+                    color: CupertinoColors.systemGrey,
+                    fontSize: 12,
                   ),
                 ),
               ],
@@ -1115,58 +1323,43 @@ class _RiseScheduleRow extends StatelessWidget {
   }
 }
 
-class _RiseFmNewsSection extends StatefulWidget {
+class _RiseFmNewsSection extends ConsumerWidget {
   const _RiseFmNewsSection({required this.accent});
 
   final Color accent;
 
   @override
-  State<_RiseFmNewsSection> createState() => _RiseFmNewsSectionState();
+  Widget build(BuildContext context, WidgetRef ref) {
+    final news = ref.watch(riseFmNewsProvider);
+    return news.when(
+      loading: () => _RiseFmNewsBody(accent: accent, items: const [], loading: true),
+      error: (_, __) => _RiseFmNewsBody(accent: accent, items: const [], error: true),
+      data: (items) => _RiseFmNewsBody(accent: accent, items: items),
+    );
+  }
 }
 
-class _RiseFmNewsSectionState extends State<_RiseFmNewsSection> {
-  List<_NewsItem> _items = const [];
-  bool _loading = true;
-  String? _error;
+class _RiseFmNewsBody extends StatelessWidget {
+  const _RiseFmNewsBody({
+    required this.accent,
+    required this.items,
+    this.loading = false,
+    this.error = false,
+  });
 
-  @override
-  void initState() {
-    super.initState();
-    _load();
-  }
+  final Color accent;
+  final List<RiseFmNewsItem> items;
+  final bool loading;
+  final bool error;
 
-  Future<void> _load() async {
-    setState(() {
-      _loading = true;
-      _error = null;
-    });
-    try {
-      final items = await _fetchRss(BrandConfig.riseFmNewsRssUrl);
-      if (mounted) {
-        setState(() {
-          _items = items;
-          _loading = false;
-        });
-      }
-    } catch (e) {
-      if (mounted) {
-        setState(() {
-          _error = e.toString();
-          _loading = false;
-        });
-      }
-    }
-  }
-
-  Future<void> _open(_NewsItem item) async {
-    final uri = Uri.tryParse(item.link);
+  Future<void> _open(RiseFmNewsItem item) async {
+    final uri = Uri.tryParse(item.url);
     if (uri == null) return;
     await launchUrl(uri, mode: LaunchMode.externalApplication);
   }
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -1175,191 +1368,175 @@ class _RiseFmNewsSectionState extends State<_RiseFmNewsSection> {
             Expanded(
               child: Text(
                 'Mpumalanga news',
-                style: theme.textTheme.titleMedium?.copyWith(
+                style: TextStyle(
+                  color: accent,
+                  fontSize: 18,
                   fontWeight: FontWeight.w700,
-                  color: widget.accent,
                 ),
               ),
             ),
-            IconButton(
-              icon: const Icon(Icons.refresh, size: 20),
-              onPressed: _loading ? null : _load,
-              tooltip: 'Refresh',
-            ),
+            if (loading) const CupertinoActivityIndicator(radius: 9),
           ],
         ),
-        if (_loading)
-          const Padding(
-            padding: EdgeInsets.symmetric(vertical: 16),
-            child: Center(child: CircularProgressIndicator(strokeWidth: 2)),
-          )
-        else if (_error != null)
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 8),
-            child: Text(
-              'Could not load news.',
-              style: theme.textTheme.bodySmall,
-            ),
-          )
-        else if (_items.isEmpty)
-          Text('No headlines right now.', style: theme.textTheme.bodySmall)
-        else
-          ..._items.take(8).map(
-                (item) => ListTile(
-                  contentPadding: EdgeInsets.zero,
-                  title: Text(
-                    item.title,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
+        const SizedBox(height: 8),
+        if (error)
+          const Text(
+            'Could not load news.',
+            style: TextStyle(color: CupertinoColors.systemGrey, fontSize: 13),
+          ),
+        if (!loading && !error && items.isEmpty)
+          const Text(
+            'No headlines right now.',
+            style: TextStyle(color: CupertinoColors.systemGrey, fontSize: 13),
+          ),
+        ...items.take(8).map(
+              (item) => GestureDetector(
+                onTap: () => _open(item),
+                child: Padding(
+                  padding: const EdgeInsets.only(bottom: 8),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              item.title,
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(
+                                color: CupertinoColors.white,
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            if (item.publishedLabel != null)
+                              Text(
+                                item.publishedLabel!,
+                                style: const TextStyle(
+                                  color: CupertinoColors.systemGrey,
+                                  fontSize: 11,
+                                ),
+                              ),
+                          ],
+                        ),
+                      ),
+                      const Icon(
+                        CupertinoIcons.arrow_up_right,
+                        size: 14,
+                        color: CupertinoColors.systemGrey,
+                      ),
+                    ],
                   ),
-                  subtitle: item.date != null ? Text(item.date!) : null,
-                  trailing: const Icon(Icons.open_in_new, size: 16),
-                  onTap: () => _open(item),
                 ),
               ),
+            ),
       ],
     );
   }
 }
 
-// ---------------------------------------------------------------------------
-// Shared RSS helper + news model
-// ---------------------------------------------------------------------------
+class _StationLivePlayerCard extends ConsumerWidget {
+  const _StationLivePlayerCard({required this.accent});
 
-class _NewsItem {
-  const _NewsItem({required this.title, required this.link, this.date});
-
-  final String title;
-  final String link;
-  final String? date;
-}
-
-Future<List<_NewsItem>> _fetchRss(String feedUrl) async {
-  if (feedUrl.isEmpty) return const [];
-  final response = await http
-      .get(Uri.parse(feedUrl))
-      .timeout(const Duration(seconds: 15));
-  if (response.statusCode != 200) {
-    throw Exception('HTTP ${response.statusCode}');
-  }
-  final doc = xml.XmlDocument.parse(response.body);
-  final items = doc.findAllElements('item');
-  return items.map((item) {
-    final title = item.getElement('title')?.innerText.trim() ?? 'Untitled';
-    final link = item.getElement('link')?.innerText.trim() ?? '';
-    final pubDate = item.getElement('pubDate')?.innerText.trim();
-    return _NewsItem(title: title, link: link, date: pubDate);
-  }).where((i) => i.link.isNotEmpty).toList();
-}
-
-// ---------------------------------------------------------------------------
-// Live player card
-// ---------------------------------------------------------------------------
-
-class _StationLivePlayerCard extends StatelessWidget {
-  const _StationLivePlayerCard({
-    required this.playing,
-    required this.buffering,
-    required this.error,
-    required this.accent,
-    required this.onToggle,
-  });
-
-  final bool playing;
-  final bool buffering;
-  final String? error;
   final Color accent;
-  final VoidCallback onToggle;
 
   @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return Card(
-      clipBehavior: Clip.antiAlias,
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Container(
-                  width: 10,
-                  height: 10,
-                  decoration: BoxDecoration(
-                    color: playing ? Colors.redAccent : theme.disabledColor,
-                    shape: BoxShape.circle,
-                  ),
+  Widget build(BuildContext context, WidgetRef ref) {
+    final ui = ref.watch(roguesRadioUiStateProvider);
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: const Color(0xFF12121A),
+        borderRadius: BorderRadius.circular(14),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                width: 10,
+                height: 10,
+                decoration: BoxDecoration(
+                  color: ui.isPlaying
+                      ? CupertinoColors.systemRed
+                      : CupertinoColors.systemGrey,
+                  shape: BoxShape.circle,
                 ),
-                const SizedBox(width: 8),
-                Text(
-                  playing ? 'ON AIR' : 'LIVE STREAM',
-                  style: theme.textTheme.labelLarge?.copyWith(
-                    fontWeight: FontWeight.w700,
-                    letterSpacing: 1.2,
-                    color: playing ? Colors.redAccent : accent,
-                  ),
+              ),
+              const SizedBox(width: 8),
+              Text(
+                ui.isPlaying ? 'ON AIR' : 'LIVE STREAM',
+                style: TextStyle(
+                  color: ui.isPlaying ? CupertinoColors.systemRed : accent,
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: 1.1,
+                  fontSize: 12,
                 ),
-                const Spacer(),
-                if (buffering)
-                  const SizedBox(
-                    width: 18,
-                    height: 18,
-                    child: CircularProgressIndicator(strokeWidth: 2),
-                  ),
-              ],
+              ),
+              const Spacer(),
+              if (ui.isLoading) const CupertinoActivityIndicator(radius: 9),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Text(
+            BrandConfig.stationName,
+            style: const TextStyle(
+              color: CupertinoColors.white,
+              fontSize: 20,
+              fontWeight: FontWeight.w700,
             ),
-            const SizedBox(height: 12),
+          ),
+          if (BrandConfig.stationFrequencyLabel.isNotEmpty) ...[
+            const SizedBox(height: 4),
             Text(
-              BrandConfig.stationName,
-              style: theme.textTheme.titleLarge?.copyWith(
-                fontWeight: FontWeight.w700,
+              BrandConfig.stationFrequencyLabel,
+              style: const TextStyle(
+                color: CupertinoColors.systemGrey,
+                fontSize: 14,
               ),
             ),
-            if (BrandConfig.stationFrequencyLabel.isNotEmpty) ...[
-              const SizedBox(height: 4),
-              Text(
-                BrandConfig.stationFrequencyLabel,
-                style: theme.textTheme.bodyMedium?.copyWith(
-                  color: theme.textTheme.bodyMedium?.color?.withValues(alpha: 0.75),
-                ),
-              ),
-            ],
-            const SizedBox(height: 16),
-            SizedBox(
-              width: double.infinity,
-              child: FilledButton.icon(
-                onPressed: buffering ? null : onToggle,
-                icon: Icon(playing ? Icons.stop_rounded : Icons.play_arrow_rounded),
-                label: Text(playing ? 'Stop' : 'Play live'),
-                style: FilledButton.styleFrom(
-                  backgroundColor: accent,
-                  foregroundColor: _onAccentForeground(accent),
-                  padding: const EdgeInsets.symmetric(vertical: 14),
-                ),
-              ),
-            ),
-            if (error != null) ...[
-              const SizedBox(height: 8),
-              Text(
-                error!,
-                style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.error),
-              ),
-            ],
           ],
-        ),
+          const SizedBox(height: 16),
+          SizedBox(
+            width: double.infinity,
+            child: CupertinoButton.filled(
+              color: accent,
+              padding: const EdgeInsets.symmetric(vertical: 14),
+              onPressed: ui.isLoading
+                  ? null
+                  : () => ref.read(roguesRadioPlayerProvider).toggle(),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    ui.isPlaying
+                        ? CupertinoIcons.stop_fill
+                        : CupertinoIcons.play_fill,
+                    size: 18,
+                  ),
+                  const SizedBox(width: 8),
+                  Text(ui.isPlaying ? 'Stop' : 'Play live'),
+                ],
+              ),
+            ),
+          ),
+          if (ui.errorMessage != null) ...[
+            const SizedBox(height: 8),
+            Text(
+              ui.errorMessage!,
+              style: const TextStyle(
+                color: CupertinoColors.systemRed,
+                fontSize: 12,
+              ),
+            ),
+          ],
+        ],
       ),
     );
   }
-
-  Color _onAccentForeground(Color accent) {
-    return accent.computeLuminance() > 0.5 ? Colors.black : Colors.white;
-  }
 }
-
-// ---------------------------------------------------------------------------
-// Rise FM stream quality picker
-// ---------------------------------------------------------------------------
 
 class _RiseFmQualityPicker extends StatelessWidget {
   const _RiseFmQualityPicker({
@@ -1368,59 +1545,57 @@ class _RiseFmQualityPicker extends StatelessWidget {
     required this.onChanged,
   });
 
-  final RiseStreamQuality value;
+  final String value;
   final Color accent;
-  final ValueChanged<RiseStreamQuality> onChanged;
+  final ValueChanged<String> onChanged;
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           'Stream quality',
-          style: theme.textTheme.titleSmall?.copyWith(
-            fontWeight: FontWeight.w600,
+          style: TextStyle(
             color: accent,
+            fontSize: 14,
+            fontWeight: FontWeight.w600,
           ),
         ),
         const SizedBox(height: 8),
-        SegmentedButton<RiseStreamQuality>(
-          segments: const [
-            ButtonSegment(
-              value: RiseStreamQuality.standard,
-              label: Text('Standard'),
-              icon: Icon(Icons.signal_cellular_alt, size: 16),
+        CupertinoSlidingSegmentedControl<String>(
+          groupValue: value,
+          onValueChanged: (next) {
+            if (next != null) onChanged(next);
+          },
+          children: const {
+            'medium': Padding(
+              padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+              child: Text('Standard'),
             ),
-            ButtonSegment(
-              value: RiseStreamQuality.high,
-              label: Text('High'),
-              icon: Icon(Icons.signal_cellular_alt_2_bar, size: 16),
+            'high': Padding(
+              padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+              child: Text('High'),
             ),
-          ],
-          selected: {value},
-          onSelectionChanged: (s) => onChanged(s.first),
+          },
         ),
       ],
     );
   }
 }
 
-// ---------------------------------------------------------------------------
-// Station quick actions
-// ---------------------------------------------------------------------------
-
 class _StationAction {
   const _StationAction({
     required this.label,
-    required this.icon,
     required this.url,
+    this.icon,
+    this.faIcon,
   });
 
   final String label;
-  final IconData icon;
   final String url;
+  final IconData? icon;
+  final IconData? faIcon;
 }
 
 class _StationActionChip extends StatelessWidget {
@@ -1436,72 +1611,32 @@ class _StationActionChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ActionChip(
-      avatar: Icon(action.icon, size: 18, color: accent),
-      label: Text(action.label),
-      onPressed: onTap,
-      side: BorderSide(color: accent.withValues(alpha: 0.35)),
-    );
-  }
-}
-
-
-class _RoguesPartnersSection extends StatelessWidget {
-  const _RoguesPartnersSection({required this.accent});
-
-  final Color accent;
-
-  static const _partners = <String>[
-  'AyobaAlli',
-  'BIE Inspection Services',
-  'Business Capital Group',
-  'Churchill Plumbing',
-  'Consolidated Auto',
-  'Dukes Gold & Diamond Exchange',
-  'Empirical',
-  'Fourways Mall',
-  'Pnet',
-  'Shalkim',
-  'Tic Tac',
-  'Trinity Capital Holdings',
-  'Turnkey Music & Multimedia',
-  'Adapt Signage & Branding',
-  'Bundle Media',
-  'Open Fibre',
-  'Dynamic IT',
-  'Gold Reef City',
-  'Hlasela Group',
-  'Visual Audio',
-  ];
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'Partners & sponsors',
-          style: theme.textTheme.titleMedium?.copyWith(
-            fontWeight: FontWeight.w700,
-            color: accent,
-          ),
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: accent.withValues(alpha: 0.35)),
         ),
-        const SizedBox(height: 8),
-        Wrap(
-          spacing: 6,
-          runSpacing: 6,
-          children: _partners
-              .map(
-                (p) => Chip(
-                  label: Text(p, style: theme.textTheme.labelSmall),
-                  visualDensity: VisualDensity.compact,
-                  side: BorderSide(color: accent.withValues(alpha: 0.25)),
-                ),
-              )
-              .toList(),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (action.faIcon != null)
+              FaIcon(action.faIcon, size: 14, color: accent)
+            else
+              Icon(action.icon, size: 16, color: accent),
+            const SizedBox(width: 6),
+            Text(
+              action.label,
+              style: const TextStyle(
+                color: CupertinoColors.white,
+                fontSize: 13,
+              ),
+            ),
+          ],
         ),
-      ],
+      ),
     );
   }
 }
