@@ -424,6 +424,8 @@ class ClaimService
             return $results;
         }
 
+        app(ClaimNotificationService::class)->notifyPendingClaim($entity, $type, (int) $user->id, $message);
+
         $results['pending'][] = [
             'type' => $type,
             'id' => $entity->id,

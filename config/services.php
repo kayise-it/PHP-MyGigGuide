@@ -53,4 +53,11 @@ return [
         'web_app_id' => env('FIREBASE_WEB_APP_ID', '1:929498924637:web:8d691f0f25d1cd9f72afb4'),
     ],
 
+    'evolution' => [
+        'enabled' => env('EVOLUTION_API_ENABLED', false),
+        'url' => env('EVOLUTION_API_URL'),
+        'instance' => env('EVOLUTION_INSTANCE'),
+        'admin_number' => env('EVOLUTION_ADMIN_NUMBER'),
+    ],
+
 ];

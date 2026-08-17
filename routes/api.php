@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\V1\CategoryController;
 use App\Http\Controllers\Api\V1\EventController;
 use App\Http\Controllers\Api\V1\MeController;
 use App\Http\Controllers\Api\V1\MetaController;
+use App\Http\Controllers\Api\V1\PollController;
 use App\Http\Controllers\Api\V1\RatingController;
 use App\Http\Controllers\Api\V1\VenueController;
 use Illuminate\Support\Facades\Route;
@@ -35,6 +36,9 @@ Route::prefix('v1')->group(function () {
     Route::get('{type}/{id}/reviews', [RatingController::class, 'index'])
         ->whereIn('type', ['events', 'artists', 'venues'])
         ->whereNumber('id');
+
+    Route::get('polls/{context}', [PollController::class, 'show']);
+    Route::post('polls/{poll}/vote', [PollController::class, 'vote'])->whereNumber('poll');
 
     Route::post('auth/login', [AuthController::class, 'login']);
     Route::post('auth/register', [AuthController::class, 'register']);
