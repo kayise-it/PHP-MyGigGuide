@@ -152,6 +152,11 @@ class EventCreationService
             }
         }
 
+        app(EventNotificationService::class)->notifyNewCrowdSourceEvent(
+            $event->fresh(['venue']),
+            $user
+        );
+
         return [
             'event' => $event->fresh(['venue', 'artists', 'owner', 'categories', 'youtubeVideos']),
             'existing' => false,

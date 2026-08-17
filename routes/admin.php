@@ -21,6 +21,7 @@ use App\Http\Controllers\Admin\DuplicateManagementController;
 use App\Http\Controllers\Admin\CapabilityManagementController;
 use App\Http\Controllers\Admin\EmailTemplateController;
 use App\Http\Controllers\Admin\MailAccountController;
+use App\Http\Controllers\Admin\PollAdminController;
 
 // Admin Authentication Routes
 Route::prefix('admin')->name('admin.')->group(function () {
@@ -121,6 +122,10 @@ Route::prefix('admin')->name('admin.')->group(function () {
         // Category Management
         Route::resource('categories', CategoryManagementController::class);
         Route::patch('categories/{category}/toggle-status', [CategoryManagementController::class, 'toggleStatus'])->name('categories.toggle-status');
+
+        // Polls (station contexts incl. mix938)
+        Route::patch('polls/{poll}/close', [PollAdminController::class, 'close'])->name('polls.close');
+        Route::resource('polls', PollAdminController::class)->except(['show']);
 
         // Paid Features CRUD
         Route::resource('paid-features', PaidFeatureController::class)->parameters([
