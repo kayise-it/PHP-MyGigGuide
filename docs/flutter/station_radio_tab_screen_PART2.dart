@@ -71,8 +71,8 @@ class _Fm919NewsSection extends StatelessWidget {
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                   ),
-                  subtitle: item.publishedLabel != null
-                      ? Text(item.publishedLabel!)
+                  subtitle: item.date != null
+                      ? Text(item.date!)
                       : null,
                   trailing: const Icon(Icons.open_in_new, size: 16),
                   onTap: () => onOpen(item.url),
@@ -110,8 +110,8 @@ class _RiseFmTodaySection extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final dark = BrandConfig.usesDarkChrome;
-    final dayLabel = schedule?.dayLabel ?? _weekdayNames[DateTime.now().weekday - 1];
-    final slots = schedule?.slots ?? const <RiseFmScheduleSlot>[];
+    final dayLabel = schedule?.weekday ?? _weekdayNames[DateTime.now().weekday - 1];
+    final entries = schedule?.entries ?? const <RiseFmScheduleEntry>[];
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -156,7 +156,7 @@ class _RiseFmTodaySection extends StatelessWidget {
               color: dark ? const Color(0xFF64748B) : BrandConfig.lightMutedText,
             ),
           )
-        else if (slots.isEmpty)
+        else if (entries.isEmpty)
           Text(
             'No schedule slots for today.',
             style: theme.textTheme.bodySmall?.copyWith(
@@ -164,11 +164,11 @@ class _RiseFmTodaySection extends StatelessWidget {
             ),
           )
         else
-          ...slots.map(
-            (slot) => _RiseScheduleRow(
-              time: slot.timeRange,
-              show: slot.show,
-              host: slot.presenter ?? 'RISE team',
+          ...entries.map(
+            (entry) => _RiseScheduleRow(
+              time: entry.time,
+              show: entry.show,
+              host: entry.presenter ?? 'RISE team',
               accent: accent,
             ),
           ),
@@ -309,8 +309,8 @@ class _RiseFmNewsSection extends StatelessWidget {
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                   ),
-                  subtitle: item.publishedLabel != null
-                      ? Text(item.publishedLabel!)
+                  subtitle: item.date != null
+                      ? Text(item.date!)
                       : null,
                   trailing: const Icon(Icons.open_in_new, size: 16),
                   onTap: () => onOpen(item.url),
@@ -337,17 +337,17 @@ class _StationLivePlayerCard extends StatelessWidget {
   final RiseFmDaySchedule? schedule;
 
   String? _currentShowLabel() {
-    final slots = schedule?.slots;
-    if (slots == null || slots.isEmpty) return null;
+    final entries = schedule?.entries;
+    if (entries == null || entries.isEmpty) return null;
     final now = DateTime.now();
     final minutesNow = now.hour * 60 + now.minute;
 
-    RiseFmScheduleSlot? current;
-    for (final slot in slots) {
-      final start = _parseStartMinutes(slot.timeRange);
+    RiseFmScheduleEntry? current;
+    for (final entry in entries) {
+      final start = _parseStartMinutes(entry.time);
       if (start == null) continue;
       if (start <= minutesNow) {
-        current = slot;
+        current = entry;
       } else {
         break;
       }
@@ -411,16 +411,16 @@ class _StationLivePlayerCard extends StatelessWidget {
             ),
             const SizedBox(height: 12),
             Text(
-              BrandConfig.stationName,
+              BrandConfig.stationTabHeroTitle,
               style: theme.textTheme.titleLarge?.copyWith(
                 fontWeight: FontWeight.w700,
                 color: dark ? const Color(0xFFF8FAFC) : BrandConfig.lightText,
               ),
             ),
-            if (BrandConfig.stationFrequencyLabel.isNotEmpty) ...[
+            if (BrandConfig.stationTabHeroSubtitle.isNotEmpty) ...[
               const SizedBox(height: 4),
               Text(
-                BrandConfig.stationFrequencyLabel,
+                BrandConfig.stationTabHeroSubtitle,
                 style: theme.textTheme.bodyMedium?.copyWith(
                   color: dark ? const Color(0xFF64748B) : BrandConfig.lightMutedText,
                 ),
