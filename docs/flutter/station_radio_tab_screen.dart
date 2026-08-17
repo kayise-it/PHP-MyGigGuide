@@ -751,8 +751,8 @@ class _RiseFmTodaySection extends StatelessWidget {
           ...shows.map(
             (show) => _RiseScheduleRow(
               time: show.timeRange,
-              show: show.show,
-              host: show.presenter ?? 'RISE team',
+              show: show.title,
+              host: show.host ?? 'RISE team',
               accent: accent,
             ),
           ),
@@ -930,12 +930,12 @@ class _StationLivePlayerCard extends StatelessWidget {
     final now = DateTime.now();
     final minutesNow = now.hour * 60 + now.minute;
 
-    var currentShow = shows.first.show;
+    var currentShow = shows.first.title;
     for (final show in shows) {
       final start = _parseStartMinutes(show.timeRange);
       if (start == null) continue;
       if (start <= minutesNow) {
-        currentShow = show.show;
+        currentShow = show.title;
       } else {
         break;
       }
