@@ -201,6 +201,53 @@
   @apply bg-slate-950 text-slate-100;
 }
 
+/* ── Public dark theme: 919 FM (yellow on slate) ── */
+.brand-fm919 {
+  color-scheme: dark;
+}
+
+.brand-fm919 .btn-primary {
+  @apply bg-yellow-400 text-slate-950 hover:bg-yellow-300 focus:ring-yellow-400;
+}
+
+.brand-fm919 .btn-secondary {
+  @apply bg-slate-800 text-slate-100 border border-slate-600 hover:bg-slate-700 focus:ring-yellow-400;
+}
+
+.brand-fm919 .btn-outline {
+  @apply border-yellow-400 text-yellow-400 hover:bg-yellow-400/10 focus:ring-yellow-400;
+}
+
+.brand-fm919 .text-gradient {
+  @apply bg-gradient-to-r from-yellow-200 to-yellow-400 bg-clip-text text-transparent;
+}
+
+.brand-fm919 .bg-gradient-primary {
+  @apply bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900;
+}
+
+.brand-fm919 .card,
+.brand-fm919 .card-event {
+  @apply bg-slate-900 border-slate-700 text-slate-100;
+}
+
+.brand-fm919 .form-input {
+  @apply bg-slate-950 border-slate-600 text-slate-100 placeholder:text-slate-500 focus:ring-yellow-400;
+}
+
+.brand-fm919 .form-label {
+  @apply text-slate-300;
+}
+
+.brand-fm919 .dropdown-item {
+  @apply text-slate-200 hover:bg-slate-800 hover:text-white;
+}
+
+.brand-fm919 select,
+.brand-fm919 select option {
+  @apply bg-slate-950 text-slate-100;
+}
+
 /* ── Admin panel shell ── */
 .admin-shell {
   color-scheme: dark;
@@ -240,97 +287,118 @@
 /* ── Legacy light Tailwind utilities → dark (dashboard, profile, forms, admin) ── */
 .brand-mygigguide .text-gray-900,
 .brand-rogues .text-gray-900,
+.brand-fm919 .text-gray-900,
 .admin-shell .text-gray-900 {
   color: #f8fafc !important;
 }
 
 .brand-mygigguide .text-gray-800,
 .brand-rogues .text-gray-800,
+.brand-fm919 .text-gray-800,
 .admin-shell .text-gray-800 {
   color: #f1f5f9 !important;
 }
 
 .brand-mygigguide .text-gray-700,
 .brand-rogues .text-gray-700,
+.brand-fm919 .text-gray-700,
 .admin-shell .text-gray-700 {
   color: #cbd5e1 !important;
 }
 
 .brand-mygigguide .text-gray-600,
 .brand-rogues .text-gray-600,
+.brand-fm919 .text-gray-600,
 .admin-shell .text-gray-600 {
   color: #94a3b8 !important;
 }
 
 .brand-mygigguide .text-gray-500,
 .brand-rogues .text-gray-500,
+.brand-fm919 .text-gray-500,
 .admin-shell .text-gray-500 {
   color: #64748b !important;
 }
 
 .brand-mygigguide .text-gray-400,
 .brand-rogues .text-gray-400,
+.brand-fm919 .text-gray-400,
 .admin-shell .text-gray-400 {
   color: #475569 !important;
 }
 
 .brand-mygigguide .bg-white,
 .brand-rogues .bg-white,
+.brand-fm919 .bg-white,
 .admin-shell .bg-white {
   background-color: #12121A !important;
 }
 
-.brand-rogues .bg-white {
+.brand-rogues .bg-white,
+.brand-fm919 .bg-white {
   background-color: #0f172a !important;
 }
 
 .brand-mygigguide .bg-gray-50,
 .brand-rogues .bg-gray-50,
+.brand-fm919 .bg-gray-50,
 .admin-shell .bg-gray-50 {
   background-color: #0a0a10 !important;
 }
 
 .brand-mygigguide .bg-gray-100,
 .brand-rogues .bg-gray-100,
+.brand-fm919 .bg-gray-100,
 .admin-shell .bg-gray-100 {
   background-color: #1e293b !important;
 }
 
 .brand-mygigguide .border-gray-100,
 .brand-rogues .border-gray-100,
+.brand-fm919 .border-gray-100,
 .admin-shell .border-gray-100,
 .brand-mygigguide .border-gray-200,
 .brand-rogues .border-gray-200,
+.brand-fm919 .border-gray-200,
 .admin-shell .border-gray-200,
 .brand-mygigguide .border-purple-100,
 .brand-rogues .border-purple-100,
+.brand-fm919 .border-purple-100,
 .admin-shell .border-purple-100,
 .brand-mygigguide .border-purple-200,
 .brand-rogues .border-purple-200,
+.brand-fm919 .border-purple-200,
 .admin-shell .border-purple-200 {
   border-color: rgba(255, 255, 255, 0.1) !important;
 }
 
 .brand-rogues .border-gray-200,
+.brand-fm919 .border-gray-200,
 .brand-rogues .border-purple-100,
-.brand-rogues .border-purple-200 {
+.brand-fm919 .border-purple-100,
+.brand-rogues .border-purple-200,
+.brand-fm919 .border-purple-200 {
   border-color: rgba(148, 163, 184, 0.25) !important;
 }
 
 .brand-mygigguide .divide-gray-100 > :not([hidden]) ~ :not([hidden]),
 .brand-rogues .divide-gray-100 > :not([hidden]) ~ :not([hidden]),
+.brand-fm919 .divide-gray-100 > :not([hidden]) ~ :not([hidden]),
 .admin-shell .divide-gray-100 > :not([hidden]) ~ :not([hidden]),
 .brand-mygigguide .divide-gray-200 > :not([hidden]) ~ :not([hidden]),
 .brand-rogues .divide-gray-200 > :not([hidden]) ~ :not([hidden]),
+.brand-fm919 .divide-gray-200 > :not([hidden]) ~ :not([hidden]),
 .admin-shell .divide-gray-200 > :not([hidden]) ~ :not([hidden]) {
   border-color: rgba(255, 255, 255, 0.1) !important;
 }
 
 .brand-mygigguide .hover\:bg-gray-50:hover,
 .brand-rogues .hover\:bg-gray-50:hover,
+.brand-fm919 .hover\:bg-gray-50:hover,
 .admin-shell .hover\:bg-gray-50:hover,
 .brand-mygigguide .hover\:bg-gray-100:hover,
 .brand-rogues .hover\:bg-gray-100:hover,
+.brand-fm919 .hover\:bg-gray-100:hover,
 .admin-shell .hover\:bg-gray-100:hover {
   background-color: rgba(255, 255, 255, 0.05) !important;
 }
@@ -341,7 +409,8 @@
   --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to) !important;
 }
 
-.brand-rogues .from-purple-50 {
+.brand-rogues .from-purple-50,
+.brand-fm919 .from-purple-50 {
   --tw-gradient-from: #020617 !important;
   --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to) !important;
 }
@@ -352,7 +421,8 @@
   --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-via), var(--tw-gradient-to) !important;
 }
 
-.brand-rogues .via-white {
+.brand-rogues .via-white,
+.brand-fm919 .via-white {
   --tw-gradient-via: #0f172a !important;
   --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-via), var(--tw-gradient-to) !important;
 }
@@ -362,7 +432,8 @@
   --tw-gradient-to: #0a0a10 !important;
 }
 
-.brand-rogues .to-blue-50 {
+.brand-rogues .to-blue-50,
+.brand-fm919 .to-blue-50 {
   --tw-gradient-to: #020617 !important;
 }
 
@@ -373,6 +444,19 @@
 
 .brand-rogues .bg-purple-50 {
   background-color: rgba(56, 189, 248, 0.12) !important;
+}
+
+.brand-fm919 .bg-purple-50 {
+  background-color: rgba(234, 179, 8, 0.12) !important;
+}
+
+.brand-fm919 .text-purple-800,
+.brand-fm919 .text-purple-700 {
+  color: #0f172a !important;
+}
+
+.brand-fm919 .bg-purple-100 {
+  background-color: rgba(234, 179, 8, 0.22) !important;
 }
 
 .brand-mygigguide .bg-purple-100,
@@ -472,18 +556,21 @@
 
 /* Google Maps popup chrome on dark public pages */
 .brand-mygigguide .gm-style .gm-style-iw-c,
-.brand-rogues .gm-style .gm-style-iw-c {
+.brand-rogues .gm-style .gm-style-iw-c,
+.brand-fm919 .gm-style .gm-style-iw-c {
   background-color: #12121A !important;
   padding: 0 !important;
 }
 
 .brand-mygigguide .gm-style .gm-style-iw-d,
-.brand-rogues .gm-style .gm-style-iw-d {
+.brand-rogues .gm-style .gm-style-iw-d,
+.brand-fm919 .gm-style .gm-style-iw-d {
   overflow: hidden !important;
 }
 
 .brand-mygigguide .gm-style .gm-style-iw-tc::after,
-.brand-rogues .gm-style .gm-style-iw-tc::after {
+.brand-rogues .gm-style .gm-style-iw-tc::after,
+.brand-fm919 .gm-style .gm-style-iw-tc::after {
   background: #12121A !important;
 }
 
@@ -492,14 +579,19 @@
 .brand-mygigguide .gm-style .gm-control-active,
 .brand-mygigguide .gm-style .gm-fullscreen-control,
 .brand-rogues .gm-style .gmnoprint button,
+.brand-fm919 .gm-style .gmnoprint button,
 .brand-rogues .gm-style .gm-control-active,
-.brand-rogues .gm-style .gm-fullscreen-control {
+.brand-fm919 .gm-style .gm-control-active,
+.brand-rogues .gm-style .gm-fullscreen-control,
+.brand-fm919 .gm-style .gm-fullscreen-control {
   background-color: #12121A !important;
   color: #e2e8f0 !important;
 }
 
 .brand-rogues .gm-style .gmnoprint button,
-.brand-rogues .gm-style .gm-control-active {
+.brand-fm919 .gm-style .gmnoprint button,
+.brand-rogues .gm-style .gm-control-active,
+.brand-fm919 .gm-style .gm-control-active {
   background-color: #0f172a !important;
 }
 
@@ -507,8 +599,11 @@
 .brand-mygigguide .gm-style .gm-style-cc span,
 .brand-mygigguide .gm-style .gm-style-cc a,
 .brand-rogues .gm-style .gm-style-cc,
+.brand-fm919 .gm-style .gm-style-cc,
 .brand-rogues .gm-style .gm-style-cc span,
-.brand-rogues .gm-style .gm-style-cc a {
+.brand-fm919 .gm-style .gm-style-cc span,
+.brand-rogues .gm-style .gm-style-cc a,
+.brand-fm919 .gm-style .gm-style-cc a {
   color: #64748b !important;
 }
 

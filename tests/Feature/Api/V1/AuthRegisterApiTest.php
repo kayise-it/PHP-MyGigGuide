@@ -35,6 +35,7 @@ class AuthRegisterApiTest extends TestCase
 
         $user = User::query()->where('email', 'mobile.tester@example.com')->first();
         $this->assertNotNull($user);
+        $this->assertNotNull($user->last_login_at);
         $this->assertTrue($user->hasRole('user'));
         $this->assertTrue($user->can('create-events'));
         $this->assertNotNull($user->email_verified_at);
@@ -69,6 +70,7 @@ class AuthRegisterApiTest extends TestCase
         ]);
 
         $response->assertOk()->assertJsonPath('user.username', 'unverified_user');
+        $this->assertNotNull($user->fresh()->last_login_at);
     }
 
     public function test_login_grants_create_events_when_role_lacks_permission(): void

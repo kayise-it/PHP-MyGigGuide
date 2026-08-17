@@ -146,7 +146,7 @@
                     </div>
                     
                     <div class="flex items-center">
-                        <input type="checkbox" id="newsletter" name="newsletter"
+                        <input type="checkbox" id="newsletter" name="newsletter" value="1"
                             class="h-4 w-4 {{ $siteBrand->isRogues ? 'text-sky-400 focus:ring-sky-400' : 'text-indigo-500 focus:ring-indigo-500' }} border-slate-600 rounded bg-slate-950">
                         <label for="newsletter" class="ml-2 text-sm {{ $siteBrand->detailMutedTextClass() }}">
                             Subscribe to our newsletter for event updates

@@ -21,6 +21,14 @@ class Category extends Model
     ];
 
     /**
+     * Public dropdowns and API lists — alphabetical by name.
+     */
+    public function scopeOrderedForDisplay($query)
+    {
+        return $query->orderBy('name');
+    }
+
+    /**
      * Get the events that belong to this category.
      */
     public function events(): BelongsToMany

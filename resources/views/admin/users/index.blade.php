@@ -11,7 +11,11 @@
             <h2 class="text-2xl font-bold text-gray-900">Users</h2>
             <p class="mt-1 text-sm text-gray-600">Manage user accounts and permissions</p>
         </div>
-        <div class="mt-4 sm:mt-0">
+        <div class="mt-4 sm:mt-0 flex flex-wrap gap-2">
+            <a href="{{ route('admin.users.index', array_merge(request()->only(['search', 'role']), ['sort' => 'last_login_at', 'direction' => 'desc'])) }}"
+               class="inline-flex items-center px-4 py-2 border border-purple-200 rounded-lg text-sm font-medium text-purple-700 bg-purple-50 hover:bg-purple-100 transition-colors duration-200">
+                Recent logins
+            </a>
             <a href="{{ route('admin.users.create') }}" class="btn-primary">
                 <svg class="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
@@ -21,9 +25,39 @@
         </div>
     </div>
 
+    @if(!empty($loginFilter))
+        <div class="flex flex-wrap items-center gap-2 rounded-lg border border-purple-200 bg-purple-50 px-4 py-3 text-sm text-purple-900">
+            <span class="font-medium">Login filter:</span>
+            <span>
+                @if($loginFilter === 'active_7d')
+                    Active in the last 7 days
+                @elseif($loginFilter === 'active_30d')
+                    Active in the last 30 days
+                @elseif($loginFilter === 'never')
+                    Never logged in
+                @else
+                    {{ $loginFilter }}
+                @endif
+            </span>
+            <a href="{{ route('admin.users.index', request()->except(['login', 'page'])) }}"
+               class="ml-auto font-medium text-purple-700 hover:text-purple-900 underline">
+                Clear filter
+            </a>
+        </div>
+    @endif
+
     <!-- Filters -->
     <div class="bg-white shadow-sm rounded-xl border border-gray-200 p-6">
         <form method="GET" id="ajax-search-form" class="flex flex-col sm:flex-row gap-4">
+            @if(request('sort'))
+                <input type="hidden" name="sort" value="{{ request('sort') }}">
+            @endif
+            @if(request('direction'))
+                <input type="hidden" name="direction" value="{{ request('direction') }}">
+            @endif
+            @if(request('login'))
+                <input type="hidden" name="login" value="{{ request('login') }}">
+            @endif
             <div class="flex-1">
                 <label for="search" class="block text-sm font-medium text-gray-700 mb-2">Search</label>
                 <input 
@@ -77,6 +111,18 @@
                             </button>
                         </th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            @php
+                                $lastLoginDir = ($sort ?? '') === 'last_login_at' && ($direction ?? 'asc') === 'desc' ? 'asc' : 'desc';
+                            @endphp
+                            <a href="{{ route('admin.users.index', array_merge(request()->except(['page']), ['sort' => 'last_login_at', 'direction' => $lastLoginDir])) }}"
+                               class="inline-flex items-center gap-1 hover:text-gray-700">
+                                Last login
+                                @if(($sort ?? '') === 'last_login_at')
+                                    <svg class="w-3 h-3 @if(($direction ?? 'asc') === 'asc') transform rotate-180 @endif" fill="currentColor" viewBox="0 0 20 20"><path d="M10 3l5 7H5l5-7z"/></svg>
+                                @endif
+                            </a>
+                        </th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                             <button type="button" class="sortable-header inline-flex items-center gap-1" data-key="created_at_ts" aria-label="Sort by joined date">
                                 Joined
                                 <svg class="sort-caret hidden w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path d="M10 3l5 7H5l5-7z"/></svg>
@@ -114,6 +160,13 @@
                                 </span>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                @if($user->last_login_at)
+                                    <span title="{{ $user->last_login_at->format('M j, Y g:i A') }}">{{ $user->last_login_at->diffForHumans() }}</span>
+                                @else
+                                    <span class="text-gray-400">Never</span>
+                                @endif
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                 {{ $user->created_at->format('M d, Y') }}
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
@@ -137,7 +190,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="5" class="px-6 py-12 text-center text-gray-500">
+                            <td colspan="6" class="px-6 py-12 text-center text-gray-500">
                                 <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z" />
                                 </svg>
@@ -350,12 +403,16 @@
                     method: 'POST',
                     headers: {
                         'X-CSRF-TOKEN': csrfToken,
-                        'X-Requested-With': 'XMLHttpRequest'
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Accept': 'application/json',
                     },
                     body: new URLSearchParams({ _method: 'DELETE' })
                 });
-                if (!res.ok) throw new Error('Failed');
-                // Optimistically remove the row
+                const data = await res.json().catch(() => null);
+                if (!res.ok || !data?.success) {
+                    alert(data?.message || 'Failed to delete user. Please try again.');
+                    return;
+                }
                 row.parentNode.removeChild(row);
             } catch (err) {
                 alert('Failed to delete user. Please try again.');

@@ -18,6 +18,9 @@ class DashboardController extends Controller
         $stats = [];
 
         if ($statsEnabled) {
+            $activeSince7d = now()->subDays(7);
+            $activeSince30d = now()->subDays(30);
+
             $stats = [
                 'total_users' => User::count(),
                 'total_events' => Event::count(),
@@ -27,6 +30,9 @@ class DashboardController extends Controller
                 'active_events' => Event::where('status', 'active')->count(),
                 'pending_events' => Event::where('status', 'pending')->count(),
                 'cancelled_events' => Event::where('status', 'cancelled')->count(),
+                'users_active_7d' => User::where('last_login_at', '>=', $activeSince7d)->count(),
+                'users_active_30d' => User::where('last_login_at', '>=', $activeSince30d)->count(),
+                'users_never_logged_in' => User::whereNull('last_login_at')->count(),
             ];
         }
 

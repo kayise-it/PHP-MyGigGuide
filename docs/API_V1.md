@@ -15,7 +15,7 @@ All endpoints return **JSON**. No authentication required for these read-only ro
 | GET | `/api/v1/venues` | Paginated venues |
 | GET | `/api/v1/venues/{id}` | Single venue (+ `upcoming_events`, next 90 days) |
 | GET | `/api/v1/artists` | Paginated artists |
-| GET | `/api/v1/artists/{id}` | Single artist (+ genres, `upcoming_events`, next 90 days) |
+| GET | `/api/v1/artists/{id}` | Single artist (+ genres, `upcoming_events`, `posted_events`, next 90 days) |
 
 **Artists / venues list** (`GET /api/v1/artists`, `GET /api/v1/venues`): optional query **`sort`** — `name` (default), `rating`, `events`, `newest`. Rows include **`rating_summary`** (`average`, `count`) and **`events_count`**. Matches website browse sorts (website venues also has capacity — not in app MVP).
 
@@ -35,6 +35,34 @@ All endpoints return **JSON**. No authentication required for these read-only ro
 | POST | `/api/v1/me/web-session` | **App → website SSO** — one-time URL to open www signed in (optional `{ "redirect": "/dashboard" }`) |
 | POST | `/api/v1/me/link-firebase` | Link Firebase UID to current user (requires bearer + `id_token`) |
 | GET | `/api/v1/me/favorites` | Current user favorites (events, venues, artists, organisers). Events/venues/artists rows include optional **`image_url`** (poster / main picture / profile photo). |
+| GET | `/api/v1/me/favorites/updates` | **In-app alerts (Phase 1)** — upcoming gigs for saved artists/venues/events. Query: optional **`since`** (ISO 8601 — new listings since last app visit), optional **`days`** (1–90, default 30). Each row includes `match_reasons`, `match_labels`, `is_reminder` (saved gig coming soon). |
+| GET | `/api/v1/me/page-alerts` | **My pages alerts (Phase 1)** — upcoming **user-posted** gigs that tag a **claimed** artist, venue, or organiser page you own. Query: optional **`since`**, optional **`days`** (1–90, default 30). Excludes Quicket imports and gigs you posted yourself. Same row shape as favorites/updates (`match_reasons`, `match_labels`, `created_at`). |
+| GET | `/api/v1/artists/{artist}/repertoire` | **Repertoire M1** — public song list for an artist (`title`, `original_artist`, `is_original`, optional `reference_youtube_id`). |
+| GET | `/api/v1/me/artist/songs` | Owner repertoire (includes `notes`). Requires bearer. |
+| POST | `/api/v1/me/artist/songs` | Add one song (`title`, optional `original_artist`, `is_original`, `youtube_url`, `spotify_url`, `notes`). |
+| POST | `/api/v1/me/artist/songs/bulk` | Bulk paste — body `{ "text": "Artist - Title\\n..." }` → `{ summary: { created, skipped } }`. |
+| PATCH | `/api/v1/me/artist/songs/{song}` | Update song fields. |
+| DELETE | `/api/v1/me/artist/songs/{song}` | Remove song. |
+| PATCH | `/api/v1/me/artist/songs/reorder` | Body `{ "song_ids": [3,1,2] }`. |
+| GET | `/api/v1/me/artist/songs/spotify/search` | **Spotify v2** — search tracks (`q`, optional `limit` max 10). Requires `SPOTIFY_CLIENT_ID` / `SPOTIFY_CLIENT_SECRET`. |
+| GET | `/api/v1/me/artist/songs/spotify/status` | `{ connected, connected_at }` — whether artist has linked Spotify for playlist import. |
+| GET | `/api/v1/me/artist/songs/spotify/connect` | Returns `{ url }` — open in browser to connect Spotify (playlist import). Callback: `/spotify/callback`. |
+| DELETE | `/api/v1/me/artist/songs/spotify/connect` | Disconnect Spotify from artist profile. |
+| POST | `/api/v1/me/artist/songs/spotify` | Import Spotify **track or playlist** URL → `{ data, summary? }`. **Playlists require Connect Spotify first** (Spotify Feb 2026 API). |
+| POST | `/api/v1/me/artist/songs/spotify/add` | Add one track by `{ "spotify_id": "..." }` (from search results). |
+| GET | `/api/v1/events/{event}/live` | **Live M3** — active live sessions at this event. |
+| GET | `/api/v1/artists/{artist}/live` | Current live session for artist (`data: null` if not live). |
+| GET | `/api/v1/live-sessions/{session}` | Session detail + `pending_count`. |
+| POST | `/api/v1/me/live-sessions` | **Go live** — `{ "event_id", "artist_id" }` (artist on event bill; owner or organiser). |
+| POST | `/api/v1/live-sessions/{session}/end` | End live session. |
+| GET | `/api/v1/live-sessions/{session}/queue` | Artist queue (fan name, song, status). |
+| POST | `/api/v1/live-sessions/{session}/requests` | Fan request — `{ "artist_song_id"? , "message"? }` (logged in; session must be live). |
+| GET | `/api/v1/live-sessions/{session}/my-requests` | Fan's requests in this session. |
+| PATCH | `/api/v1/live-sessions/{session}/requests/{request}` | Update status: `pending`, `accepted`, `played`, `skipped`, `declined`. |
+| GET | `/api/v1/events/{event}/board` | **Venue check-in V1** — tonight's board: lineup, LIVE sessions, check-in count. Optional bearer → `checked_in`. |
+| POST | `/api/v1/events/{event}/check-in` | **Check in** (logged in; honor system — event day only). Returns board payload. |
+| DELETE | `/api/v1/events/{event}/check-in` | **Undo check-in**. Returns board payload. |
+| GET | `/api/v1/venues/{venue}/tonight` | Events at venue **today** with board payload per event. Optional bearer → `checked_in` per event. |
 | POST | `/api/v1/me/favorites/{type}/{id}` | Add favorite (`type`: events\|venues\|artists\|organisers) |
 | DELETE | `/api/v1/me/favorites/{type}/{id}` | Remove favorite |
 | POST | `/api/v1/events/parse-poster` | **Read poster** — Groq vision via internal bridge (see below) |
@@ -42,13 +70,51 @@ All endpoints return **JSON**. No authentication required for these read-only ro
 | PUT/PATCH | `/api/v1/events/{id}` | **Update own event** (same permission + ownership; see below) |
 | DELETE | `/api/v1/events/{id}` | **Delete own event** (requires `delete-events` + ownership; see below) |
 | POST | `/api/v1/artists` | **Quick-create artist** (same auth; for add-event crowd-source) |
+| PATCH | `/api/v1/artists/{id}` | **Update artist page** (owner or admin; profile + videos; see below) |
 | POST | `/api/v1/venues` | **Quick-create venue** (same auth; for add-event crowd-source) |
+| PATCH | `/api/v1/venues/{id}` | **Update venue page videos** (owner or admin; see below) |
 | POST | `/api/v1/ratings` | **Submit or update rating** (requires `rate-content`; 1–5 stars + optional review) |
 | GET | `/api/v1/{type}/{id}/reviews` | Paginated reviews (`type`: `events` \| `artists` \| `venues`; query `offset`, `limit`) |
 
 Event / artist / venue **`show`** responses include **`rating_summary`**: `{ average, count, user: { rating, review } | null }`. Send optional bearer token on GET to populate `user` for the signed-in account.
 
-Artist / venue **`show`** also include ownership fields when a bearer token is sent: **`ownership_status`** (`official` \| `unclaimed` \| `pending` \| `disputed`), **`user_claim_pending`** (bool), **`can_request_claim`** (bool — logged-in user may call manual claim).
+Artist / venue **`show`** also include ownership fields when a bearer token is sent: **`ownership_status`** (`official` \| `unclaimed` \| `pending` \| `disputed`), **`user_claim_pending`** (bool), **`can_request_claim`** (bool — logged-in user may call manual claim). **`show`** also returns **`can_edit_videos`** and **`can_edit_profile`** when the bearer may `PATCH` that page.
+
+### Update artist page (`PATCH /api/v1/artists/{id}`)
+
+**Auth:** `Authorization: Bearer {access_token}`.
+
+**Who may edit:** approved page owner **or** admin/superuser (same as videos).
+
+**Body (JSON or `multipart/form-data` when uploading `profile_picture`):**
+
+| Field | Type | Notes |
+|-------|------|--------|
+| `stage_name` | string | Optional on PATCH; must stay unique |
+| `real_name` | string | Optional |
+| `genre` | string | Optional |
+| `bio` | string | Optional; max 5000 chars |
+| `phone_number` | string | Optional |
+| `contact_email` | email | Optional |
+| `instagram` | url | Optional |
+| `facebook` | url | Optional |
+| `twitter` | url | Optional |
+| `profile_picture` | file | Optional image (jpeg/png/gif/webp, max 10MB) |
+| `youtube_videos[]` | url[] | Optional — replaces all videos (max 5). Send `[]` to clear. |
+
+Send only fields you want to change. Omitted fields are left unchanged.
+
+**Success:** `200 OK` — updated `ArtistResource` in `data` (includes contact + social fields).
+
+**Errors:** `401` · `403` not owner · `422` validation
+
+### Update artist videos only
+
+Same endpoint — send only `youtube_videos[]` to replace video links without touching profile fields.
+
+### Update venue videos (`PATCH /api/v1/venues/{id}`)
+
+Same contract as **Update artist videos** — `youtube_videos[]` replaces all links (max 5). Owner = approved claim + listed on `venue_owners` or legacy `user_id` / polymorphic owner. Admin/superuser may edit any venue.
 
 ### Create event (`POST /api/v1/events`)
 
@@ -82,8 +148,10 @@ Artist / venue **`show`** also include ownership fields when a bearer token is s
 | `categories[]` | integer[] | Category IDs (`GET /api/v1/categories`) |
 | `artists[]` | integer[] | Artist IDs |
 | `youtube_videos[]` | url[] | |
-| `poster` | file | jpeg/png/gif/webp, max 10MB |
+| `poster` | file | jpeg/png/gif/webp, max 10MB — Laravel also stores a **`poster_card`** portrait crop for list tiles |
 | `gallery[]` | files | Up to 10 images |
+
+**Event read fields (May 2026):** `poster_url` = full uploaded poster (or venue fallback). `poster_card_url` = server-generated 2:3 crop when a poster was uploaded via API/web — use for diary/list thumbnails; detail pages should use `poster_url`.
 
 **Success:** `201 Created` — body is an `EventResource` wrapper:
 
@@ -135,10 +203,13 @@ Laravel forwards the upload to **miggs-bridge** on the VPS (`MIGGS_BRIDGE_URL`, 
     "time": "20:00",
     "price": "0",
     "description": "",
-    "categories": ["live-music"]
+    "categories": ["live-music"],
+    "ticket_url": "https://tickets.example.com/gig"
   }
 }
 ```
+
+If the poster shows a booking or ticket URL, the bridge should include **`ticket_url`** (full `https://…` link). Laravel passes bridge JSON through unchanged; the app maps `ticket_url` into the Add event form. Updating the Groq prompt / n8n step on **miggs-bridge** is required for Read image to fill this automatically — no Laravel change beyond docs unless the bridge uses a different key (map it there).
 
 **Failure:** `"ok": false` with `"error"` and optional `"poster_hint"` (same shape as the bridge).
 
@@ -164,6 +235,18 @@ MIGGS_BRIDGE_POSTER_SECRET=same-as-APP_POSTER_SECRET-on-bridge
 **Success:** `200 OK` — `EventResource` with `"message": "Event updated successfully."`
 
 **`GET /api/v1/events/{id}`** includes **`user_can_edit`** (bool) when a bearer token is sent — `true` when the authenticated user owns the listing.
+
+**`posted_by`** (object or `null`) — who listed the gig on event **`show`** responses:
+
+| Field | Type | Notes |
+|-------|------|--------|
+| `name` | string | Display name |
+| `username` | string \| null | Laravel username when set |
+| `via` | string \| null | Page name when posted via artist/organiser (e.g. band name) |
+| `owner_type` | string | `user` \| `artist` \| `organiser` |
+| `page` | object \| null | `{ type, id, name, url }` when owner is an artist or organiser Page |
+
+Admin/superuser listings omit `posted_by`. Follow + push roadmap: [NOTIFICATIONS_PLAN.md](./NOTIFICATIONS_PLAN.md).
 
 **Errors:** `401` · `403` (not owner or missing permission) · `422` validation
 
@@ -364,6 +447,7 @@ Returns `201` (new) or `200` with `"existing": true` when name + address match.
 **Artist / venue `show` only**
 
 - `upcoming_events` — array of event objects (same shape as `GET /events` rows): upcoming/ongoing gigs in the **next 90 calendar days**, ordered by date/time (max 100).
+- `posted_events` — **artist `show` only**: gigs this artist Page **listed** (`owner` = that artist), same shape and window as `upcoming_events`. Empty array when none. Distinct from `upcoming_events` (performing at / venue-hosted gigs).
 
 ## Local testing (Sail)
 

@@ -20,6 +20,7 @@ class AuthController extends Controller
         private readonly UserFirebaseLinkService $firebaseLink,
         private readonly ApiUserRegistrationService $registration,
     ) {}
+
     public function login(Request $request): JsonResponse
     {
         $validated = $request->validate([
@@ -43,6 +44,7 @@ class AuthController extends Controller
         }
 
         $this->registration->ensureMemberCanCreateEvents($user);
+        $user->recordLogin();
 
         $token = $user->createToken($validated['device_name'] ?? 'mobile-app')->plainTextToken;
 
@@ -85,6 +87,7 @@ class AuthController extends Controller
             ], 403);
         }
 
+        $user->recordLogin();
         $token = $user->createToken($validated['device_name'] ?? 'mobile-app')->plainTextToken;
 
         return response()->json([
@@ -122,6 +125,7 @@ class AuthController extends Controller
         }
 
         $user = $result['user'];
+        $user->recordLogin();
         $token = $user->createToken($validated['device_name'] ?? 'mobile-app')->plainTextToken;
 
         return response()->json([

@@ -99,30 +99,37 @@
 @section('content')
 <div class="{{ $siteBrand->pageContentShellClass() }}">
     <!-- Hero Section -->
-    <div class="relative h-96 md:h-[500px] overflow-hidden">
-        @php
+    @php
         $galleryImages = [];
         if ($event->gallery) {
-        try {
-        $galleryImages = is_string($event->gallery) ? json_decode($event->gallery, true) : $event->gallery;
-        if (!is_array($galleryImages)) {
-        $galleryImages = [];
-        }
-        // Filter out invalid temp paths
-        $galleryImages = array_filter($galleryImages, function($path) {
-        return $path && !str_contains($path, '/tmp/php') && !str_contains($path, 'tmp.php');
-        });
-        } catch (Exception $e) {
-        $galleryImages = [];
-        }
+            try {
+                $galleryImages = is_string($event->gallery) ? json_decode($event->gallery, true) : $event->gallery;
+                if (! is_array($galleryImages)) {
+                    $galleryImages = [];
+                }
+                $galleryImages = array_filter($galleryImages, function ($path) {
+                    return $path && ! str_contains($path, '/tmp/php') && ! str_contains($path, 'tmp.php');
+                });
+            } catch (Exception $e) {
+                $galleryImages = [];
+            }
         }
         $mainImage = $event->poster ?: ($galleryImages[0] ?? null);
-        // Also check if mainImage is a valid path and the file exists
-        if ($mainImage && (str_contains($mainImage, '/tmp/php') || str_contains($mainImage, 'tmp.php') || !\Illuminate\Support\Facades\Storage::disk('public')->exists($mainImage))) {
+        if ($mainImage && (str_contains($mainImage, '/tmp/php') || str_contains($mainImage, 'tmp.php') || ! \Illuminate\Support\Facades\Storage::disk('public')->exists($mainImage))) {
             $mainImage = null;
         }
-        @endphp
-
+        $heroLandscape = false;
+        if ($mainImage) {
+            $heroInfo = @getimagesize(\Illuminate\Support\Facades\Storage::disk('public')->path($mainImage));
+            if ($heroInfo && $heroInfo[1] > 0 && ($heroInfo[0] / $heroInfo[1]) >= 1.35) {
+                $heroLandscape = true;
+            }
+        }
+        // User gallery shots: show full frame (contain). Posters may still use cover in hero.
+        $heroGalleryOnly = ! $event->poster && count($galleryImages) > 0;
+        $heroUseContain = $heroLandscape || count($galleryImages) > 1 || $heroGalleryOnly;
+    @endphp
+    <div class="relative overflow-hidden bg-neutral-950 {{ $heroLandscape ? 'h-52 sm:h-64 md:h-72 lg:h-80' : 'h-96 md:h-[500px]' }}">
         @if(count($galleryImages) > 1)
         <!-- Owl Carousel for multiple gallery images -->
         <div class="owl-carousel owl-theme event-hero-carousel w-full h-full">
@@ -135,16 +142,21 @@
                 @endif
             <div class="item relative w-full h-full">
                 <img src="{{ url('/storage/' . ltrim($image, '/')) }}" alt="{{ $event->name }} - Image {{ $index + 1 }}"
-                    class="w-full h-full object-cover">
+                    class="w-full h-full {{ $heroUseContain ? 'object-contain' : 'object-cover' }}">
+                @if(! $heroUseContain)
                 <div class="absolute inset-0 bg-black/40"></div>
+                @endif
             </div>
             @endforeach
         </div>
         @elseif($mainImage)
         <!-- Single image background -->
-        <div class="relative w-full h-full">
-            <img src="{{ url('/storage/' . ltrim($mainImage, '/')) }}" alt="{{ $event->name }}" class="w-full h-full object-cover">
+        <div class="relative w-full h-full flex items-center justify-center">
+            <img src="{{ url('/storage/' . ltrim($mainImage, '/')) }}" alt="{{ $event->name }}"
+                class="w-full h-full {{ $heroUseContain ? 'object-contain' : 'object-cover' }}">
+            @if(! $heroUseContain)
             <div class="absolute inset-0 bg-black/40"></div>
+            @endif
         </div>
         @else
         <!-- Fallback gradient background -->
@@ -320,6 +332,36 @@
                 </div>
                 @endif
                 @endauth
+                @if(!empty($postedBy['name']))
+                <div class="{{ $siteBrand->detailPanelClass() }}">
+                    <p class="text-slate-400 text-sm">
+                        Posted by
+                        <span class="text-slate-200">{{ $postedBy['name'] }}</span>
+                        @if(!empty($postedBy['via']))
+                        <span class="text-slate-500"> · via </span>
+                            @if(!empty($postedBy['page']['url']))
+                            <a href="{{ $postedBy['page']['url'] }}" class="{{ $siteBrand->isRogues ? 'text-sky-400 hover:text-sky-300' : 'text-indigo-400 hover:text-indigo-300' }} font-medium">
+                                {{ $postedBy['via'] }}
+                            </a>
+                            @else
+                            <span class="text-slate-200">{{ $postedBy['via'] }}</span>
+                            @endif
+                        @elseif(!empty($postedBy['page']['url']))
+                        <span class="text-slate-500"> · </span>
+                        <a href="{{ $postedBy['page']['url'] }}" class="{{ $siteBrand->isRogues ? 'text-sky-400 hover:text-sky-300' : 'text-indigo-400 hover:text-indigo-300' }} font-medium">
+                            {{ $postedBy['page']['name'] }}
+                        </a>
+                        @endif
+                    </p>
+                    @if(!empty($postedBy['page']['url']))
+                    <p class="mt-2 text-sm">
+                        <a href="{{ $postedBy['page']['url'] }}#gigs-they-posted" class="{{ $siteBrand->isRogues ? 'text-sky-400 hover:text-sky-300' : 'text-indigo-400 hover:text-indigo-300' }} font-medium">
+                            See gigs they posted →
+                        </a>
+                    </p>
+                    @endif
+                </div>
+                @endif
                 <!-- About Section -->
                 <div class="{{ $siteBrand->detailPanelClass() }}">
                     <h2 class="{{ $siteBrand->detailPanelHeadingClass() }}">About This Event</h2>
@@ -413,7 +455,7 @@
                             @if($imageExists && !str_contains($image, '/tmp/php') && !str_contains($image, 'tmp.php'))
                             <div class="relative group cursor-pointer" data-gallery-index="{{ $galleryIndexMap[$index] ?? $index }}" role="button" tabindex="0" aria-label="Open image {{ ($galleryIndexMap[$index] ?? $index) + 1 }} in gallery">
                                 <img src="{{ url('/storage/' . ltrim($image, '/')) }}" alt="{{ $event->name }} - Image {{ ($galleryIndexMap[$index] ?? $index) + 1 }}"
-                                    class="w-full h-32 object-cover rounded-lg shadow-sm group-hover:shadow-md transition-shadow">
+                                    class="w-full h-32 object-contain bg-neutral-900 rounded-lg shadow-sm group-hover:shadow-md transition-shadow">
                             <div
                                 class="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all rounded-lg flex items-center justify-center">
                                 <svg class="h-6 w-6 text-white opacity-0 group-hover:opacity-100 transition-opacity"

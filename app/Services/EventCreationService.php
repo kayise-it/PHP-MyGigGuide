@@ -4,15 +4,19 @@ namespace App\Services;
 
 use App\Models\Event;
 use App\Models\User;
+use App\Models\Venue;
 use App\Models\YoutubeVideo;
 use App\Rules\YoutubeUrl;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use App\Services\EventNotificationService;
 
 class EventCreationService
 {
     public function __construct(
         private readonly EventDuplicateService $duplicateService,
+        private readonly EventPosterCardService $posterCardService,
+        private readonly EventNotificationService $notificationService,
     ) {}
 
     /**
@@ -40,7 +44,7 @@ class EventCreationService
             'categories' => 'nullable|array',
             'categories.*' => 'integer|exists:categories,id',
             'youtube_videos' => 'nullable|array',
-            'youtube_videos.*' => ['nullable', new YoutubeUrl()],
+            'youtube_videos.*' => ['nullable', new YoutubeUrl],
         ];
     }
 
@@ -88,9 +92,11 @@ class EventCreationService
         $eventFolder = $this->createEventFolder($userFolder, $validated['name'], $validated['date']);
 
         if ($request->hasFile('poster')) {
-            $validated['poster'] = $request->file('poster')->store($eventFolder.'/poster', 'public');
+            $storedPoster = $request->file('poster')->store($eventFolder.'/poster', 'public');
+            $validated['poster'] = $storedPoster;
+            $validated['poster_card'] = $this->posterCardService->portraitCardForPoster($storedPoster);
         } else {
-            unset($validated['poster']);
+            unset($validated['poster'], $validated['poster_card']);
         }
 
         $galleryPaths = [];
@@ -105,8 +111,16 @@ class EventCreationService
 
         unset($validated['artists'], $validated['categories'], $validated['youtube_videos']);
 
-        $validated['owner_id'] = $user->id;
-        $validated['owner_type'] = $this->resolveOwnerType($user);
+        if (empty($validated['poster']) && ! empty($validated['venue_id'])) {
+            $venue = Venue::query()->find($validated['venue_id']);
+            if ($venue?->main_picture) {
+                $validated['poster'] = $venue->main_picture;
+            }
+        }
+
+        $owner = $this->resolveOwner($user);
+        $validated['owner_id'] = $owner['owner_id'];
+        $validated['owner_type'] = $owner['owner_type'];
         $validated['status'] = 'upcoming';
 
         $event = Event::create($validated);
@@ -138,22 +152,17 @@ class EventCreationService
         if ($request->has('youtube_videos') && is_array($request->youtube_videos)) {
             foreach ($request->youtube_videos as $index => $url) {
                 if (! empty($url)) {
-                    $videoId = YoutubeVideo::extractVideoId($url);
-                    if ($videoId) {
-                        YoutubeVideo::create([
-                            'videoable_type' => Event::class,
-                            'videoable_id' => $event->id,
-                            'youtube_url' => $url,
-                            'youtube_video_id' => $videoId,
-                            'order' => $index,
-                        ]);
-                    }
+                    YoutubeVideo::createFromUrl($event, $url, $index);
                 }
             }
         }
 
+        $freshEvent = $event->fresh(['venue', 'artists', 'owner', 'categories', 'youtubeVideos']);
+
+        $this->notificationService->notifyAdminNewEvent($freshEvent, $user);
+
         return [
-            'event' => $event->fresh(['venue', 'artists', 'owner', 'categories', 'youtubeVideos']),
+            'event' => $freshEvent,
             'existing' => false,
         ];
     }
@@ -173,8 +182,14 @@ class EventCreationService
 
         return match ($ownerType) {
             'user' => (int) $event->owner_id === (int) $user->id,
-            'artist' => $user->artist && (int) $event->owner_id === (int) $user->artist->id,
-            'organiser' => $user->organiser && (int) $event->owner_id === (int) $user->organiser->id,
+            'artist' => $user->artist && (
+                (int) $event->owner_id === (int) $user->artist->id
+                || (int) $event->owner_id === (int) $user->id
+            ),
+            'organiser' => $user->organiser && (
+                (int) $event->owner_id === (int) $user->organiser->id
+                || (int) $event->owner_id === (int) $user->id
+            ),
             default => false,
         };
     }
@@ -218,19 +233,27 @@ class EventCreationService
         $eventFolder = $this->createEventFolder($userFolder, $validated['name'], $validated['date']);
 
         $posterPath = $event->poster;
+        $posterCardPath = $event->poster_card;
         if ($request->hasFile('poster')) {
             if ($event->poster) {
                 Storage::disk('public')->delete($event->poster);
             }
+            $this->posterCardService->deletePortraitCard($event->poster_card);
             $posterPath = $request->file('poster')->store($eventFolder.'/poster', 'public');
+            $posterCardPath = $this->posterCardService->portraitCardForPoster($posterPath);
         }
         $validated['poster'] = $posterPath;
+        $validated['poster_card'] = $posterCardPath;
 
         $existingGallery = is_array($event->gallery)
             ? $event->gallery
             : (is_string($event->gallery) ? json_decode($event->gallery, true) : []);
         if (! is_array($existingGallery)) {
             $existingGallery = [];
+        }
+
+        if ($request->has('gallery_keep_urls')) {
+            $existingGallery = $this->syncGalleryKeepUrls($existingGallery, $request->input('gallery_keep_urls'));
         }
 
         if ($request->hasFile('gallery')) {
@@ -268,16 +291,7 @@ class EventCreationService
             $event->youtubeVideos()->delete();
             foreach ($request->youtube_videos as $index => $url) {
                 if (! empty($url)) {
-                    $videoId = YoutubeVideo::extractVideoId($url);
-                    if ($videoId) {
-                        YoutubeVideo::create([
-                            'videoable_type' => Event::class,
-                            'videoable_id' => $event->id,
-                            'youtube_url' => $url,
-                            'youtube_video_id' => $videoId,
-                            'order' => $index,
-                        ]);
-                    }
+                    YoutubeVideo::createFromUrl($event, $url, $index);
                 }
             }
         }
@@ -305,6 +319,8 @@ class EventCreationService
             Storage::disk('public')->delete($event->poster);
         }
 
+        $this->posterCardService->deletePortraitCard($event->poster_card);
+
         $gallery = is_array($event->gallery)
             ? $event->gallery
             : (is_string($event->gallery) ? json_decode($event->gallery, true) : []);
@@ -318,16 +334,97 @@ class EventCreationService
         }
     }
 
-    public function resolveOwnerType(User $user): string
+    /**
+     * Keep only gallery files whose public URL is listed; delete the rest from storage.
+     *
+     * @param  array<int, string>  $existingPaths
+     * @return array<int, string>
+     */
+    private function syncGalleryKeepUrls(array $existingPaths, mixed $keepUrlsRaw): array
     {
-        if ($user->hasRole('artist')) {
-            return 'artist';
+        $keepUrls = $keepUrlsRaw;
+        if (is_string($keepUrls)) {
+            $decoded = json_decode($keepUrls, true);
+            $keepUrls = is_array($decoded) ? $decoded : [];
         }
-        if ($user->hasRole('organiser')) {
-            return 'organiser';
+        if (! is_array($keepUrls)) {
+            $keepUrls = [];
         }
 
-        return 'user';
+        $keepPaths = [];
+        foreach ($keepUrls as $url) {
+            if (! is_string($url) || trim($url) === '') {
+                continue;
+            }
+            $path = $this->storagePathFromPublicUrl($url);
+            if ($path !== null) {
+                $keepPaths[] = $path;
+            }
+        }
+
+        $keepSet = array_flip($keepPaths);
+        foreach ($existingPaths as $path) {
+            if (! is_string($path) || $path === '') {
+                continue;
+            }
+            if (isset($keepSet[$path])) {
+                continue;
+            }
+            if (Storage::disk('public')->exists($path)) {
+                Storage::disk('public')->delete($path);
+            }
+        }
+
+        return array_values(array_filter(
+            $existingPaths,
+            fn ($path) => is_string($path) && $path !== '' && isset($keepSet[$path])
+        ));
+    }
+
+    private function storagePathFromPublicUrl(string $url): ?string
+    {
+        $path = parse_url(trim($url), PHP_URL_PATH);
+        if (! is_string($path) || $path === '') {
+            return null;
+        }
+
+        if (preg_match('#/storage/(.+)$#', $path, $matches) !== 1) {
+            return null;
+        }
+
+        return ltrim($matches[1], '/');
+    }
+
+    /**
+     * @return array{owner_id: int, owner_type: string}
+     */
+    public function resolveOwner(User $user): array
+    {
+        $user->loadMissing(['artist', 'organiser']);
+
+        if ($user->artist) {
+            return [
+                'owner_id' => (int) $user->artist->id,
+                'owner_type' => 'artist',
+            ];
+        }
+
+        if ($user->organiser) {
+            return [
+                'owner_id' => (int) $user->organiser->id,
+                'owner_type' => 'organiser',
+            ];
+        }
+
+        return [
+            'owner_id' => (int) $user->id,
+            'owner_type' => 'user',
+        ];
+    }
+
+    public function resolveOwnerType(User $user): string
+    {
+        return $this->resolveOwner($user)['owner_type'];
     }
 
     public function createEventFolder(string $userFolder, string $eventName, string $eventDate): string

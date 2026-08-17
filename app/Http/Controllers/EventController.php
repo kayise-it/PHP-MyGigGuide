@@ -9,6 +9,8 @@ use App\Models\Venue;
 use App\Models\YoutubeVideo;
 use App\Rules\YoutubeUrl;
 use App\Services\EventCreationService;
+use App\Services\EventPosterCardService;
+use App\Services\EventPosterService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -135,15 +137,15 @@ class EventController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Request $request, Event $event, EventCreationService $eventCreation)
+    public function show(Request $request, Event $event, EventCreationService $eventCreation, EventPosterService $eventPoster)
     {
-$event->load(['venue', 'artists', 'owner', 'ratings.user', 'youtubeVideos']);
-        
+        $event->load(['venue', 'artists', 'owner', 'ratings.user', 'youtubeVideos']);
+
         // Ensure youtubeVideos relationship is loaded even if not eager loaded
-        if (!$event->relationLoaded('youtubeVideos')) {
+        if (! $event->relationLoaded('youtubeVideos')) {
             $event->load('youtubeVideos');
         }
-// Check for social media crawlers FIRST, before auth check
+        // Check for social media crawlers FIRST, before auth check
         if ($this->isSocialPreviewRequest($request)) {
             $shareData = $this->buildSocialPreviewData($event);
 
@@ -156,7 +158,9 @@ $event->load(['venue', 'artists', 'owner', 'ratings.user', 'youtubeVideos']);
         $canManageEvent = auth()->check()
             && $eventCreation->userOwnsEvent(auth()->user(), $event);
 
-        return view('events.show', compact('event', 'canManageEvent'));
+        $postedBy = $eventPoster->serializePostedBy($event);
+
+        return view('events.show', compact('event', 'canManageEvent', 'postedBy'));
     }
 
     /**
@@ -178,7 +182,7 @@ $event->load(['venue', 'artists', 'owner', 'ratings.user', 'youtubeVideos']);
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Event $event, EventCreationService $eventCreation)
+    public function update(Request $request, Event $event, EventCreationService $eventCreation, EventPosterCardService $posterCardService)
     {
         if (! auth()->check() || ! $eventCreation->userOwnsEvent(auth()->user(), $event)) {
             abort(403, 'You can only edit events you posted.');
@@ -202,7 +206,7 @@ $event->load(['venue', 'artists', 'owner', 'ratings.user', 'youtubeVideos']);
             'categories' => 'nullable|array',
             'categories.*' => 'exists:categories,id',
             'youtube_videos' => 'nullable|array',
-            'youtube_videos.*' => ['nullable', new YoutubeUrl()],
+            'youtube_videos.*' => ['nullable', new YoutubeUrl],
             'youtube_video_ids' => 'nullable|array',
             'youtube_video_ids.*' => 'nullable|integer|exists:youtube_videos,id',
         ]);
@@ -212,22 +216,25 @@ $event->load(['venue', 'artists', 'owner', 'ratings.user', 'youtubeVideos']);
         $eventFolder = $this->createEventFolder($userFolder, $validated['name'], $validated['date']);
 
         // Handle poster upload - preserve existing if no new file uploaded
-        $posterPath = $event->poster; // Keep existing poster
+        $posterPath = $event->poster;
+        $posterCardPath = $event->poster_card;
         if ($request->hasFile('poster')) {
-            // Delete old poster if exists
             if ($event->poster) {
                 Storage::disk('public')->delete($event->poster);
             }
+            $posterCardService->deletePortraitCard($event->poster_card);
             $posterPath = $request->file('poster')->store($eventFolder.'/poster', 'public');
+            $posterCardPath = $posterCardService->generatePortraitCard($posterPath);
         }
         $validated['poster'] = $posterPath;
+        $validated['poster_card'] = $posterCardPath;
 
         // Handle gallery - preserve existing and merge with new uploads
         // Normalize existing gallery to array
         $existingGallery = is_array($event->gallery)
             ? $event->gallery
             : (is_string($event->gallery) ? json_decode($event->gallery, true) : []);
-        if (!is_array($existingGallery)) {
+        if (! is_array($existingGallery)) {
             $existingGallery = [];
         }
 
@@ -244,7 +251,7 @@ $event->load(['venue', 'artists', 'owner', 'ratings.user', 'youtubeVideos']);
         $event->update($validated);
 
         // Sync artists - preserve existing if not provided or empty
-        if ($request->has('artists') && !empty($request->artists)) {
+        if ($request->has('artists') && ! empty($request->artists)) {
             $event->artists()->sync($request->artists);
         }
         // If artists not provided or empty, keep existing associations (don't detach)
@@ -268,19 +275,10 @@ $event->load(['venue', 'artists', 'owner', 'ratings.user', 'youtubeVideos']);
         if ($request->has('youtube_videos') && is_array($request->youtube_videos)) {
             $existingVideoIds = $request->youtube_video_ids ?? [];
             $orderOffset = $event->youtubeVideos()->whereIn('id', array_filter($existingVideoIds))->count();
-            
+
             foreach ($request->youtube_videos as $index => $url) {
-                if (!empty($url)) {
-                    $videoId = YoutubeVideo::extractVideoId($url);
-                    if ($videoId) {
-                        YoutubeVideo::create([
-                            'videoable_type' => Event::class,
-                            'videoable_id' => $event->id,
-                            'youtube_url' => $url,
-                            'youtube_video_id' => $videoId,
-                            'order' => $orderOffset + $index,
-                        ]);
-                    }
+                if (! empty($url)) {
+                    YoutubeVideo::createFromUrl($event, $url, $orderOffset + $index);
                 }
             }
         }
@@ -367,46 +365,46 @@ $event->load(['venue', 'artists', 'owner', 'ratings.user', 'youtubeVideos']);
         if ($event->poster && Storage::disk('public')->exists($event->poster)) {
             $storageUrl = Storage::disk('public')->url($event->poster);
             // Ensure absolute URL - Storage::url() may return relative if APP_URL not set
-            $imageUrl = (str_starts_with($storageUrl, 'http://') || str_starts_with($storageUrl, 'https://')) 
-                ? $storageUrl 
+            $imageUrl = (str_starts_with($storageUrl, 'http://') || str_starts_with($storageUrl, 'https://'))
+                ? $storageUrl
                 : url($storageUrl);
-        } 
+        }
         // Try event gallery images
         elseif ($event->gallery) {
             $galleryImages = [];
             try {
                 $galleryImages = is_string($event->gallery) ? json_decode($event->gallery, true) : $event->gallery;
-                if (!is_array($galleryImages)) {
+                if (! is_array($galleryImages)) {
                     $galleryImages = [];
                 }
                 // Filter out invalid temp paths
-                $galleryImages = array_filter($galleryImages, function($path) {
-                    return $path && !str_contains($path, '/tmp/php') && !str_contains($path, 'tmp.php');
+                $galleryImages = array_filter($galleryImages, function ($path) {
+                    return $path && ! str_contains($path, '/tmp/php') && ! str_contains($path, 'tmp.php');
                 });
             } catch (\Exception $e) {
                 $galleryImages = [];
             }
-            
+
             // Try first gallery image
             if (count($galleryImages) > 0) {
                 $firstImage = $galleryImages[0];
                 if (Storage::disk('public')->exists($firstImage)) {
                     $storageUrl = Storage::disk('public')->url($firstImage);
-                    $imageUrl = (str_starts_with($storageUrl, 'http://') || str_starts_with($storageUrl, 'https://')) 
-                        ? $storageUrl 
+                    $imageUrl = (str_starts_with($storageUrl, 'http://') || str_starts_with($storageUrl, 'https://'))
+                        ? $storageUrl
                         : url($storageUrl);
                 }
             }
         }
         // Try venue main picture
-        if (!$imageUrl && $event->venue && $event->venue->main_picture && Storage::disk('public')->exists($event->venue->main_picture)) {
+        if (! $imageUrl && $event->venue && $event->venue->main_picture && Storage::disk('public')->exists($event->venue->main_picture)) {
             $storageUrl = Storage::disk('public')->url($event->venue->main_picture);
-            $imageUrl = (str_starts_with($storageUrl, 'http://') || str_starts_with($storageUrl, 'https://')) 
-                ? $storageUrl 
+            $imageUrl = (str_starts_with($storageUrl, 'http://') || str_starts_with($storageUrl, 'https://'))
+                ? $storageUrl
                 : url($storageUrl);
         }
         // Fallback to logo
-        if (!$imageUrl) {
+        if (! $imageUrl) {
             $fallbackUrl = asset('logos/logo1.jpeg');
             $imageUrl = url($fallbackUrl);
         }

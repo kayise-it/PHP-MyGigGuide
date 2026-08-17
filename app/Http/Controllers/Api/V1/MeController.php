@@ -7,12 +7,15 @@ use App\Http\Resources\Api\V1\Concerns\ResolvesStorageUrl;
 use App\Models\Artist;
 use App\Models\Event;
 use App\Models\Organiser;
-use App\Models\User;
 use App\Models\Venue;
+use App\Services\ApiFavoriteUpdatesService;
+use App\Services\ApiPageAlertsService;
 use App\Services\ApiMeProfileService;
 use App\Services\AppWebSessionService;
 use App\Services\ClaimService;
+use App\Services\EventCreationService;
 use App\Services\UserFirebaseLinkService;
+use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
@@ -28,6 +31,9 @@ class MeController extends Controller
         private readonly ApiMeProfileService $meProfile,
         private readonly ClaimService $claimService,
         private readonly AppWebSessionService $webSession,
+        private readonly EventCreationService $eventCreation,
+        private readonly ApiFavoriteUpdatesService $favoriteUpdates,
+        private readonly ApiPageAlertsService $pageAlerts,
     ) {}
 
     public function show(Request $request): JsonResponse
@@ -45,6 +51,7 @@ class MeController extends Controller
             'firebase_linked' => $user->firebase_uid !== null,
             'owned_pages' => $this->meProfile->ownedPages($user),
             'claimable_pages' => $this->meProfile->claimablePages($user),
+            'stats' => $this->meProfile->contributorStats($user),
             'website_claim_url' => route('register'),
         ]);
     }
@@ -88,13 +95,14 @@ class MeController extends Controller
         $approved = $result['approved'];
         $pending = $result['pending'];
         $errors = $result['errors'];
+        $skipped = $result['skipped'];
 
-        if (empty($approved) && empty($pending) && ! empty($errors)) {
+        if (empty($approved) && empty($pending) && empty($skipped) && ! empty($errors)) {
             return response()->json([
                 'message' => $errors[0]['message'] ?? 'Could not start claim.',
                 'approved' => [],
                 'pending' => [],
-                'skipped' => $result['skipped'],
+                'skipped' => [],
                 'errors' => $errors,
                 'owned_pages' => $this->meProfile->ownedPages($user),
                 'claimable_pages' => $this->meProfile->claimablePages($user),
@@ -106,6 +114,10 @@ class MeController extends Controller
                 ? 'Page claimed: '.$approved[0]['name']
                 : count($approved).' pages claimed.',
             count($pending) > 0 => 'Claim started — pending verification or grace period.',
+            count($skipped) > 0 && ! empty($errors) => count($skipped).' page(s) skipped — some could not be claimed. Try one at a time or use the website.',
+            count($skipped) > 0 => count($skipped) === 1
+                ? '1 page was skipped (one artist/organiser per account, or already claimed).'
+                : count($skipped).' pages were skipped (one artist/organiser per account, or already claimed).',
             default => 'Claim request recorded.',
         };
 
@@ -113,7 +125,7 @@ class MeController extends Controller
             'message' => $message,
             'approved' => $approved,
             'pending' => $pending,
-            'skipped' => $result['skipped'],
+            'skipped' => $skipped,
             'errors' => $errors,
             'owned_pages' => $this->meProfile->ownedPages($user),
             'claimable_pages' => $this->meProfile->claimablePages($user),
@@ -197,6 +209,47 @@ class MeController extends Controller
         ]);
     }
 
+    public function events(Request $request): JsonResponse
+    {
+        return response()->json([
+            'data' => $this->meProfile->managedEvents($request->user()),
+        ]);
+    }
+
+    public function favoriteUpdates(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'since' => ['nullable', 'date'],
+            'days' => ['nullable', 'integer', 'min:1', 'max:90'],
+        ]);
+
+        $since = isset($validated['since'])
+            ? Carbon::parse($validated['since'])
+            : null;
+        $days = isset($validated['days']) ? (int) $validated['days'] : 30;
+
+        return response()->json(
+            $this->favoriteUpdates->updatesForUser($request->user(), $since, $days),
+        );
+    }
+
+    public function pageAlerts(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'since' => ['nullable', 'date'],
+            'days' => ['nullable', 'integer', 'min:1', 'max:90'],
+        ]);
+
+        $since = isset($validated['since'])
+            ? Carbon::parse($validated['since'])
+            : null;
+        $days = isset($validated['days']) ? (int) $validated['days'] : 30;
+
+        return response()->json(
+            $this->pageAlerts->alertsForUser($request->user(), $since, $days),
+        );
+    }
+
     public function favorites(Request $request): JsonResponse
     {
         $user = $request->user();
@@ -210,6 +263,7 @@ class MeController extends Controller
                     'id' => $e->id,
                     'name' => $e->name,
                     'image_url' => self::publicStorageUrl($e->poster),
+                    'user_can_edit' => $this->eventCreation->userOwnsEvent($user, $e),
                 ])
                 ->values(),
             'venues' => $user->favoriteVenues()
@@ -248,13 +302,13 @@ class MeController extends Controller
 
         $model = $modelClass::find($id);
         if (! $model) {
-            return response()->json(['message' => ucfirst($type) . ' not found.'], 404);
+            return response()->json(['message' => ucfirst($type).' not found.'], 404);
         }
 
         $request->user()->{$relation}()->syncWithoutDetaching([$id]);
 
         return response()->json([
-            'message' => ucfirst($type) . ' added to favorites.',
+            'message' => ucfirst($type).' added to favorites.',
             'favorited' => true,
             'type' => $type,
             'id' => $id,
@@ -271,7 +325,7 @@ class MeController extends Controller
         $request->user()->{$relation}()->detach($id);
 
         return response()->json([
-            'message' => ucfirst($type) . ' removed from favorites.',
+            'message' => ucfirst($type).' removed from favorites.',
             'favorited' => false,
             'type' => $type,
             'id' => $id,

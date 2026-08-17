@@ -2,16 +2,16 @@
 
 namespace App\Services;
 
+use App\Mail\ArtistClaimWarningMail;
+use App\Mail\ClaimApprovedMail;
+use App\Mail\ClaimRejectedMail;
+use App\Mail\ClaimWarningMail;
+use App\Mail\PendingClaimNoticeMail;
 use App\Models\Artist;
 use App\Models\Event;
 use App\Models\Organiser;
 use App\Models\User;
 use App\Models\Venue;
-use App\Mail\ArtistClaimWarningMail;
-use App\Mail\ClaimWarningMail;
-use App\Mail\PendingClaimNoticeMail;
-use App\Mail\ClaimApprovedMail;
-use App\Mail\ClaimRejectedMail;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
@@ -20,6 +20,13 @@ use Illuminate\Support\Facades\Mail;
 
 class ClaimService
 {
+    protected ClaimNotificationService $notifications;
+
+    public function __construct(?ClaimNotificationService $notifications = null)
+    {
+        $this->notifications = $notifications ?? new ClaimNotificationService;
+    }
+
     /**
      * Get all claimable model classes.
      */
@@ -43,7 +50,7 @@ class ClaimService
 
     /**
      * Find all unclaimed entities matching an email address.
-     * 
+     *
      * @return Collection<Model>
      */
     public function findUnclaimedByEmail(string $email): Collection
@@ -97,10 +104,13 @@ class ClaimService
                 $entity->initiateClaim($user, $gracePeriodEndsAt);
 
                 // Send warning email to the entity's contact email
-                if (!$entity->warning_email_sent_at) {
+                if (! $entity->warning_email_sent_at) {
                     $this->sendClaimWarningEmail($entity, $user, $gracePeriodEndsAt);
                     $entity->markWarningEmailSent();
                 }
+
+                // Notify admin so Dave can keep an eye on incoming claims
+                $this->notifications->notifyAdmin($entity, $user, null, 'email_match');
 
                 $results['pending'][] = [
                     'type' => $entity->getClaimableType(),
@@ -108,7 +118,7 @@ class ClaimService
                     'name' => $entity->getDisplayName(),
                 ];
             } catch (\Exception $e) {
-                Log::error("Failed to initiate claim for {$entity->getClaimableType()} #{$entity->id}: " . $e->getMessage());
+                Log::error("Failed to initiate claim for {$entity->getClaimableType()} #{$entity->id}: ".$e->getMessage());
                 $results['errors'][] = [
                     'type' => $entity->getClaimableType(),
                     'id' => $entity->id,
@@ -118,13 +128,13 @@ class ClaimService
         }
 
         // Send notice to the user about pending claims
-        if (!empty($results['pending'])) {
+        if (! empty($results['pending'])) {
             try {
                 Mail::to($user->email)->send(
                     new PendingClaimNoticeMail($unclaimedEntities->first(), $gracePeriodEndsAt)
                 );
             } catch (\Exception $e) {
-                Log::error('Failed to send pending claim notice email: ' . $e->getMessage());
+                Log::error('Failed to send pending claim notice email: '.$e->getMessage());
             }
         }
 
@@ -180,6 +190,9 @@ class ClaimService
         }
 
         $toInitiate = collect();
+        $bulkClaim = $type === null && $id === null;
+        $willInitiateArtist = false;
+        $willInitiateOrganiser = false;
 
         foreach ($entities as $entity) {
             if ($entity->hasPendingClaim() && $entity->pending_claim_user_id !== $user->id) {
@@ -189,18 +202,44 @@ class ClaimService
                     'name' => $entity->getDisplayName(),
                     'reason' => 'claim_pending_other_user',
                 ];
+
                 continue;
             }
 
-            if (in_array($entity->getClaimableType(), ['artist', 'organiser'], true)) {
-                $existing = $this->getUserExistingEntity($user, $entity->getClaimableType());
+            $entityType = $entity->getClaimableType();
+
+            if (in_array($entityType, ['artist', 'organiser'], true)) {
+                $existing = $this->getUserExistingEntity($user, $entityType);
                 if ($existing && (int) $existing->id !== (int) $entity->id) {
-                    $results['errors'][] = [
-                        'type' => $entity->getClaimableType(),
+                    $results['skipped'][] = [
+                        'type' => $entityType,
                         'id' => $entity->id,
                         'name' => $entity->getDisplayName(),
-                        'message' => "You already have a {$entity->getClaimableType()} page linked to your account.",
+                        'reason' => 'already_have_'.$entityType,
                     ];
+
+                    continue;
+                }
+
+                if ($bulkClaim && $entityType === 'artist' && $willInitiateArtist) {
+                    $results['skipped'][] = [
+                        'type' => $entityType,
+                        'id' => $entity->id,
+                        'name' => $entity->getDisplayName(),
+                        'reason' => 'one_artist_per_account',
+                    ];
+
+                    continue;
+                }
+
+                if ($bulkClaim && $entityType === 'organiser' && $willInitiateOrganiser) {
+                    $results['skipped'][] = [
+                        'type' => $entityType,
+                        'id' => $entity->id,
+                        'name' => $entity->getDisplayName(),
+                        'reason' => 'one_organiser_per_account',
+                    ];
+
                     continue;
                 }
             }
@@ -210,18 +249,25 @@ class ClaimService
             }
 
             $toInitiate->push($entity);
+
+            if ($entityType === 'artist') {
+                $willInitiateArtist = true;
+            } elseif ($entityType === 'organiser') {
+                $willInitiateOrganiser = true;
+            }
         }
 
         if ($toInitiate->isNotEmpty()) {
             $gracePeriodEnabled = config('artist_claims.enable_grace_period', false);
             $gracePeriodHours = config('artist_claims.grace_period_hours', 48);
             $gracePeriodEndsAt = $gracePeriodEnabled ? Carbon::now()->addHours($gracePeriodHours) : null;
+            $skipWarningEmails = $toInitiate->count() > 1;
 
             foreach ($toInitiate as $entity) {
                 try {
                     $entity->initiateClaim($user, $gracePeriodEndsAt);
 
-                    if (! $entity->warning_email_sent_at) {
+                    if (! $skipWarningEmails && ! $entity->warning_email_sent_at) {
                         $this->sendClaimWarningEmail($entity, $user, $gracePeriodEndsAt);
                         $entity->markWarningEmailSent();
                     }
@@ -296,18 +342,29 @@ class ClaimService
                     'id' => $entity->id,
                     'name' => $entity->getDisplayName(),
                 ];
+
                 continue;
             }
 
             // Check grace period
-            if (!$entity->isGracePeriodExpired()) {
+            if (! $entity->isGracePeriodExpired()) {
                 $results['pending'][] = [
                     'type' => $entity->getClaimableType(),
                     'id' => $entity->id,
                     'name' => $entity->getDisplayName(),
                     'grace_period_ends' => $entity->grace_period_ends_at,
                 ];
+
                 continue;
+            }
+
+            // One artist / organiser page per account — skip extra pending rows.
+            if (in_array($entity->getClaimableType(), ['artist', 'organiser'], true)) {
+                $user->refresh()->loadMissing(['artist', 'organiser']);
+                $existing = $this->getUserExistingEntity($user, $entity->getClaimableType());
+                if ($existing && (int) $existing->id !== (int) $entity->id) {
+                    continue;
+                }
             }
 
             // Approve the claim
@@ -413,6 +470,7 @@ class ClaimService
 
         try {
             $entity->requestManualClaim($user, $message);
+            $this->notifications->notifyAdmin($entity, $user, $message, 'manual');
         } catch (\Exception $e) {
             Log::error("Manual claim request failed for {$type} #{$id}: ".$e->getMessage());
             $results['errors'][] = [
@@ -438,12 +496,12 @@ class ClaimService
      */
     public function approveClaim(Model $entity): bool
     {
-        if (!$entity->hasPendingClaim()) {
+        if (! $entity->hasPendingClaim()) {
             return false;
         }
 
         $user = $entity->pendingClaimUser;
-        if (!$user) {
+        if (! $user) {
             return false;
         }
 
@@ -454,7 +512,7 @@ class ClaimService
         try {
             Mail::to($user->email)->send(new ClaimApprovedMail($entity));
         } catch (\Exception $e) {
-            Log::error("Failed to send claim approved email: " . $e->getMessage());
+            Log::error('Failed to send claim approved email: '.$e->getMessage());
         }
 
         return true;
@@ -465,12 +523,12 @@ class ClaimService
      */
     public function rejectClaim(Model $entity, ?string $reason = null): bool
     {
-        if (!$entity->hasPendingClaim() && !$entity->hasDisputedClaim()) {
+        if (! $entity->hasPendingClaim() && ! $entity->hasDisputedClaim()) {
             return false;
         }
 
         $user = $entity->pendingClaimUser;
-        
+
         $entity->rejectClaim($reason);
 
         // Send rejection email
@@ -478,7 +536,7 @@ class ClaimService
             try {
                 Mail::to($user->email)->send(new ClaimRejectedMail($entity, $reason));
             } catch (\Exception $e) {
-                Log::error("Failed to send claim rejected email: " . $e->getMessage());
+                Log::error('Failed to send claim rejected email: '.$e->getMessage());
             }
         }
 
@@ -491,18 +549,18 @@ class ClaimService
     public function linkToUser(Model $entity, User $user, bool $forceReplace = false): bool
     {
         $type = $entity->getClaimableType();
-// For hasOne relationships (artist, organiser), check for existing
-        if (in_array($type, ['artist', 'organiser']) && !$forceReplace) {
+        // For hasOne relationships (artist, organiser), check for existing
+        if (in_array($type, ['artist', 'organiser']) && ! $forceReplace) {
             $existing = $this->getUserExistingEntity($user, $type);
-if ($existing && $existing->id !== $entity->id) {
-throw new \App\Exceptions\UserAlreadyHasEntityException(
+            if ($existing && $existing->id !== $entity->id) {
+                throw new \App\Exceptions\UserAlreadyHasEntityException(
                     $type,
                     $existing,
                     $user
                 );
             }
         }
-        
+
         // If forcing replacement, unlink the existing entity first (make it unclaimed)
         if ($forceReplace && in_array($type, ['artist', 'organiser'])) {
             $existing = $this->getUserExistingEntity($user, $type);
@@ -511,7 +569,7 @@ throw new \App\Exceptions\UserAlreadyHasEntityException(
                 $this->unlinkFromUser($existing);
             }
         }
-        
+
         $ownerField = $entity->getOwnerUserIdField();
         $entity->update([
             $ownerField => $user->id,
@@ -519,7 +577,8 @@ throw new \App\Exceptions\UserAlreadyHasEntityException(
         $entity->markOwnershipApproved();
 
         $this->assignRoleForEntity($user, $entity);
-return true;
+
+        return true;
     }
 
     /**
@@ -527,7 +586,7 @@ return true;
      */
     public function getUserExistingEntity(User $user, string $type): ?Model
     {
-        return match($type) {
+        return match ($type) {
             'artist' => $user->artist,
             'organiser' => $user->organiser,
             default => null,
@@ -539,12 +598,12 @@ return true;
      */
     public function checkLinkConflict(User $user, string $type, int $entityId): ?array
     {
-        if (!in_array($type, ['artist', 'organiser'])) {
+        if (! in_array($type, ['artist', 'organiser'])) {
             return null; // No conflict possible for hasMany relationships
         }
-        
+
         $existing = $this->getUserExistingEntity($user, $type);
-        
+
         if ($existing && $existing->id !== $entityId) {
             return [
                 'has_conflict' => true,
@@ -555,7 +614,7 @@ return true;
                 'user_id' => $user->id,
             ];
         }
-        
+
         return null;
     }
 
@@ -565,11 +624,11 @@ return true;
     public function unlinkFromUser(Model $entity): bool
     {
         $ownerField = $entity->getOwnerUserIdField();
-        
+
         $entity->update([
             $ownerField => null,
         ]);
-        
+
         $entity->clearClaimData();
 
         return true;
@@ -581,16 +640,18 @@ return true;
     public function sendClaimInvitation(Model $entity): bool
     {
         $email = $entity->getClaimEmail();
-        
-        if (!$email) {
+
+        if (! $email) {
             return false;
         }
 
         try {
             Mail::to($email)->send(new \App\Mail\ClaimInvitationMail($entity));
+
             return true;
         } catch (\Exception $e) {
-            Log::error("Failed to send claim invitation email: " . $e->getMessage());
+            Log::error('Failed to send claim invitation email: '.$e->getMessage());
+
             return false;
         }
     }
@@ -601,8 +662,8 @@ return true;
     protected function sendClaimWarningEmail(Model $entity, User $claimant, ?Carbon $gracePeriodEndsAt): void
     {
         $email = $entity->getClaimEmail();
-        
-        if (!$email) {
+
+        if (! $email) {
             return;
         }
 
@@ -618,7 +679,7 @@ return true;
                 );
             }
         } catch (\Exception $e) {
-            Log::error("Failed to send claim warning email to {$email}: " . $e->getMessage());
+            Log::error("Failed to send claim warning email to {$email}: ".$e->getMessage());
         }
     }
 
@@ -638,7 +699,7 @@ return true;
 
         $role = $roleMap[$type] ?? null;
 
-        if ($role && !$user->hasRole($role)) {
+        if ($role && ! $user->hasRole($role)) {
             $user->addRole($role);
         }
     }
@@ -690,4 +751,3 @@ return true;
         ];
     }
 }
-

@@ -2,12 +2,16 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
+use App\Http\Controllers\Api\V1\Concerns\ResolvesPostedEvents;
+use App\Http\Controllers\Api\V1\Concerns\ResolvesRecentEvents;
 use App\Models\Artist;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Http\Request;
 
 class ArtistController extends Controller
 {
+    use ResolvesPostedEvents;
+    use ResolvesRecentEvents;
+
     /**
      * Display a listing of the resource.
      */
@@ -20,18 +24,18 @@ class ArtistController extends Controller
             $searchTerm = trim(request('search'));
             $query->where(function ($q) use ($searchTerm) {
                 $q->where('stage_name', 'like', "%{$searchTerm}%")
-                  ->orWhere('real_name', 'like', "%{$searchTerm}%")
-                  ->orWhereHas('user', function ($uq) use ($searchTerm) {
-                      $uq->where('name', 'like', "%{$searchTerm}%")
-                         ->orWhere('username', 'like', "%{$searchTerm}%")
-                         ->orWhere('email', 'like', "%{$searchTerm}%");
-                  });
+                    ->orWhere('real_name', 'like', "%{$searchTerm}%")
+                    ->orWhereHas('user', function ($uq) use ($searchTerm) {
+                        $uq->where('name', 'like', "%{$searchTerm}%")
+                            ->orWhere('username', 'like', "%{$searchTerm}%")
+                            ->orWhere('email', 'like', "%{$searchTerm}%");
+                    });
             });
 
             // Prioritize artists whose names START with the search term
             // Then sort the rest normally. This keeps “A …” above names with numbers that merely contain "a".
             $safe = str_replace(['%', '_'], ['\\%', '\\_'], $searchTerm);
-            $query->orderByRaw("CASE WHEN stage_name LIKE ? THEN 0 ELSE 1 END", ["{$safe}%"]);
+            $query->orderByRaw('CASE WHEN stage_name LIKE ? THEN 0 ELSE 1 END', ["{$safe}%"]);
         }
 
         // Filter by genre if provided
@@ -96,9 +100,9 @@ class ArtistController extends Controller
      */
     public function show(Artist $artist)
     {
-        // Load YouTube videos
-        $artist->load('youtubeVideos');
-        
+        // Load YouTube videos and repertoire
+        $artist->load(['youtubeVideos', 'songs']);
+
         // Compute average rating if ratings relation exists; default to 0
         $ratingAvg = 0.0;
         if (method_exists($artist, 'ratings')) {
@@ -110,10 +114,10 @@ class ArtistController extends Controller
             ->where('status', 'upcoming')
             ->whereDate('date', '>=', now()->toDateString())
             ->where(function ($q) use ($artist) {
-                $q->where(function($own) use ($artist) {
-                        $own->where('owner_type', 'artist')->where('owner_id', $artist->id);
-                    })
-                  ->orWhereHas('artists', function ($aq) use ($artist) {
+                $q->where(function ($own) use ($artist) {
+                    $own->where('owner_type', 'artist')->where('owner_id', $artist->id);
+                })
+                    ->orWhereHas('artists', function ($aq) use ($artist) {
                         $aq->where('artist_id', $artist->id);
                     });
             })
@@ -121,10 +125,15 @@ class ArtistController extends Controller
             ->take(10)
             ->get();
 
+        $postedEvents = $this->postedEventsForArtist($artist, 90)->take(10);
+        $recentEvents = $this->recentEventsForArtist($artist);
+
         return view('artists.show', [
             'artist' => $artist,
             'ratingAvg' => $ratingAvg,
             'upcomingEvents' => $upcomingEvents,
+            'postedEvents' => $postedEvents,
+            'recentEvents' => $recentEvents,
         ]);
     }
 
@@ -133,7 +142,7 @@ class ArtistController extends Controller
      */
     public function edit(string $id)
     {
-// TODO: implement artist edit form
+        return redirect()->route('profile.edit');
     }
 
     /**

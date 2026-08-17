@@ -15,7 +15,36 @@
 
 ---
 
-## Status legend
+## 5 Aug 2026 — Claim notifications: admin email + WhatsApp (Evolution API)
+
+| Area | What | Status |
+|------|------|--------|
+| **ClaimNotificationService** | Sends admin email via `ClaimPendingAdminMail` + optional WhatsApp via Evolution API (self-hosted) | Done — local |
+| **Email notifications** | Fires for both manual and email-match claims (`initiateClaimsForUser`) | Done |
+| **WhatsApp** | Silently skipped unless `EVOLUTION_API_URL`, `EVOLUTION_API_KEY`, and `EVOLUTION_ADMIN_NUMBER` are set in VPS `.env` | Ready — set env vars to activate |
+| **Config** | `config/services.php` evolution block + `.env.example` entries for `ARTIST_CLAIM_ADMIN_EMAIL`, `EVOLUTION_API_URL`, `EVOLUTION_INSTANCE`, `EVOLUTION_API_KEY`, `EVOLUTION_ADMIN_NUMBER` | Done |
+
+**To activate on VPS:** Set `ARTIST_CLAIM_ADMIN_EMAIL=dave@...` for email. Set the four `EVOLUTION_*` vars for WhatsApp (uses your existing Evolution API + n8n stack on the VPS).
+
+---
+
+## 5 Aug 2026 — VOW FM (VOW 88.1) flavor scaffold
+
+| Area | What | Status |
+|------|------|--------|
+| **Flavor** | Gradle `vowfm` · `applicationId` `za.co.mygigguide.vowfm` · `ic_launcher_background` `#1A3870` (dark navy) | **Coded** |
+| **Brand** | `isVowFm` · teal `#29B8B0` accent · dark navy `#1A3870` primary · dark chrome · Radio tab | **Coded** |
+| **Stream** | iono.fm station 101 · `https://edge.iono.fm/xice/101_medium.aac` · quality helper `vowFmStreamUrlForQuality` | **Coded** |
+| **Map** | Default centre Wits campus `-26.1929, 28.0305` (Braamfontein) | **Coded** |
+| **Engagement** | WhatsApp placeholder (empty — get number from station) · competition/feedback/podcast URLs · Facebook + Instagram social | **Coded** |
+| **Assets** | `store-assets/vow/Logo4-scaled.jpg` → `assets/images/brands/vowfm/header_logo.png` · `flutter_launcher_icons-vowfm.yaml` | **Coded** |
+| **Build** | `./scripts/build_apk.sh vowfm --label=v1` (do not build yet — needs square PNG app_icon) | **Dave runs** |
+
+**Note:** `app_icon.png` is the landscape JPEG from `store-assets/vow/`. Dave needs a proper square PNG for the app icon before `dart run flutter_launcher_icons -f flutter_launcher_icons-vowfm.yaml`.
+
+**Missing / Dave to provide:** WhatsApp studio number · square app icon PNG · verify stream plays · station website for schedule scraper (later).
+
+---
 
 | Status | Meaning |
 |--------|---------|
@@ -44,6 +73,34 @@ Goal: trust labels on web → richer `/me` → claims from app → SSO.
 ---
 
 ## Log (newest first)
+
+### 23 Jul 2026 — Play AD_ID + home gallery week fix
+
+- **Flutter Play fix:** `AndroidManifest.xml` strips Facebook SDK ad permissions (`AD_ID`, `ACCESS_ADSERVICES_*`) and removes Facebook init components; Play Console declaration stays **No** for advertising ID. Rebuild: `./scripts/build_aab.sh mygigguide|fm919 --label=play-no-ad-id`.
+- **Laravel home gallery:** `HomeController` week window inclusive 7 days; hero limit 500 for Week (was 60 — truncated busy weeks).
+- **Flutter gallery sort:** Home coverflow chronological even when Near me on (radius filter only).
+- **Quicket cron:** 3 new overnight = normal delta; gaps = category 64/6 not on cron, province allowlist.
+- **Status:** **Coded** — see [SESSION_HANDOFF](./SESSION_HANDOFF.md) pick-up block.
+
+### 22 Jul 2026 — Quicket clear-cards + letterbox restore
+
+- **Laravel:** `--clear-cards` clears all Quicket `poster_card` (non-Quicket untouched); import/backfill skip inventing landscape crops.
+- **Flutter:** list thumbs / diary strip use `contain` + `coverflowBackdrop` when no card; `cover` only when `poster_card_url` present.
+- **Dave next:** rsync + `quicket:backfill-posters --clear-cards` (dry-run then `--apply`); rebuild `risefm --label=letterbox-posters`.
+- **Status:** **Coded** — see [SESSION_HANDOFF](./SESSION_HANDOFF.md) pick-up block.
+
+### 21 Jul 2026 — Rise FM Flutter flavour scaffold
+
+- **Flutter** (`~/development/mygigguide_app`): Gradle flavor `risefm`, `applicationId` `za.co.mygigguide.risefm`, Radio tab (919 pattern), iono stream `73_medium.aac`, Mbombela map default, hosts catalog, accent `#EC1C24`, logo from `store-assets/risefm/Rise-FM.png`.
+- **Build:** `./scripts/build_apk.sh risefm --label=v1` (Dave). No Play Store / Laravel tenant yet.
+- **Status:** **Coded** locally.
+
+### 20 Jul 2026 — Quicket Family (30) + Free State / Eastern Cape
+
+- **Config:** `category_slug_map` 30 → `family-friendly` + `quicket`; default `QUICKET_PROVINCES` includes Free State + Eastern Cape.
+- **Docs / seeder / tests:** `QUICKET_IMPORT.md`, `.env.example`, CategorySeeder, unit test for map entry.
+- **Cron:** still Music-only (`QUICKET_CATEGORIES=1`) — do not add 30.
+- **Status:** **Coded** locally; VPS deploy + province env + Family dry-run pending (SSH).
 
 ### 3 Jun 2026 — Web Google auth aligned with app (tested + deployed)
 
@@ -140,6 +197,8 @@ Goal: trust labels on web → richer `/me` → claims from app → SSO.
 
 | Label | Roughly contains |
 |-------|------------------|
+| `play-no-ad-id` | Facebook SDK ad permissions stripped; Play advertising ID declaration **No** |
+| `gallery-chrono` | Home coverflow date order + web week window fix (Laravel rsync separate) |
 | `logo-round` | Dark theme + header glow |
 | `claim-pages` | Phase 2 banner (website claim link) |
 | `claims` | Phase 3 in-app **Claim now** |

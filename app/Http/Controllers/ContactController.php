@@ -2,10 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\ContactFormMail;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Facades\Validator;
-use App\Mail\ContactFormMail;
 
 class ContactController extends Controller
 {
@@ -22,23 +21,17 @@ class ContactController extends Controller
      */
     public function submit(Request $request)
     {
-        $validator = Validator::make($request->all(), [
+        $validated = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|max:255',
             'subject' => 'required|string|max:255',
             'message' => 'required|string|max:5000',
-            'newsletter' => 'nullable|boolean',
         ]);
 
-        if ($validator->fails()) {
-            return redirect()->back()
-                ->withErrors($validator)
-                ->withInput();
-        }
+        $newsletter = $request->boolean('newsletter');
 
         try {
-            $contactData = $request->only(['name', 'email', 'subject', 'message', 'newsletter']);
-            $newsletter = $request->has('newsletter');
+            $contactData = $request->only(['name', 'email', 'subject', 'message']);
 
             // Log the contact form submission
             \Log::info('Contact form submitted', array_merge($contactData, ['newsletter' => $newsletter]));
@@ -56,9 +49,9 @@ class ContactController extends Controller
             } catch (\Throwable $mailErr) {
                 \Log::error('Failed to send contact email', [
                     'error' => $mailErr->getMessage(),
-                    'trace' => $mailErr->getTraceAsString()
+                    'trace' => $mailErr->getTraceAsString(),
                 ]);
-                
+
                 return redirect()->back()
                     ->with('error', 'Sorry, there was an error sending your message. Please try again or contact us directly at dave@mygigguide.co.za.')
                     ->withInput();
@@ -70,7 +63,7 @@ class ContactController extends Controller
         } catch (\Exception $e) {
             \Log::error('Contact form submission failed', [
                 'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
+                'trace' => $e->getTraceAsString(),
             ]);
 
             return redirect()->back()

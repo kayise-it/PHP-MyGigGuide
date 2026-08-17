@@ -105,6 +105,29 @@
             </div>
             @endif
 
+            @if($artist->songs->count() > 0)
+            <div class="{{ $siteBrand->detailPanelClass('p-8 mb-8') }}">
+                <h2 class="{{ $siteBrand->detailPanelHeadingClass() }}">Songs I play</h2>
+                <p class="text-sm {{ $siteBrand->detailMutedTextClass() }} mb-4">Repertoire — request these at live gigs (coming soon).</p>
+                <ul class="space-y-2">
+                    @foreach($artist->songs as $song)
+                    <li class="flex flex-wrap items-baseline gap-x-2 {{ $siteBrand->detailBodyTextClass() }}">
+                        <span class="font-medium text-white">{{ $song->title }}</span>
+                        @if($song->is_original)
+                            <span class="text-xs px-2 py-0.5 rounded-full bg-purple-500/20 text-purple-200">Original</span>
+                        @elseif($song->original_artist)
+                            <span class="text-sm {{ $siteBrand->detailMutedTextClass() }}">— {{ $song->original_artist }}</span>
+                        @endif
+                    </li>
+                    @endforeach
+                </ul>
+            </div>
+            @endif
+
+            @if(isset($postedEvents) && $postedEvents->count() > 0)
+            <x-page-posted-events :events="$postedEvents" />
+            @endif
+
             <!-- Upcoming Events -->
             <div class="{{ $siteBrand->detailPanelClass('p-8') }}">
                 <h2 class="{{ $siteBrand->detailPanelHeadingClass() }} mb-6">Upcoming Events</h2>
@@ -131,6 +154,10 @@
                 </div>
                 @endif
             </div>
+
+            @if(isset($recentEvents) && $recentEvents->count() > 0)
+            <x-page-recent-events :events="$recentEvents" />
+            @endif
         </div>
 
         <!-- Sidebar -->

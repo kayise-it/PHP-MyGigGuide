@@ -67,6 +67,28 @@
                             <label class="block text-sm font-medium text-gray-700">Joined</label>
                             <p class="mt-1 text-sm text-gray-900">{{ $user->created_at->format('M d, Y') }}</p>
                         </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Last login</label>
+                            <p class="mt-1 text-sm text-gray-900">
+                                @if($user->last_login_at)
+                                    {{ $user->last_login_at->format('M j, Y g:i A') }}
+                                    <span class="text-gray-500">({{ $user->last_login_at->diffForHumans() }})</span>
+                                @else
+                                    Never
+                                @endif
+                            </p>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Last app use</label>
+                            <p class="mt-1 text-sm text-gray-900">
+                                @if($user->last_api_used_at)
+                                    {{ \Carbon\Carbon::parse($user->last_api_used_at)->format('M j, Y g:i A') }}
+                                    <span class="text-gray-500">({{ \Carbon\Carbon::parse($user->last_api_used_at)->diffForHumans() }})</span>
+                                @else
+                                    No API activity
+                                @endif
+                            </p>
+                        </div>
                     </div>
                 </div>
             </div>

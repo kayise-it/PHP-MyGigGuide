@@ -36,11 +36,16 @@ class Artist extends Model
         'claim_status',
         'grace_period_ends_at',
         'warning_email_sent_at',
+        'spotify_refresh_token',
+        'spotify_connected_at',
+        'snapscan_code',
     ];
 
     protected $casts = [
         'gallery' => 'array',
         'settings' => 'array',
+        'spotify_refresh_token' => 'encrypted',
+        'spotify_connected_at' => 'datetime',
         'pending_claim_at' => 'datetime',
         'dispute_raised_at' => 'datetime',
         'grace_period_ends_at' => 'datetime',
@@ -188,5 +193,18 @@ class Artist extends Model
     public function youtubeVideos(): MorphMany
     {
         return $this->morphMany(YoutubeVideo::class, 'videoable')->orderBy('order');
+    }
+
+    /**
+     * Requestable repertoire (covers / originals the artist plays).
+     */
+    public function songs(): HasMany
+    {
+        return $this->hasMany(ArtistSong::class)->orderBy('sort_order')->orderBy('title');
+    }
+
+    public function liveSessions(): HasMany
+    {
+        return $this->hasMany(LiveSession::class);
     }
 }

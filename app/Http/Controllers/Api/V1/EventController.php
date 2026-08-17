@@ -7,6 +7,7 @@ use App\Http\Resources\Api\V1\EventResource;
 use App\Models\Category;
 use App\Models\Event;
 use App\Services\EventCreationService;
+use App\Services\EventDuplicateService;
 use App\Services\MiggsBridgePosterService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -97,8 +98,8 @@ class EventController extends Controller
     public function show(Request $request, Event $event): EventResource
     {
         $user = $request->user('sanctum');
-        $canView = in_array($event->status, ['upcoming', 'ongoing'], true)
-            || ($user && app(EventCreationService::class)->userOwnsEvent($user, $event));
+        $isOwner = $user && app(EventCreationService::class)->userOwnsEvent($user, $event);
+        $canView = $isOwner || ! $event->isCancelled();
 
         abort_unless($canView, 404);
 
@@ -143,6 +144,36 @@ class EventController extends Controller
         }
 
         return response()->json($result);
+    }
+
+    /**
+     * Check whether a create payload would match an existing listing (no side effects).
+     */
+    public function checkDuplicate(Request $request, EventDuplicateService $duplicateService): JsonResponse
+    {
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'date' => 'required|date',
+            'time' => 'required|date_format:H:i',
+            'venue_id' => 'required|exists:venues,id',
+            'ticket_url' => 'nullable|url',
+        ]);
+
+        $duplicate = $duplicateService->findDuplicate($validated);
+
+        if ($duplicate === null) {
+            return response()->json([
+                'duplicate' => false,
+                'data' => null,
+            ]);
+        }
+
+        $duplicate->loadMissing(['venue']);
+
+        return response()->json([
+            'duplicate' => true,
+            'data' => (new EventResource($duplicate))->resolve($request),
+        ]);
     }
 
     /**

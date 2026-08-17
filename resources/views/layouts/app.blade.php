@@ -8,7 +8,7 @@
     <title>@yield('title', $siteBrand->name)</title>
     <meta name="description" content="@yield('description', $siteBrand->tagline)">
     <link rel="icon" href="{{ $siteBrand->faviconUrl() }}" type="image/png" sizes="32x32">
-    @if(! $siteBrand->isRogues)
+    @if(! $siteBrand->isPartnerTenant())
     <link rel="apple-touch-icon" href="{{ asset('logos/apple-touch-icon.png') }}">
     @endif
     
@@ -27,6 +27,7 @@
     
     <!-- Favorite Button Styles -->
     <style>
+    [x-cloak] { display: none !important; }
     .favorite-toggle.favorited svg {
         fill: #ef4444 !important;
         stroke: #ef4444 !important;

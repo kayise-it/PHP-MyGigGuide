@@ -20,19 +20,19 @@ class EventDuplicateService
      */
     public function findDuplicate(array $payload): ?Event
     {
+        if (! empty($payload['ticket_url'])) {
+            $byUrl = $this->findByTicketUrl((string) $payload['ticket_url']);
+            if ($byUrl !== null) {
+                return $byUrl;
+            }
+        }
+
         $venueId = (int) $payload['venue_id'];
         $day = Carbon::parse($payload['date'])->toDateString();
         $inputTime = $this->normalizeTimeString($payload['time']);
 
         if ($inputTime === null) {
             return null;
-        }
-
-        if (! empty($payload['ticket_url'])) {
-            $byUrl = $this->findByTicketUrl((string) $payload['ticket_url']);
-            if ($byUrl !== null) {
-                return $byUrl;
-            }
         }
 
         $candidates = Event::query()

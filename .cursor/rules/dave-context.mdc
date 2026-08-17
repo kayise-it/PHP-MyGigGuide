@@ -1,0 +1,16 @@
+---
+description: Dave's working style and session continuity for My Gig Guide
+alwaysApply: true
+---
+
+# Dave — project context
+
+At the start of substantive work on this repo (or when Dave says "continue" / "pick up"):
+
+1. Read `docs/personal.md` — pace, Linux Mint, baby steps, no unsolicited commits.
+2. Read `docs/SESSION_HANDOFF.md` — what was done last and what to do next.
+3. Skim `docs/PRODUCT_CONTINUITY.md` for architecture.
+
+Flutter app lives in `~/development/mygigguide_app` (separate repo). **Default dev/test:** `./scripts/build_apk.sh mygigguide`. **Rogues** at major milestones: `./scripts/build_apk.sh rogues` (`BRAND=rogues`). Launcher icons: `flutter_launcher_icons-<flavor>.yaml`, then `dart run flutter_launcher_icons`.
+
+Explain commands in plain language; one step at a time unless Dave asks for a batch.

@@ -145,6 +145,25 @@
                         @enderror
                     </div>
 
+                    <!-- SnapScan (live tips) -->
+                    <div class="md:col-span-2">
+                        <label for="snapscan_code" class="block text-sm font-medium text-gray-700 mb-2">
+                            SnapScan code (live tips)
+                        </label>
+                        <input type="text" id="snapscan_code" name="snapscan_code"
+                               value="{{ old('snapscan_code', $artist->snapscan_code) }}"
+                               placeholder="e.g. peMSrHSr or https://pos.snapscan.io/qr/…"
+                               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent @error('snapscan_code') border-red-500 @enderror">
+                        @error('snapscan_code')
+                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                        @enderror
+                        <p class="mt-2 text-sm text-gray-500">
+                            Optional. Paste the artist’s SnapScan snapcode or payment link from their SnapScan merchant account.
+                            Fans see an optional tip after a live song request only when this is set. Leave blank to disable tips.
+                            SnapScan signup and payouts stay on <a href="https://www.snapscan.co.za/merchant" class="text-purple-600 hover:text-purple-700" target="_blank" rel="noopener">snapscan.co.za</a>.
+                        </p>
+                    </div>
+
                     <!-- YouTube Videos -->
                     <div class="md:col-span-2">
                         <label class="block text-sm font-medium text-gray-700 mb-2">YouTube Videos</label>

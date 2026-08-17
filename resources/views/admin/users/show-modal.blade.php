@@ -59,6 +59,28 @@
                             <dd class="mt-1 text-gray-900">{{ $user->created_at->format('M d, Y') }}</dd>
                         </div>
                         <div>
+                            <dt class="text-gray-500">Last login</dt>
+                            <dd class="mt-1 text-gray-900">
+                                @if($user->last_login_at)
+                                    {{ $user->last_login_at->format('M j, Y g:i A') }}
+                                    <span class="text-gray-500">({{ $user->last_login_at->diffForHumans() }})</span>
+                                @else
+                                    Never
+                                @endif
+                            </dd>
+                        </div>
+                        <div>
+                            <dt class="text-gray-500">Last app use</dt>
+                            <dd class="mt-1 text-gray-900">
+                                @if($user->last_api_used_at)
+                                    {{ \Carbon\Carbon::parse($user->last_api_used_at)->format('M j, Y g:i A') }}
+                                    <span class="text-gray-500">({{ \Carbon\Carbon::parse($user->last_api_used_at)->diffForHumans() }})</span>
+                                @else
+                                    No API activity
+                                @endif
+                            </dd>
+                        </div>
+                        <div>
                             <dt class="text-gray-500">Roles</dt>
                             <dd class="mt-1 flex flex-wrap gap-1">
                                 @forelse($user->roles as $role)

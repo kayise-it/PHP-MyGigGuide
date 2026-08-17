@@ -12,6 +12,7 @@ use App\Models\User;
 use App\Models\YoutubeVideo;
 use App\Rules\UniqueNormalizedName;
 use App\Rules\YoutubeUrl;
+use App\Services\SnapScanService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Storage;
@@ -98,17 +99,8 @@ class ArtistManagementController extends Controller
         // Handle YouTube videos
         if ($request->has('youtube_videos') && is_array($request->youtube_videos)) {
             foreach ($request->youtube_videos as $index => $url) {
-                if (!empty($url)) {
-                    $videoId = YoutubeVideo::extractVideoId($url);
-                    if ($videoId) {
-                        YoutubeVideo::create([
-                            'videoable_type' => Artist::class,
-                            'videoable_id' => $artist->id,
-                            'youtube_url' => $url,
-                            'youtube_video_id' => $videoId,
-                            'order' => $index,
-                        ]);
-                    }
+                if (! empty($url)) {
+                    YoutubeVideo::createFromUrl($artist, $url, $index);
                 }
             }
         }
@@ -151,6 +143,7 @@ class ArtistManagementController extends Controller
             'instagram' => 'nullable|url',
             'facebook' => 'nullable|url',
             'twitter' => 'nullable|url',
+            'snapscan_code' => 'nullable|string|max:255',
             'profile_picture' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:10240',
             'user_id' => 'nullable|exists:users,id',
             'youtube_videos' => 'nullable|array',
@@ -171,6 +164,11 @@ class ArtistManagementController extends Controller
                 if (strtolower(trim($request->contact_email)) === strtolower($adminEmail)) {
                     $validator->errors()->add('contact_email', 'Do not use your own email as the unclaimed artist\'s contact. Enter the artist\'s contact email.');
                 }
+            }
+
+            $rawSnapscan = trim((string) $request->input('snapscan_code', ''));
+            if ($rawSnapscan !== '' && app(SnapScanService::class)->normalizeCode($rawSnapscan) === null) {
+                $validator->errors()->add('snapscan_code', 'Paste a valid SnapScan snapcode or payment URL (e.g. https://pos.snapscan.io/qr/…).');
             }
         });
 
@@ -213,6 +211,11 @@ class ArtistManagementController extends Controller
             }
         }
 
+        $rawSnapscan = trim((string) $request->input('snapscan_code', ''));
+        $snapscanCode = $rawSnapscan === ''
+            ? null
+            : app(SnapScanService::class)->normalizeCode($rawSnapscan);
+
         // Prepare data array - collect all form fields
         $data = [
             'stage_name' => $request->input('stage_name'),
@@ -224,6 +227,7 @@ class ArtistManagementController extends Controller
             'instagram' => $request->input('instagram'),
             'facebook' => $request->input('facebook'),
             'twitter' => $request->input('twitter'),
+            'snapscan_code' => $snapscanCode,
             'user_id' => $request->input('user_id', null), // Use null as default if empty
         ];
 
@@ -235,8 +239,8 @@ class ArtistManagementController extends Controller
         // Remove null values but keep empty strings (for clearing fields)
         $updateData = [];
         foreach ($data as $key => $value) {
-            if ($value !== null || $key === 'user_id') {
-                // Allow null for user_id (for unclaimed artists)
+            if ($value !== null || in_array($key, ['user_id', 'snapscan_code'], true)) {
+                // Allow null for user_id (unclaimed) and snapscan_code (tips off).
                 $updateData[$key] = $value;
             }
         }
@@ -285,17 +289,8 @@ class ArtistManagementController extends Controller
             $orderOffset = $artist->youtubeVideos()->whereIn('id', array_filter($existingVideoIds))->count();
             
             foreach ($request->youtube_videos as $index => $url) {
-                if (!empty($url)) {
-                    $videoId = YoutubeVideo::extractVideoId($url);
-                    if ($videoId) {
-                        YoutubeVideo::create([
-                            'videoable_type' => Artist::class,
-                            'videoable_id' => $artist->id,
-                            'youtube_url' => $url,
-                            'youtube_video_id' => $videoId,
-                            'order' => $orderOffset + $index,
-                        ]);
-                    }
+                if (! empty($url)) {
+                    YoutubeVideo::createFromUrl($artist, $url, $orderOffset + $index);
                 }
             }
         }

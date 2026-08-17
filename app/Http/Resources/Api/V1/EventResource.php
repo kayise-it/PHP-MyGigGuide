@@ -2,8 +2,8 @@
 
 namespace App\Http\Resources\Api\V1;
 
-use App\Http\Resources\Api\V1\Concerns\SerializesRatingSummary;
 use App\Http\Resources\Api\V1\Concerns\ResolvesStorageUrl;
+use App\Http\Resources\Api\V1\Concerns\SerializesRatingSummary;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -29,7 +29,8 @@ class EventResource extends JsonResource
             'ticket_url' => $this->ticket_url,
             'status' => $this->status,
             'legacy_category' => $this->category,
-            'poster_url' => self::publicStorageUrl($this->poster),
+            'poster_url' => $this->resolvePosterUrl(),
+            'poster_card_url' => self::publicStorageUrl($this->poster_card),
             'gallery_urls' => self::publicStorageUrls($gallery),
             'venue' => VenueResource::make($this->whenLoaded('venue')),
             'artists' => ArtistResource::collection($this->whenLoaded('artists')),
@@ -45,6 +46,7 @@ class EventResource extends JsonResource
             'detail_url' => route('events.show', $this->resource),
             'rating_summary' => $this->ratingSummary($request),
             'user_can_edit' => $this->userCanEdit($request),
+            'posted_by' => app(\App\Services\EventPosterService::class)->serializePostedBy($this->resource),
         ];
     }
 
@@ -56,5 +58,19 @@ class EventResource extends JsonResource
         }
 
         return app(\App\Services\EventCreationService::class)->userOwnsEvent($user, $this->resource);
+    }
+
+    protected function resolvePosterUrl(): ?string
+    {
+        $poster = self::publicStorageUrl($this->poster);
+        if ($poster !== null) {
+            return $poster;
+        }
+
+        if ($this->relationLoaded('venue') && $this->venue) {
+            return self::publicStorageUrl($this->venue->main_picture);
+        }
+
+        return null;
     }
 }

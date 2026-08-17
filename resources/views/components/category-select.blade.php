@@ -10,7 +10,7 @@
 ])
 
 @php
-    $categories = \App\Models\Category::where('is_active', true)->orderBy('sort_order')->orderBy('name')->get();
+    $categories = \App\Models\Category::where('is_active', true)->orderedForDisplay()->get();
     $selectName = $multiple ? $name . '[]' : $name;
     $finalClasses = trim($siteBrand->formSelectClass() . ' ' . $class);
 @endphp

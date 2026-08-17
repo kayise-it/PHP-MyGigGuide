@@ -1,23 +1,26 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Support\Facades\DB;
-use App\Http\Controllers\ArtistController;
 use App\Http\Controllers\AppWebSessionController;
+use App\Http\Controllers\ArtistController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\EventController;
 use App\Http\Controllers\FavoriteController;
+use App\Http\Controllers\FeaturePurchaseController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\OrganiserController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RatingController;
+use App\Http\Controllers\Fm919EngagementController;
+use App\Http\Controllers\PartnerPreviewController;
+use App\Http\Controllers\RoguesListenController;
 use App\Http\Controllers\VenueController;
-use App\Http\Controllers\FeaturePurchaseController;
 use App\Http\Controllers\VerificationController;
-use App\Http\Controllers\NotificationController;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Schema;
 
 // Public venue creation routes (MUST come before admin routes)
 Route::get('/venues/create', [VenueController::class, 'create'])->name('venues.create');
@@ -30,7 +33,7 @@ Route::get('/api/venues/{venue}', [VenueController::class, 'showApi'])->name('ap
 Route::middleware(['auth', 'capability'])->group(function () {
     Route::get('/venues/my-requests', [VenueController::class, 'myVenueRequests'])->name('venues.my-requests');
     Route::post('/venues/request-ownership', [VenueController::class, 'requestOwnership'])->name('venues.request-ownership');
-    
+
     // Venue owner management routes (only for venue owners)
     Route::post('/venues/{venue}/approve-request/{venueOwnerRequest}', [VenueController::class, 'approveRequest'])->name('venues.approve-request');
     Route::post('/venues/{venue}/reject-request/{venueOwnerRequest}', [VenueController::class, 'rejectRequest'])->name('venues.reject-request');
@@ -53,6 +56,9 @@ Route::view('/about', 'about')->name('about');
 Route::redirect('/privacy', '/popia', 301);
 Route::view('/popia', 'popia')->name('popia');
 Route::view('/terms', 'terms')->name('terms');
+Route::view('/help/claim-your-page', 'help.claim-your-page')->name('help.claim-your-page');
+Route::view('/help/delete-account', 'help.delete-account')->name('help.delete-account');
+Route::get('/spotify/callback', \App\Http\Controllers\SpotifyCallbackController::class)->name('spotify.callback');
 
 // Venue selector demo
 Route::view('/venue-selector-demo', 'venue-selector-demo')->name('venue-selector-demo');
@@ -63,6 +69,14 @@ Route::view('/user-selector-demo', 'user-selector-demo')->name('user-selector-de
 // Contact routes
 Route::get('/contact', [ContactController::class, 'index'])->name('contact.index');
 Route::post('/contact/submit', [ContactController::class, 'submit'])->name('contact.submit');
+
+// Partner tenant previews + listener tools (hostname-aware)
+Route::get('/pitch', [PartnerPreviewController::class, 'pitch'])->name('rogues.pitch');
+Route::view('/advertise', 'rogues.advertise-mock')->name('rogues.advertise.mock');
+Route::get('/station', [PartnerPreviewController::class, 'station'])->name('rogues.station.mock');
+Route::get('/listen', [RoguesListenController::class, 'show'])->name('rogues.listen');
+Route::get('/poll', [Fm919EngagementController::class, 'poll'])->name('fm919.poll');
+Route::get('/request', [Fm919EngagementController::class, 'request'])->name('fm919.request');
 
 // Mark notification as read and redirect (auth required)
 Route::middleware(['auth'])->group(function () {
@@ -170,7 +184,7 @@ Route::middleware('auth')->group(function () {
     // Paid feature purchase flow
     Route::get('/boost/checkout', [FeaturePurchaseController::class, 'create'])->name('features.checkout');
     Route::post('/boost/purchase', [FeaturePurchaseController::class, 'store'])->name('features.purchase');
-    
+
     // Dashboard routes
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/dashboard/artist', [DashboardController::class, 'artistDashboard'])->name('dashboard.artist');
@@ -207,7 +221,7 @@ Route::get('/api/user', function () {
 
 // Temporary maintenance route to create email_templates table if migrations cannot run
 Route::get('/internal/dev/create-email-templates-table', function () {
-    if (!Schema::hasTable('email_templates')) {
+    if (! Schema::hasTable('email_templates')) {
         Schema::create('email_templates', function (\Illuminate\Database\Schema\Blueprint $table) {
             $table->id();
             $table->string('key')->unique();
@@ -221,7 +235,7 @@ Route::get('/internal/dev/create-email-templates-table', function () {
     }
 
     // Seed initial claim_invitation template if missing
-    if (!DB::table('email_templates')->where('key', 'claim_invitation')->exists()) {
+    if (! DB::table('email_templates')->where('key', 'claim_invitation')->exists()) {
         $html = <<<'HTML'
 <!DOCTYPE html>
 <html lang="en">
@@ -272,7 +286,7 @@ Route::get('/run-migrations', function () {
         $dbHost = config('database.connections.mysql.host');
         $dbUser = config('database.connections.mysql.username');
         $dbPass = config('database.connections.mysql.password');
-        
+
         $pdo = new PDO("mysql:host={$dbHost};port=3306;dbname={$dbName};charset=utf8mb4", $dbUser, $dbPass, [
             PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
         ]);
@@ -285,16 +299,16 @@ Route::get('/run-migrations', function () {
         $stmt = $pdo->query('SHOW TABLES');
         $tables = $stmt->fetchAll(PDO::FETCH_COLUMN);
         $result['messages'][] = 'Current tables: '.count($tables);
-        
+
         // Check if venue_owner tables exist
         $hasVenueOwners = in_array('venue_owners', $tables);
         $hasVenueOwnerRequests = in_array('venue_owner_requests', $tables);
         $result['venue_owners_table_exists'] = $hasVenueOwners;
         $result['venue_owner_requests_table_exists'] = $hasVenueOwnerRequests;
 
-        if (!$hasVenueOwners || !$hasVenueOwnerRequests) {
+        if (! $hasVenueOwners || ! $hasVenueOwnerRequests) {
             $result['messages'][] = '⚠️ Venue owner tables are missing. Running migrations...';
-            
+
             // Run migrations
             $output = [];
             $returnCode = 0;

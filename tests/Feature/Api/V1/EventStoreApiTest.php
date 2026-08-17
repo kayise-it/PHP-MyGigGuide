@@ -5,8 +5,8 @@ namespace Tests\Feature\Api\V1;
 use App\Models\User;
 use App\Models\Venue;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Laravel\Sanctum\Sanctum;
 use Laratrust\Models\Role;
+use Laravel\Sanctum\Sanctum;
 use Tests\TestCase;
 
 class EventStoreApiTest extends TestCase
@@ -112,6 +112,38 @@ class EventStoreApiTest extends TestCase
             'owner_id' => $user->id,
             'owner_type' => 'user',
             'status' => 'upcoming',
+        ]);
+    }
+
+    public function test_claimed_artist_posts_event_with_artist_page_as_owner(): void
+    {
+        $user = $this->makeVerifiedUser();
+        $user->syncRoles(['user', 'artist']);
+
+        $artist = \App\Models\Artist::query()->create([
+            'stage_name' => 'Danger Daveed',
+            'user_id' => $user->id,
+            'claim_status' => 'approved',
+        ]);
+
+        $venue = $this->makeVenue($user);
+        Sanctum::actingAs($user);
+
+        $response = $this->postJson('/api/v1/events', [
+            'name' => 'Daveed Live',
+            'date' => now()->addDays(4)->toDateString(),
+            'time' => '21:00',
+            'venue_id' => $venue->id,
+        ]);
+
+        $response->assertCreated()
+            ->assertJsonPath('data.posted_by.via', 'Danger Daveed')
+            ->assertJsonPath('data.posted_by.page.id', $artist->id);
+
+        $this->assertDatabaseHas('events', [
+            'name' => 'Daveed Live',
+            'owner_id' => $artist->id,
+            'owner_type' => 'artist',
         ]);
     }
 

@@ -22,6 +22,7 @@
 
 # Mail credentials (set via Admin > Mail Accounts; never commit)
 /storage/app/mail_credentials.json
+/docs/VPS_CREDENTIALS.local.md
 
 # Environment files
 .env

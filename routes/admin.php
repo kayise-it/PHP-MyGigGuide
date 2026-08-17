@@ -1,26 +1,27 @@
 <?php
 
-use App\Http\Controllers\Admin\ArtistManagementController;
 use App\Http\Controllers\Admin\ArtistClaimDisputeController;
+use App\Http\Controllers\Admin\ArtistManagementController;
 use App\Http\Controllers\Admin\AuthController;
+use App\Http\Controllers\Admin\CapabilityManagementController;
 use App\Http\Controllers\Admin\CategoryManagementController;
+use App\Http\Controllers\Admin\ContentReportController;
 use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\DuplicateManagementController;
+use App\Http\Controllers\Admin\EmailTemplateController;
 use App\Http\Controllers\Admin\EventManagementController;
+use App\Http\Controllers\Admin\FeaturePackageController;
+use App\Http\Controllers\Admin\FeatureProgramController;
 use App\Http\Controllers\Admin\GenreManagementController;
+use App\Http\Controllers\Admin\MailAccountController;
 use App\Http\Controllers\Admin\OrganiserManagementController;
+use App\Http\Controllers\Admin\PaidFeatureController;
+use App\Http\Controllers\Admin\PollAdminController;
+use App\Http\Controllers\Admin\SettingsController;
+use App\Http\Controllers\Admin\UnclaimedController;
 use App\Http\Controllers\Admin\UserManagementController;
 use App\Http\Controllers\Admin\VenueManagementController;
-use App\Http\Controllers\Admin\PaidFeatureController;
-use App\Http\Controllers\Admin\FeatureProgramController;
-use App\Http\Controllers\Admin\FeaturePackageController;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Admin\UnclaimedArtistController;
-use App\Http\Controllers\Admin\UnclaimedController;
-use App\Http\Controllers\Admin\SettingsController;
-use App\Http\Controllers\Admin\DuplicateManagementController;
-use App\Http\Controllers\Admin\CapabilityManagementController;
-use App\Http\Controllers\Admin\EmailTemplateController;
-use App\Http\Controllers\Admin\MailAccountController;
 
 // Admin Authentication Routes
 Route::prefix('admin')->name('admin.')->group(function () {
@@ -100,8 +101,8 @@ Route::prefix('admin')->name('admin.')->group(function () {
         });
 
         // Legacy route redirects for backward compatibility
-        Route::get('unclaimed-artists', fn() => redirect()->route('admin.unclaimed.index', ['type' => 'artist']))->name('unclaimed-artists.index');
-        Route::get('unclaimed-artists/{artist}/edit', fn($artist) => redirect()->route('admin.unclaimed.edit', ['type' => 'artist', 'id' => $artist]))->name('unclaimed-artists.edit');
+        Route::get('unclaimed-artists', fn () => redirect()->route('admin.unclaimed.index', ['type' => 'artist']))->name('unclaimed-artists.index');
+        Route::get('unclaimed-artists/{artist}/edit', fn ($artist) => redirect()->route('admin.unclaimed.edit', ['type' => 'artist', 'id' => $artist]))->name('unclaimed-artists.edit');
 
         // Artist Claim Disputes
         Route::get('artist-disputes', [ArtistClaimDisputeController::class, 'index'])->name('artist-disputes.index');
@@ -109,6 +110,15 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::post('artist-disputes/{artist}/approve', [ArtistClaimDisputeController::class, 'approve'])->name('artist-disputes.approve');
         Route::post('artist-disputes/{artist}/reject', [ArtistClaimDisputeController::class, 'reject'])->name('artist-disputes.reject');
         Route::post('artist-disputes/{artist}/clear-dispute', [ArtistClaimDisputeController::class, 'clearDispute'])->name('artist-disputes.clear-dispute');
+
+        Route::get('content-reports', [ContentReportController::class, 'index'])->name('content-reports.index');
+        Route::get('content-reports/{contentReport}', [ContentReportController::class, 'show'])->name('content-reports.show');
+        Route::post('content-reports/{contentReport}/resolve', [ContentReportController::class, 'resolve'])->name('content-reports.resolve');
+        Route::post('content-reports/{contentReport}/dismiss', [ContentReportController::class, 'dismiss'])->name('content-reports.dismiss');
+
+        // Station Polls
+        Route::resource('polls', PollAdminController::class)->except(['show']);
+        Route::post('polls/{poll}/close', [PollAdminController::class, 'close'])->name('polls.close');
 
         // Organiser Management
         Route::resource('organisers', OrganiserManagementController::class);

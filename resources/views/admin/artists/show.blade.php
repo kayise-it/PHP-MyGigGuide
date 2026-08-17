@@ -82,6 +82,19 @@
                                 @endif
                             </p>
                         </div>
+                        <div>
+                            <label class="text-sm font-medium text-gray-500">Live tips (SnapScan)</label>
+                            <p class="text-gray-900">
+                                @if($artist->snapscan_code)
+                                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">On</span>
+                                    <span class="ml-2">{{ $artist->snapscan_code }}</span>
+                                    <a href="https://pos.snapscan.io/qr/{{ $artist->snapscan_code }}" target="_blank" rel="noopener" class="block text-sm text-purple-600 hover:text-purple-700 mt-1">View payment page</a>
+                                @else
+                                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-700">Off</span>
+                                    <span class="text-gray-500 text-sm ml-2">No SnapScan code — fans won’t be prompted to tip</span>
+                                @endif
+                            </p>
+                        </div>
                     </div>
                     <div class="mt-4">
                         <label class="text-sm font-medium text-gray-500">Bio</label>

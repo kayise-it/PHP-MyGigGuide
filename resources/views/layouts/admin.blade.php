@@ -49,7 +49,7 @@
             <!-- Logo -->
             <div class="flex items-center justify-center h-16 px-4 bg-gradient-to-r from-purple-600 to-blue-600">
                 <div class="flex items-center space-x-3">
-                    <img src="{{ asset('logos/logo1.jpeg') }}" alt="My Gig Guide" class="h-8 w-auto rounded-lg">
+                    <img src="{{ asset('logos/mgg-headphones-logo.png') }}" alt="My Gig Guide" class="h-8 w-auto rounded-lg">
                     <span class="text-white font-bold text-lg">Admin Panel</span>
                 </div>
             </div>
@@ -166,6 +166,24 @@
                         @endif
                     </a>
 
+                    @php
+                        try {
+                            $contentReportCount = \App\Models\ContentReport::where('status', 'new')->count();
+                        } catch (\Throwable $e) {
+                            $contentReportCount = 0;
+                        }
+                    @endphp
+                    <a href="{{ route('admin.content-reports.index') }}"
+                       class="nav-item {{ request()->routeIs('admin.content-reports.*') ? 'nav-item-active' : '' }}">
+                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 21v-4m0 0V5a2 2 0 012-2h6.5l1 1H21l-3 6 3 6h-8.5l-1-1H5a2 2 0 00-2 2zm9-13.5V9" />
+                        </svg>
+                        Content reports
+                        @if($contentReportCount > 0)
+                            <span class="ml-2 px-2 py-0.5 text-xs font-semibold rounded-full bg-amber-100 text-amber-800">{{ $contentReportCount }}</span>
+                        @endif
+                    </a>
+
                     <!-- Duplicate Names -->
                     @php
                         $duplicateService = app(\App\Services\DuplicateNameService::class);
@@ -181,6 +199,15 @@
                         @if($totalDuplicateGroups > 0)
                             <span class="ml-auto px-2 py-0.5 text-xs font-semibold rounded-full bg-amber-100 text-amber-800">{{ $totalDuplicateGroups }}</span>
                         @endif
+                    </a>
+
+                    <!-- Station Polls -->
+                    <a href="{{ route('admin.polls.index') }}"
+                       class="nav-item {{ request()->routeIs('admin.polls.*') ? 'nav-item-active' : '' }}">
+                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+                        </svg>
+                        Polls
                     </a>
 
                     <!-- Divider -->

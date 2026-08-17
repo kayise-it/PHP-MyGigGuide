@@ -4,7 +4,11 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Mail\PasswordResetMail;
+use App\Models\Artist;
+use App\Models\Event;
+use App\Models\Organiser;
 use App\Models\User;
+use App\Models\Venue;
 use App\Rules\UniqueNormalizedName;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -64,6 +68,7 @@ class UserManagementController extends Controller
         // Add role information and format for frontend
         $users = $users->map(function ($user) {
             $user->role_name = $user->roles->first() ? ucfirst($user->roles->first()->name) : 'User';
+
             return $user;
         });
 
@@ -73,14 +78,15 @@ class UserManagementController extends Controller
                 'page' => (int) $page,
                 'limit' => (int) $limit,
                 'total' => $total,
-                'totalPages' => ceil($total / $limit)
-            ]
+                'totalPages' => ceil($total / $limit),
+            ],
         ]);
     }
 
     public function index(Request $request)
     {
-        $query = User::with('roles');
+        $query = User::with('roles')
+            ->withMax('tokens as last_api_used_at', 'last_used_at');
 
         // Search functionality
         if ($request->has('search') && $request->search) {
@@ -99,12 +105,25 @@ class UserManagementController extends Controller
             });
         }
 
+        // Login activity filter (from admin dashboard cards)
+        if ($request->filled('login')) {
+            match ($request->login) {
+                'active_7d' => $query->where('last_login_at', '>=', now()->subDays(7)),
+                'active_30d' => $query->where('last_login_at', '>=', now()->subDays(30)),
+                'never' => $query->whereNull('last_login_at'),
+                default => null,
+            };
+        }
+
         // Sorting
-        $allowedSorts = ['name', 'email', 'username', 'created_at', 'is_active'];
+        $allowedSorts = ['name', 'email', 'username', 'created_at', 'is_active', 'last_login_at'];
         $sort = $request->get('sort');
         $direction = strtolower($request->get('direction', 'asc')) === 'desc' ? 'desc' : 'asc';
 
-        if (in_array($sort, $allowedSorts, true)) {
+        if ($sort === 'last_login_at') {
+            $query->orderByRaw('last_login_at IS NULL')
+                ->orderBy('last_login_at', $direction);
+        } elseif (in_array($sort, $allowedSorts, true)) {
             $query->orderBy($sort, $direction);
         } else {
             $query->orderBy('created_at', 'desc');
@@ -116,6 +135,7 @@ class UserManagementController extends Controller
             'users' => $users,
             'sort' => $sort,
             'direction' => $direction,
+            'loginFilter' => $request->get('login'),
         ]);
     }
 
@@ -165,7 +185,8 @@ class UserManagementController extends Controller
 
     public function show(Request $request, User $user)
     {
-        $user->load(['roles', 'permissions', 'events', 'venues', 'ratings']);
+        $user->load(['roles', 'permissions', 'events', 'venues', 'ratings'])
+            ->loadMax('tokens as last_api_used_at', 'last_used_at');
 
         if ($request->ajax()) {
             return view('admin.users.show-modal', compact('user'));
@@ -186,8 +207,8 @@ class UserManagementController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'name' => ['required', 'string', 'max:255', UniqueNormalizedName::forUser($user->id)],
-            'username' => 'required|string|max:255|unique:users,username,' . $user->id,
-            'email' => 'required|string|email|max:255|unique:users,email,' . $user->id,
+            'username' => 'required|string|max:255|unique:users,username,'.$user->id,
+            'email' => 'required|string|email|max:255|unique:users,email,'.$user->id,
             'password' => 'nullable|string|min:8|confirmed',
             // Admin edit form allows multiple roles + direct permissions
             'roles' => 'nullable|array',
@@ -253,127 +274,125 @@ class UserManagementController extends Controller
 
         try {
             Mail::to($user->email)->send(new PasswordResetMail($user, $token));
+
             return redirect()->route('admin.users.edit', $user)
-                ->with('success', 'Password reset email sent to ' . $user->email . '.');
+                ->with('success', 'Password reset email sent to '.$user->email.'.');
         } catch (\Exception $e) {
-            Log::error('Admin send password reset failed: ' . $e->getMessage());
+            Log::error('Admin send password reset failed: '.$e->getMessage());
+
             return redirect()->route('admin.users.edit', $user)
                 ->with('error', 'Failed to send password reset email. Please try again.');
         }
     }
 
-    public function destroy(User $user)
+    public function destroy(Request $request, User $user)
     {
-        \DB::beginTransaction();
+        if ((int) auth()->id() === (int) $user->id) {
+            return $this->destroyResponse($request, false, 'You cannot delete your own account from admin.');
+        }
+
+        DB::beginTransaction();
         try {
-            // #region agent log
-            @file_put_contents('/var/www/mygigguide/.cursor/debug.log', json_encode([
-                'location'    => 'UserManagementController.php:destroy:entry',
-                'message'     => 'Admin user delete entry',
-                'data'        => [
-                    'target_user_id'    => $user->id,
-                    'target_user_email' => $user->email,
-                    'has_artist'        => (bool) ($user->artist ?? null),
-                    'has_organiser'     => (bool) ($user->organiser ?? null),
-                ],
-                'timestamp'  => round(microtime(true) * 1000),
-                'sessionId'  => 'debug-session',
-                'runId'      => 'user-delete',
-                'hypothesisId' => 'DEL1',
-            ]) . "\n", FILE_APPEND | LOCK_EX);
-            // #endregion
+            $this->detachUserRelationships($user);
+            $user->delete();
 
-            // Detach favorites
-            if (method_exists($user, 'favoriteEvents')) {
-                $user->favoriteEvents()->detach();
-            }
-            if (method_exists($user, 'favoriteVenues')) {
-                $user->favoriteVenues()->detach();
-            }
-            if (method_exists($user, 'favoriteArtists')) {
-                $user->favoriteArtists()->detach();
-            }
-            if (method_exists($user, 'favoriteOrganisers')) {
-                $user->favoriteOrganisers()->detach();
-            }
+            DB::commit();
 
-            // Delete ratings made by the user
-            if (method_exists($user, 'ratings')) {
-                $user->ratings()->delete();
-            }
+            return $this->destroyResponse($request, true, 'User deleted successfully.');
+        } catch (\Throwable $e) {
+            DB::rollBack();
+            Log::error('Admin user delete failed', [
+                'user_id' => $user->id,
+                'email' => $user->email,
+                'error' => $e->getMessage(),
+            ]);
 
-            // Null any pending artist claims referencing this user
-            \App\Models\Artist::where('pending_claim_user_id', $user->id)
+            return $this->destroyResponse(
+                $request,
+                false,
+                'Unable to delete user. Please resolve linked records first. '.$e->getMessage()
+            );
+        }
+    }
+
+    /**
+     * Detach or clear links so the users row can be removed safely.
+     */
+    private function detachUserRelationships(User $user): void
+    {
+        $user->loadMissing(['artist', 'organiser']);
+
+        if (method_exists($user, 'favoriteEvents')) {
+            $user->favoriteEvents()->detach();
+        }
+        if (method_exists($user, 'favoriteVenues')) {
+            $user->favoriteVenues()->detach();
+        }
+        if (method_exists($user, 'favoriteArtists')) {
+            $user->favoriteArtists()->detach();
+        }
+        if (method_exists($user, 'favoriteOrganisers')) {
+            $user->favoriteOrganisers()->detach();
+        }
+
+        if (method_exists($user, 'ratings')) {
+            $user->ratings()->delete();
+        }
+
+        if (method_exists($user, 'ownedVenues')) {
+            $user->ownedVenues()->detach();
+        }
+
+        $user->tokens()->delete();
+
+        $user->roles()->detach();
+        $user->permissions()->detach();
+
+        foreach ([Artist::class, Venue::class, Organiser::class, Event::class] as $modelClass) {
+            $modelClass::query()
+                ->where('pending_claim_user_id', $user->id)
                 ->update(['pending_claim_user_id' => null, 'pending_claim_at' => null]);
+        }
 
-            // Mark any venues owned by this user as UNCLAIMED by nulling user_id/owner links
-            $ownedVenues = \App\Models\Venue::where('user_id', $user->id)->get();
-            foreach ($ownedVenues as $venue) {
+        Venue::query()
+            ->where('user_id', $user->id)
+            ->each(function (Venue $venue) use ($user) {
                 $venue->user_id = null;
 
-                // If this user is set as polymorphic owner, clear that too
-                if ($venue->owner_type === \App\Models\User::class && $venue->owner_id === $user->id) {
+                if ($venue->owner_type === User::class && (int) $venue->owner_id === (int) $user->id) {
                     $venue->owner_id = null;
                     $venue->owner_type = null;
                 }
 
                 $venue->save();
-            }
+            });
 
-            // If the user has an artist profile, gracefully detach without deleting related events
-            if (method_exists($user, 'artist') && $user->artist) {
-                $user->artist()->update(['user_id' => null]);
-            }
+        Event::query()
+            ->where('owner_type', User::class)
+            ->where('owner_id', $user->id)
+            ->update(['owner_id' => null, 'owner_type' => null]);
 
-            // If the user has an organiser profile, mark it unclaimed by nulling user_id
-            if (method_exists($user, 'organiser') && $user->organiser) {
-                $user->organiser()->update(['user_id' => null]);
-            }
-
-            // Finally delete the user
-            $user->delete();
-
-            \DB::commit();
-
-            // #region agent log
-            @file_put_contents('/var/www/mygigguide/.cursor/debug.log', json_encode([
-                'location'    => 'UserManagementController.php:destroy:success',
-                'message'     => 'Admin user delete succeeded',
-                'data'        => [
-                    'target_user_id'    => $user->id,
-                    'target_user_email' => $user->email,
-                ],
-                'timestamp'  => round(microtime(true) * 1000),
-                'sessionId'  => 'debug-session',
-                'runId'      => 'user-delete',
-                'hypothesisId' => 'DEL1',
-            ]) . "\n", FILE_APPEND | LOCK_EX);
-            // #endregion
-
-            return redirect()->route('admin.users.index')
-                ->with('success', 'User deleted successfully.');
-        } catch (\Throwable $e) {
-            \DB::rollBack();
-
-            // #region agent log
-            @file_put_contents('/var/www/mygigguide/.cursor/debug.log', json_encode([
-                'location'    => 'UserManagementController.php:destroy:error',
-                'message'     => 'Admin user delete failed',
-                'data'        => [
-                    'target_user_id'    => $user->id,
-                    'target_user_email' => $user->email,
-                    'exception_class'   => get_class($e),
-                    'exception_message' => $e->getMessage(),
-                ],
-                'timestamp'  => round(microtime(true) * 1000),
-                'sessionId'  => 'debug-session',
-                'runId'      => 'user-delete',
-                'hypothesisId' => 'DEL2',
-            ]) . "\n", FILE_APPEND | LOCK_EX);
-            // #endregion
-
-            return back()->with('error', 'Unable to delete user. Please resolve linked records first. '.$e->getMessage());
+        if ($user->artist) {
+            $user->artist()->update(['user_id' => null]);
         }
+
+        if ($user->organiser) {
+            $user->organiser()->update(['user_id' => null]);
+        }
+    }
+
+    private function destroyResponse(Request $request, bool $success, string $message)
+    {
+        if ($request->expectsJson() || $request->ajax()) {
+            return response()->json([
+                'success' => $success,
+                'message' => $message,
+            ], $success ? 200 : 422);
+        }
+
+        return $success
+            ? redirect()->route('admin.users.index')->with('success', $message)
+            : back()->with('error', $message);
     }
 
     public function toggleStatus(User $user)
@@ -413,7 +432,7 @@ class UserManagementController extends Controller
         }
 
         $validated = $request->validate([
-            'email' => 'required|email|max:255|unique:users,email,' . $user->id,
+            'email' => 'required|email|max:255|unique:users,email,'.$user->id,
             'sync_related' => 'sometimes|boolean',
         ]);
 

@@ -3,11 +3,14 @@
 namespace App\Models;
 
 use App\Traits\Claimable;
+use App\Models\User;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
+use Illuminate\Support\Carbon;
 
 class Event extends Model
 {
@@ -20,6 +23,7 @@ class Event extends Model
         'price',
         'ticket_url',
         'poster',
+        'poster_card',
         'gallery',
         'status',
         'category',
@@ -132,6 +136,16 @@ class Event extends Model
         return $this->belongsToMany(Artist::class, 'event_artist');
     }
 
+    public function liveSessions(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(LiveSession::class);
+    }
+
+    public function checkIns(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(EventCheckIn::class);
+    }
+
     /**
      * Get the ratings for the event.
      */
@@ -170,5 +184,93 @@ class Event extends Model
     public function youtubeVideos(): MorphMany
     {
         return $this->morphMany(YoutubeVideo::class, 'videoable')->orderBy('order');
+    }
+
+    public function isCancelled(): bool
+    {
+        return $this->status === 'cancelled';
+    }
+
+    /**
+     * Whether the gig date/time is in the past (status is ignored).
+     */
+    public function hasTakenPlace(?Carbon $now = null): bool
+    {
+        if ($this->date === null) {
+            return false;
+        }
+
+        $now ??= now();
+        $day = $this->date->toDateString();
+
+        if ($day < $now->toDateString()) {
+            return true;
+        }
+
+        if ($day > $now->toDateString()) {
+            return false;
+        }
+
+        if ($this->time === null) {
+            return false;
+        }
+
+        return Carbon::parse($this->time)->format('H:i:s') < $now->format('H:i:s');
+    }
+
+    /**
+     * @param  Builder<Event>  $query
+     */
+    public function scopeWhereTakenPlace(Builder $query, ?Carbon $now = null): void
+    {
+        $now ??= now();
+
+        $query->whereNotNull('date')
+            ->where(function (Builder $q) use ($now) {
+                $q->whereDate('date', '<', $now->toDateString())
+                    ->orWhere(function (Builder $inner) use ($now) {
+                        $inner->whereDate('date', '=', $now->toDateString())
+                            ->whereNotNull('time')
+                            ->whereTime('time', '<', $now->format('H:i:s'));
+                    });
+            });
+    }
+
+    /**
+     * @param  Builder<Event>  $query
+     */
+    public function scopeWhereNotCancelled(Builder $query): void
+    {
+        $query->where(function (Builder $q) {
+            $q->whereNull('status')
+                ->orWhere('status', '!=', 'cancelled');
+        });
+    }
+
+    /**
+     * Crowd-sourced / app-posted listings — excludes Quicket import rows.
+     *
+     * @param  Builder<Event>  $query
+     */
+    public function scopeUserPosted(Builder $query): Builder
+    {
+        $query->where(function (Builder $q) {
+            $q->whereNull('ticket_url')
+                ->orWhere('ticket_url', 'not like', '%quicket.co.za%');
+        });
+
+        $quicketOwnerId = config('quicket.owner_user_id');
+        if ($quicketOwnerId) {
+            $query->whereNot(function (Builder $q) use ($quicketOwnerId) {
+                $q->where('owner_id', $quicketOwnerId)
+                    ->where(function (Builder $inner) {
+                        $inner->where('owner_type', 'user')
+                            ->orWhere('owner_type', User::class)
+                            ->orWhere('owner_type', 'App\Models\User');
+                    });
+            });
+        }
+
+        return $query;
     }
 }

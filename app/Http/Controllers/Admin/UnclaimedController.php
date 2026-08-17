@@ -109,7 +109,8 @@ return view('admin.unclaimed.index', compact('unclaimed', 'counts', 'type'));
 
             $this->applyStatusFilter($query, $type, $request);
 
-            return $query->get()->map(fn($item) => $this->transformForUnified($item, $type));
+            // Plain Support\Collection — Eloquent Collection merge() calls getKey() on items.
+            return collect($query->get())->map(fn ($item) => $this->transformForUnified($item, $type));
         };
 
         // Get all unclaimed entities

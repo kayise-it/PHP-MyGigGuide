@@ -322,6 +322,49 @@ $description = \Illuminate\Support\Str::limit(strip_tags($venue->description ?? 
                     </div>
                 </div>
                 @endif
+
+                @if(isset($recentEvents) && $recentEvents->count() > 0)
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mt-8 opacity-95">
+                    <h2 class="text-2xl font-bold text-gray-700 mb-6">Recent gigs</h2>
+                    <div class="space-y-4">
+                        @foreach($recentEvents as $event)
+                        <div class="flex items-center gap-4 p-4 border border-gray-200 rounded-lg bg-gray-50/80">
+                            @if($event->poster)
+                            <img
+                                src="{{ Storage::url($event->poster) }}"
+                                alt="{{ $event->name }}"
+                                class="w-16 h-16 object-cover rounded-lg opacity-90"
+                            >
+                            @else
+                            <div class="w-16 h-16 bg-gray-200 rounded-lg flex items-center justify-center">
+                                <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                </svg>
+                            </div>
+                            @endif
+                            <div class="flex-1 min-w-0">
+                                <h3 class="font-semibold text-gray-800 truncate">{{ $event->name }}</h3>
+                                <p class="text-sm text-gray-500">
+                                    {{ \Carbon\Carbon::parse($event->date)->format('M j, Y') }}@if($event->time) at {{ \Carbon\Carbon::parse($event->time)->format('g:i A') }}@endif
+                                </p>
+                                @if($event->relationLoaded('artists') && $event->artists->isNotEmpty())
+                                <p class="text-xs text-gray-500 truncate">
+                                    {{ $event->artists->pluck('stage_name')->filter()->join(', ') }}
+                                </p>
+                                @endif
+                            </div>
+                            <span class="shrink-0 text-xs px-2 py-1 rounded-full bg-gray-200 text-gray-600">Past</span>
+                            <a
+                                href="{{ route('events.show', $event) }}"
+                                class="btn-primary text-sm shrink-0 opacity-90"
+                            >
+                                View Event
+                            </a>
+                        </div>
+                        @endforeach
+                    </div>
+                </div>
+                @endif
             </div>
 
             <!-- Right Column - Sidebar -->

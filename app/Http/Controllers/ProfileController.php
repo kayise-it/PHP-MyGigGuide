@@ -8,6 +8,7 @@ use App\Models\Organiser;
 use App\Models\User;
 use App\Models\Venue;
 use App\Rules\UniqueNormalizedName;
+use App\Services\ArtistPageService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -108,9 +109,9 @@ class ProfileController extends Controller
         }
 
         // Update role-specific profile
-        if ($user->hasRole('artist')) {
+        if ($user->hasRole('artist') && $user->artist) {
             $this->updateArtistProfile($user, $request);
-        } elseif ($user->hasRole('organiser')) {
+        } elseif ($user->hasRole('organiser') && $user->organiser) {
             $this->updateOrganiserProfile($user, $request);
         }
 
@@ -122,44 +123,46 @@ class ProfileController extends Controller
      */
     private function updateArtistProfile($user, $request)
     {
-        $artistId = $user->artist ? $user->artist->id : null;
-        
+        $artist = $user->artist;
+        if (! $artist || ! app(ArtistPageService::class)->userCanEditPage($user, $artist)) {
+            return;
+        }
+
         $request->validate([
-            'stage_name' => ['required', 'string', 'max:255', UniqueNormalizedName::forArtist($artistId)],
-            'real_name' => 'required|string|max:255',
+            'stage_name' => ['required', 'string', 'max:255', UniqueNormalizedName::forArtist($artist->id)],
+            'real_name' => 'nullable|string|max:255',
             'genre' => 'required|string|max:255',
-            'bio' => 'nullable|string|max:1000',
-            'contact_phone' => 'nullable|string|max:20',
+            'bio' => 'nullable|string|max:5000',
+            'phone_number' => 'nullable|string|max:30',
             'contact_email' => 'nullable|email|max:255',
-            'website' => 'nullable|url|max:255',
-            'social_media' => 'nullable|string|max:1000',
+            'instagram' => 'nullable|url|max:255',
+            'facebook' => 'nullable|url|max:255',
+            'twitter' => 'nullable|url|max:255',
+            'artist_profile_picture' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:10240',
         ]);
 
-        $artist = $user->artist;
-        if (! $artist) {
-            $artist = Artist::create([
-                'user_id' => $user->id,
-                'stage_name' => $request->stage_name,
-                'real_name' => $request->real_name,
-                'genre' => $request->genre,
-                'bio' => $request->bio,
-                'contact_phone' => $request->contact_phone,
-                'contact_email' => $request->contact_email,
-                'website' => $request->website,
-                'social_media' => $request->social_media,
-            ]);
-        } else {
-            $artist->update([
-                'stage_name' => $request->stage_name,
-                'real_name' => $request->real_name,
-                'genre' => $request->genre,
-                'bio' => $request->bio,
-                'contact_phone' => $request->contact_phone,
-                'contact_email' => $request->contact_email,
-                'website' => $request->website,
-                'social_media' => $request->social_media,
-            ]);
+        $data = [
+            'stage_name' => $request->stage_name,
+            'real_name' => $request->real_name,
+            'genre' => $request->genre,
+            'bio' => $request->bio,
+            'phone_number' => $request->phone_number,
+            'contact_email' => $request->contact_email,
+            'instagram' => $request->instagram,
+            'facebook' => $request->facebook,
+            'twitter' => $request->twitter,
+        ];
+
+        if ($request->hasFile('artist_profile_picture')) {
+            if ($artist->profile_picture && Storage::disk('public')->exists($artist->profile_picture)) {
+                Storage::disk('public')->delete($artist->profile_picture);
+            }
+
+            $data['profile_picture'] = $request->file('artist_profile_picture')
+                ->store('artists/profile_pictures', 'public');
         }
+
+        $artist->update($data);
     }
 
     /**
@@ -167,35 +170,26 @@ class ProfileController extends Controller
      */
     private function updateOrganiserProfile($user, $request)
     {
-        $organiserId = $user->organiser ? $user->organiser->id : null;
-        
+        $organiser = $user->organiser;
+        if (! $organiser || $organiser->claim_status !== 'approved') {
+            return;
+        }
+
         $request->validate([
-            'organisation_name' => ['required', 'string', 'max:255', UniqueNormalizedName::forOrganiser($organiserId)],
-            'contact_phone' => 'nullable|string|max:20',
+            'organisation_name' => ['required', 'string', 'max:255', UniqueNormalizedName::forOrganiser($organiser->id)],
+            'phone_number' => 'nullable|string|max:30',
             'contact_email' => 'nullable|email|max:255',
             'website' => 'nullable|url|max:255',
-            'description' => 'nullable|string|max:1000',
+            'description' => 'nullable|string|max:5000',
         ]);
 
-        $organiser = $user->organiser;
-        if (! $organiser) {
-            $organiser = Organiser::create([
-                'user_id' => $user->id,
-                'organisation_name' => $request->organisation_name,
-                'contact_phone' => $request->contact_phone,
-                'contact_email' => $request->contact_email,
-                'website' => $request->website,
-                'description' => $request->description,
-            ]);
-        } else {
-            $organiser->update([
-                'organisation_name' => $request->organisation_name,
-                'contact_phone' => $request->contact_phone,
-                'contact_email' => $request->contact_email,
-                'website' => $request->website,
-                'description' => $request->description,
-            ]);
-        }
+        $organiser->update([
+            'organisation_name' => $request->organisation_name,
+            'phone_number' => $request->phone_number,
+            'contact_email' => $request->contact_email,
+            'website' => $request->website,
+            'description' => $request->description,
+        ]);
     }
 
     /**

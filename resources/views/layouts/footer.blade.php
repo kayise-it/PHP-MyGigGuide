@@ -7,7 +7,7 @@
                     <img src="{{ $siteBrand->logoUrl() }}" alt="{{ $siteBrand->name }}" class="h-10 w-auto max-w-[120px] object-contain rounded-md">
                     <div>
                         <span class="text-2xl font-bold block">{{ $siteBrand->footerBrandTitle() }}</span>
-                        @if($siteBrand->isRogues)
+                        @if($siteBrand->isPartnerTenant())
                             <span class="text-sm text-gray-400">Powered by My Gig Guide</span>
                         @endif
                     </div>
@@ -41,8 +41,14 @@
 
             <!-- Quick Links -->
             <div>
-                <h3 class="text-lg font-semibold mb-4">Quick Links</h3>
+                <h3 class="text-lg font-semibold mb-4">{{ $siteBrand->isFm919 ? '919 FM' : 'Quick Links' }}</h3>
                 <ul class="space-y-2">
+                    @if($siteBrand->isFm919)
+                        <li><a href="{{ route('rogues.listen') }}" class="text-gray-400 hover:text-white transition-colors duration-200">Listen live</a></li>
+                        <li><a href="{{ route('fm919.poll') }}" class="text-gray-400 hover:text-white transition-colors duration-200">Listener poll</a></li>
+                        <li><a href="{{ route('fm919.request') }}" class="text-gray-400 hover:text-white transition-colors duration-200">Send a request</a></li>
+                        <li><a href="{{ route('rogues.station.mock') }}" class="text-gray-400 hover:text-white transition-colors duration-200">Station portal (preview)</a></li>
+                    @endif
                     <li><a href="{{ route('events.index') }}" class="text-gray-400 hover:text-white transition-colors duration-200">Browse Events</a></li>
                     <li><a href="{{ route('artists.index') }}" class="text-gray-400 hover:text-white transition-colors duration-200">Discover Artists</a></li>
                     <li><a href="{{ route('venues.index') }}" class="text-gray-400 hover:text-white transition-colors duration-200">Find Venues</a></li>
@@ -65,11 +71,11 @@
         <div class="border-t border-gray-800 mt-8 pt-6">
             <div class="flex flex-col md:flex-row justify-between items-center">
                 <p class="text-gray-400 text-sm">
-                    &copy; {{ date('Y') }} {{ $siteBrand->isRogues ? 'Rogues on Radio · My Gig Guide' : 'My Gig Guide' }}. All rights reserved.
+                    &copy; {{ date('Y') }} {{ $siteBrand->footerCopyrightLine() }}. All rights reserved.
                 </p>
                 <p class="text-gray-400 text-sm mt-2 md:mt-0">
-                    Created by <a href="https://kayiseit.co.za" class="{{ $siteBrand->isRogues ? 'text-sky-400 hover:text-white' : 'text-purple-400 hover:text-white' }} font-semibold" target="_blank" rel="noopener">KAYISE IT</a>
-                    @if($siteBrand->isRogues)
+                    Created by <a href="https://kayiseit.co.za" class="{{ $siteBrand->footerAccentLinkClass() }} font-semibold" target="_blank" rel="noopener">KAYISE IT</a>
+                    @if($siteBrand->isPartnerTenant())
                         — gig guide powered by My Gig Guide
                     @else
                         — promoting My Gig Guide

@@ -28,10 +28,10 @@ Make sure you're using the **full email address** and correct password:
 
 ### Step 3: Verify SMTP Settings
 
-RainLoop should automatically use these settings (already configured):
-- **SMTP Server:** localhost
+RainLoop should use these settings (already configured):
+- **SMTP Server:** localhost / 127.0.0.1
 - **SMTP Port:** 587
-- **Security:** STARTTLS
+- **Security:** **TLS** (not `STARTTLS` — see fix below)
 - **Authentication:** Required
 
 ### Step 4: Test Authentication
@@ -142,5 +142,5 @@ doveadm auth test dave@mygigguide.co.za Dave123!
 
 ---
 
-**Last Updated:** 2026-01-20  
-**Status:** Server authentication is working. Issue is likely in RainLoop client configuration.
+**Last Updated:** 2026-01-20 (send fix: domain `smtp_secure = "TLS"` on port 587 — May 2026)  
+**Status:** If receive works but send fails instantly with correct password, check domain ini `smtp_secure` is `"TLS"` not `"STARTTLS"`. Server-side `sudo doveadm auth test` + Python SMTP on localhost:587 should pass first.

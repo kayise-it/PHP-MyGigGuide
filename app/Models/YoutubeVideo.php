@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Services\YoutubeVideoService;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 
@@ -26,6 +27,24 @@ class YoutubeVideo extends Model
     public function videoable(): MorphTo
     {
         return $this->morphTo();
+    }
+
+    /**
+     * Create a video row from a URL and fetch its title from YouTube.
+     */
+    public static function createFromUrl(Model $videoable, string $url, int $order): ?self
+    {
+        return app(YoutubeVideoService::class)->createFor($videoable, $url, $order);
+    }
+
+    /**
+     * Title for display when the stored title is missing.
+     */
+    public function getDisplayTitleAttribute(): string
+    {
+        $title = trim((string) ($this->title ?? ''));
+
+        return $title !== '' ? $title : 'Watch on YouTube';
     }
 
     /**

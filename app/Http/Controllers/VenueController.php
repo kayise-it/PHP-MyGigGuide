@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\Api\V1\Concerns\ResolvesRecentEvents;
 use App\Models\User;
 use App\Models\Venue;
 use App\Models\VenueOwnerRequest;
@@ -9,16 +10,17 @@ use App\Models\YoutubeVideo;
 use App\Rules\YoutubeUrl;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 
 class VenueController extends Controller
 {
+    use ResolvesRecentEvents;
+
     /**
      * Search venues for the venue selector component
      */
@@ -61,7 +63,7 @@ class VenueController extends Controller
             $query->orderByRaw("CASE WHEN owner_id = ? AND owner_type = 'organiser' THEN 0 ELSE 1 END", [$organiserId]);
         } elseif ($userRole === 'artist' && $artistId) {
             // Show venues where artist has performed, then others
-            $query->orderByRaw("CASE WHEN id IN (SELECT DISTINCT venue_id FROM event_artists ea JOIN events e ON ea.event_id = e.id WHERE ea.artist_id = ?) THEN 0 ELSE 1 END", [$artistId]);
+            $query->orderByRaw('CASE WHEN id IN (SELECT DISTINCT venue_id FROM event_artists ea JOIN events e ON ea.event_id = e.id WHERE ea.artist_id = ?) THEN 0 ELSE 1 END', [$artistId]);
         }
 
         // Default ordering
@@ -78,7 +80,7 @@ class VenueController extends Controller
         // Add ownership information
         $venues = $venues->map(function ($venue) use ($userRole, $organiserId, $artistId) {
             $venue->isOwnVenue = false;
-            
+
             if ($userRole === 'organiser' && $organiserId && $venue->owner_id == $organiserId && $venue->owner_type === 'organiser') {
                 $venue->isOwnVenue = true;
             } elseif ($userRole === 'artist' && $artistId && $venue->owner_id == $artistId && $venue->owner_type === 'artist') {
@@ -94,8 +96,8 @@ class VenueController extends Controller
                 'page' => (int) $page,
                 'limit' => (int) $limit,
                 'total' => $total,
-                'totalPages' => ceil($total / $limit)
-            ]
+                'totalPages' => ceil($total / $limit),
+            ],
         ]);
     }
 
@@ -114,6 +116,7 @@ class VenueController extends Controller
         } elseif ($userRole === 'artist' && $artistId && $venue->owner_id == $artistId && $venue->owner_type === 'artist') {
             $venue->isOwnVenue = true;
         }
+
         return response()->json($venue);
     }
 
@@ -179,13 +182,20 @@ class VenueController extends Controller
             case 'events':
                 $query->withCount('events')->orderBy('events_count', 'desc');
                 break;
+            case 'rating':
+                if (method_exists(Venue::class, 'ratings')) {
+                    $query->withAvg('ratings', 'rating')->orderByDesc('ratings_avg_rating');
+                } else {
+                    $query->orderByDesc('created_at');
+                }
+                break;
             default:
                 $query->orderBy('created_at', 'desc');
                 break;
         }
 
         // Prioritise owned venues (top) while keeping other sort order
-        if (!empty($ownedVenueIds)) {
+        if (! empty($ownedVenueIds)) {
             // Cross-DB safe prioritization (SQLite does not support MySQL FIELD()).
             $placeholders = implode(',', array_fill(0, count($ownedVenueIds), '?'));
             $query->orderByRaw("CASE WHEN id IN ({$placeholders}) THEN 1 ELSE 0 END DESC", $ownedVenueIds);
@@ -243,7 +253,7 @@ class VenueController extends Controller
             $validated['user_id'] = Auth::id();
             $validated['owner_id'] = Auth::id();
             $validated['owner_type'] = Auth::user()->hasRole('artist') ? 'artist' : 'organiser';
-            
+
             // Get user's folder path for authenticated users
             $userFolder = Auth::user()->getFolderPath();
             $venueFolder = $this->createVenueFolder($userFolder, $validated['name']);
@@ -252,9 +262,9 @@ class VenueController extends Controller
             $validated['user_id'] = null;
             $validated['owner_id'] = null;
             $validated['owner_type'] = 'guest';
-            
+
             // Create a default folder structure for guest users
-            $venueFolder = 'public/guest_venues/' . Str::slug($validated['name']) . '_' . time();
+            $venueFolder = 'public/guest_venues/'.Str::slug($validated['name']).'_'.time();
             Storage::disk('public')->makeDirectory($venueFolder.'/images');
             Storage::disk('public')->makeDirectory($venueFolder.'/gallery');
             Storage::disk('public')->makeDirectory($venueFolder.'/documents');
@@ -284,17 +294,8 @@ class VenueController extends Controller
         // Handle YouTube videos
         if ($request->has('youtube_videos') && is_array($request->youtube_videos)) {
             foreach ($request->youtube_videos as $index => $url) {
-                if (!empty($url)) {
-                    $videoId = YoutubeVideo::extractVideoId($url);
-                    if ($videoId) {
-                        YoutubeVideo::create([
-                            'videoable_type' => Venue::class,
-                            'videoable_id' => $venue->id,
-                            'youtube_url' => $url,
-                            'youtube_video_id' => $videoId,
-                            'order' => $index,
-                        ]);
-                    }
+                if (! empty($url)) {
+                    YoutubeVideo::createFromUrl($venue, $url, $index);
                 }
             }
         }
@@ -311,16 +312,16 @@ class VenueController extends Controller
         $venue->load(['owner', 'events' => function ($query) {
             $query->orderBy('date', 'asc');
         }, 'youtubeVideos']);
-        
+
         // Load venue owners and pending requests if user is an owner
         $venueOwners = collect();
         $pendingRequests = collect();
         $isOwner = false;
         $isPrimaryOwner = false;
-        
+
         if (auth()->check()) {
             $userId = auth()->id();
-            
+
             // Check ownership - try new system first, then legacy
             try {
                 $isOwner = $venue->isOwnedBy($userId);
@@ -328,18 +329,18 @@ class VenueController extends Controller
                 // If venue_owners table doesn't exist, check legacy
                 $isOwner = false;
             }
-            
+
             // Also check direct user_id match (most reliable for legacy venues)
-            if (!$isOwner && $venue->user_id === $userId) {
+            if (! $isOwner && $venue->user_id === $userId) {
                 $isOwner = true;
             }
-            
+
             if ($isOwner) {
                 // Try to load from new venue_owners system
                 try {
                     // Load owners using relationship
                     $venueOwners = $venue->owners()->get();
-                    
+
                     // If empty, try direct database query as fallback
                     if ($venueOwners->isEmpty()) {
                         $ownerRows = DB::table('venue_owners')
@@ -347,7 +348,7 @@ class VenueController extends Controller
                             ->where('venue_owners.venue_id', $venue->id)
                             ->select('users.*', 'venue_owners.role', 'venue_owners.added_by_user_id', 'venue_owners.added_at')
                             ->get();
-                        
+
                         if ($ownerRows->isNotEmpty()) {
                             // Convert to User models with pivot data
                             $venueOwners = collect();
@@ -355,7 +356,7 @@ class VenueController extends Controller
                                 $user = User::find($row->id);
                                 if ($user) {
                                     // Manually set pivot data as object property
-                                    $pivot = new \stdClass();
+                                    $pivot = new \stdClass;
                                     $pivot->role = $row->role;
                                     $pivot->added_by_user_id = $row->added_by_user_id;
                                     $pivot->added_at = $row->added_at;
@@ -365,7 +366,7 @@ class VenueController extends Controller
                             }
                         }
                     }
-                    
+
                     // If still empty but user is owner via legacy, ensure entry exists
                     if ($venueOwners->isEmpty() && $venue->user_id === $userId) {
                         // Check if entry already exists in database
@@ -373,8 +374,8 @@ class VenueController extends Controller
                             ->where('venue_id', $venue->id)
                             ->where('user_id', $userId)
                             ->exists();
-                        
-                        if (!$exists) {
+
+                        if (! $exists) {
                             try {
                                 $venue->owners()->attach($userId, [
                                     'role' => 'primary',
@@ -388,17 +389,17 @@ class VenueController extends Controller
                         // Reload owners after potential attach
                         $venueOwners = $venue->owners()->get();
                     }
-                    
+
                     // Determine primary owner - SIMPLIFIED AND RELIABLE
                     $isPrimaryOwner = false;
-                    
+
                     // Method 1: Direct database query (most reliable)
                     $primaryOwnerCheck = DB::table('venue_owners')
                         ->where('venue_id', $venue->id)
                         ->where('user_id', $userId)
                         ->where('role', 'primary')
                         ->exists();
-                    
+
                     if ($primaryOwnerCheck) {
                         $isPrimaryOwner = true;
                     } else {
@@ -425,7 +426,7 @@ class VenueController extends Controller
                             }
                         }
                     }
-                    
+
                     // Load pending requests - ALWAYS use direct query for maximum reliability
                     $requestRows = DB::table('venue_owner_requests')
                         ->join('users', 'venue_owner_requests.requester_user_id', '=', 'users.id')
@@ -434,7 +435,7 @@ class VenueController extends Controller
                         ->select('venue_owner_requests.*', 'users.name as requester_name', 'users.email as requester_email')
                         ->orderBy('venue_owner_requests.requested_at', 'desc')
                         ->get();
-                    
+
                     $pendingRequests = collect();
                     foreach ($requestRows as $row) {
                         $venueRequest = VenueOwnerRequest::find($row->id);
@@ -452,7 +453,7 @@ class VenueController extends Controller
                     $pendingRequests = collect();
                     // If owner via legacy system (user_id match), assume primary
                     $isPrimaryOwner = ($venue->user_id === $userId);
-                    
+
                     // Still try to load pending requests even if owners failed
                     try {
                         $requestRows = DB::table('venue_owner_requests')
@@ -462,7 +463,7 @@ class VenueController extends Controller
                             ->select('venue_owner_requests.*', 'users.name as requester_name', 'users.email as requester_email')
                             ->orderBy('venue_owner_requests.requested_at', 'desc')
                             ->get();
-                        
+
                         $pendingRequests = collect();
                         foreach ($requestRows as $row) {
                             $venueRequest = VenueOwnerRequest::find($row->id);
@@ -510,12 +511,15 @@ class VenueController extends Controller
             })
             ->values();
 
+        $recentEvents = $this->recentEventsForVenue($venue);
+
         $ratingAvg = round((float) ($venue->ratings()->avg('rating') ?? 0), 1);
 
         return view('venues.show', compact(
             'venue',
             'gallery',
             'upcomingEvents',
+            'recentEvents',
             'ratingAvg',
             'venueOwners',
             'pendingRequests',
@@ -561,8 +565,8 @@ class VenueController extends Controller
         if ($venue->main_picture && Storage::disk('public')->exists($venue->main_picture)) {
             $storageUrl = Storage::disk('public')->url($venue->main_picture);
             // Ensure absolute URL - Storage::url() may return relative if APP_URL not set
-            $imageUrl = (str_starts_with($storageUrl, 'http://') || str_starts_with($storageUrl, 'https://')) 
-                ? $storageUrl 
+            $imageUrl = (str_starts_with($storageUrl, 'http://') || str_starts_with($storageUrl, 'https://'))
+                ? $storageUrl
                 : url($storageUrl);
         } else {
             // Try gallery - normalize same way as show() method
@@ -581,14 +585,14 @@ class VenueController extends Controller
             if (count($gallery) > 0 && Storage::disk('public')->exists($gallery[0])) {
                 $storageUrl = Storage::disk('public')->url($gallery[0]);
                 // Ensure absolute URL - Storage::url() may return relative if APP_URL not set
-                $imageUrl = (str_starts_with($storageUrl, 'http://') || str_starts_with($storageUrl, 'https://')) 
-                    ? $storageUrl 
+                $imageUrl = (str_starts_with($storageUrl, 'http://') || str_starts_with($storageUrl, 'https://'))
+                    ? $storageUrl
                     : url($storageUrl);
             }
         }
 
         // Fallback to logo
-        if (!$imageUrl) {
+        if (! $imageUrl) {
             $imageUrl = url(asset('logos/logo1.jpeg'));
         }
 
@@ -655,7 +659,7 @@ class VenueController extends Controller
             'amenities' => 'nullable|array',
             'amenities.*' => 'string|max:255',
             'youtube_videos' => 'nullable|array',
-            'youtube_videos.*' => ['nullable', new YoutubeUrl()],
+            'youtube_videos.*' => ['nullable', new YoutubeUrl],
             'youtube_video_ids' => 'nullable|array',
             'youtube_video_ids.*' => 'nullable|integer|exists:youtube_videos,id',
         ]);
@@ -718,19 +722,10 @@ class VenueController extends Controller
         if ($request->has('youtube_videos') && is_array($request->youtube_videos)) {
             $existingVideoIds = $request->youtube_video_ids ?? [];
             $orderOffset = $venue->youtubeVideos()->whereIn('id', array_filter($existingVideoIds))->count();
-            
+
             foreach ($request->youtube_videos as $index => $url) {
-                if (!empty($url)) {
-                    $videoId = YoutubeVideo::extractVideoId($url);
-                    if ($videoId) {
-                        YoutubeVideo::create([
-                            'videoable_type' => Venue::class,
-                            'videoable_id' => $venue->id,
-                            'youtube_url' => $url,
-                            'youtube_video_id' => $videoId,
-                            'order' => $orderOffset + $index,
-                        ]);
-                    }
+                if (! empty($url)) {
+                    YoutubeVideo::createFromUrl($venue, $url, $orderOffset + $index);
                 }
             }
         }
@@ -833,6 +828,7 @@ class VenueController extends Controller
                     'errors' => $e->errors(),
                 ], 422);
             }
+
             return back()->withErrors($e->errors())->withInput();
         } catch (\Throwable $e) {
             Log::error('Quick venue create failed', [
@@ -846,6 +842,7 @@ class VenueController extends Controller
                     'message' => 'Server error creating venue',
                 ], 500);
             }
+
             return back()->with('error', 'Server error creating venue');
         }
     }
@@ -878,7 +875,7 @@ class VenueController extends Controller
     {
         $user = Auth::user();
 
-        if (!$user) {
+        if (! $user) {
             return redirect()->route('login');
         }
 
@@ -904,12 +901,13 @@ class VenueController extends Controller
                 if ($user && ($user->hasRole('admin') || $user->hasRole('superuser'))) {
                     return redirect()->route('dashboard')
                         ->withErrors([
-                            'migration' => 'The venue_owner_requests table does not exist. Please run: php artisan migrate. Or visit /run-migrations if available.'
+                            'migration' => 'The venue_owner_requests table does not exist. Please run: php artisan migrate. Or visit /run-migrations if available.',
                         ]);
                 }
+
                 return redirect()->route('dashboard')
                     ->withErrors([
-                        'migration' => 'The venue ownership feature is not yet available. Please contact the administrator to run database migrations.'
+                        'migration' => 'The venue ownership feature is not yet available. Please contact the administrator to run database migrations.',
                     ]);
             }
             throw $e;
@@ -925,7 +923,7 @@ class VenueController extends Controller
     {
         $user = Auth::user();
 
-        if (!$user) {
+        if (! $user) {
             return back()->withErrors(['error' => 'You must be logged in to request venue ownership.']);
         }
 
@@ -945,21 +943,22 @@ class VenueController extends Controller
         } catch (\Illuminate\Database\QueryException $e) {
             // If venue_owners table doesn't exist, check legacy ownership
             if (str_contains($e->getMessage(), "doesn't exist") || str_contains($e->getMessage(), 'Base table or view not found')) {
-                $isOwner = ($venue->user_id === $user->id) || 
+                $isOwner = ($venue->user_id === $user->id) ||
                           ($venue->owner_id && $venue->owner_type === \App\Models\User::class && $venue->owner_id === $user->id);
             } else {
                 throw $e;
             }
         }
-        
+
         if ($isOwner) {
             $errorMessage = 'You are already an owner of this venue.';
             if ($request->ajax() || $request->wantsJson() || $request->header('X-Requested-With') === 'XMLHttpRequest') {
                 return response()->json([
                     'success' => false,
-                    'message' => $errorMessage
+                    'message' => $errorMessage,
                 ], 400);
             }
+
             return back()->withErrors(['venue_id' => $errorMessage]);
         }
 
@@ -978,9 +977,10 @@ class VenueController extends Controller
                 if ($request->ajax() || $request->wantsJson() || $request->header('X-Requested-With') === 'XMLHttpRequest') {
                     return response()->json([
                         'success' => false,
-                        'message' => $errorMessage
+                        'message' => $errorMessage,
                     ], 400);
                 }
+
                 return redirect()->back()->withErrors(['venue_id' => $errorMessage]);
             }
             throw $e;
@@ -991,9 +991,10 @@ class VenueController extends Controller
             if ($request->ajax() || $request->wantsJson() || $request->header('X-Requested-With') === 'XMLHttpRequest') {
                 return response()->json([
                     'success' => false,
-                    'message' => $errorMessage
+                    'message' => $errorMessage,
                 ], 400);
             }
+
             return back()->withErrors(['venue_id' => $errorMessage]);
         }
 
@@ -1023,9 +1024,10 @@ class VenueController extends Controller
                 if ($request->ajax() || $request->wantsJson() || $request->header('X-Requested-With') === 'XMLHttpRequest') {
                     return response()->json([
                         'success' => false,
-                        'message' => $errorMessage
+                        'message' => $errorMessage,
                     ], 400);
                 }
+
                 return back()->withErrors(['venue_id' => $errorMessage]);
             }
             throw $e;
@@ -1038,11 +1040,11 @@ class VenueController extends Controller
         if ($request->ajax() || $request->wantsJson() || $request->header('X-Requested-With') === 'XMLHttpRequest') {
             return response()->json([
                 'success' => true,
-                'message' => "Your request to join '{$venue->name}' has been submitted. The venue owner will be notified."
+                'message' => "Your request to join '{$venue->name}' has been submitted. The venue owner will be notified.",
             ], 200);
         }
 
-        return redirect()->back()->with('success', 
+        return redirect()->back()->with('success',
             "Your request to join '{$venue->name}' has been submitted. The venue owner will be notified."
         );
     }
@@ -1053,8 +1055,8 @@ class VenueController extends Controller
     public function approveRequest(Request $request, Venue $venue, VenueOwnerRequest $venueOwnerRequest)
     {
         $user = Auth::user();
-        
-        if (!$user) {
+
+        if (! $user) {
             return redirect()->route('login');
         }
 
@@ -1064,11 +1066,11 @@ class VenueController extends Controller
             $isPrimaryOwner = $primaryOwner && $primaryOwner->id === $user->id;
         } catch (\Exception $e) {
             // Fallback to legacy check
-            $isPrimaryOwner = ($venue->user_id === $user->id) || 
+            $isPrimaryOwner = ($venue->user_id === $user->id) ||
                             ($venue->owner_id && $venue->owner_type === User::class && $venue->owner_id === $user->id);
         }
 
-        if (!$isPrimaryOwner && !$user->hasRole(['admin', 'superuser'])) {
+        if (! $isPrimaryOwner && ! $user->hasRole(['admin', 'superuser'])) {
             abort(403, 'Only the primary owner or admin can approve requests.');
         }
 
@@ -1112,8 +1114,8 @@ class VenueController extends Controller
     public function rejectRequest(Request $request, Venue $venue, VenueOwnerRequest $venueOwnerRequest)
     {
         $user = Auth::user();
-        
-        if (!$user) {
+
+        if (! $user) {
             return redirect()->route('login');
         }
 
@@ -1123,11 +1125,11 @@ class VenueController extends Controller
             $isPrimaryOwner = $primaryOwner && $primaryOwner->id === $user->id;
         } catch (\Exception $e) {
             // Fallback to legacy check
-            $isPrimaryOwner = ($venue->user_id === $user->id) || 
+            $isPrimaryOwner = ($venue->user_id === $user->id) ||
                             ($venue->owner_id && $venue->owner_type === User::class && $venue->owner_id === $user->id);
         }
 
-        if (!$isPrimaryOwner && !$user->hasRole(['admin', 'superuser'])) {
+        if (! $isPrimaryOwner && ! $user->hasRole(['admin', 'superuser'])) {
             abort(403, 'Only the primary owner or admin can reject requests.');
         }
 
@@ -1157,8 +1159,8 @@ class VenueController extends Controller
     public function removeOwner(Request $request, Venue $venue)
     {
         $user = Auth::user();
-        
-        if (!$user) {
+
+        if (! $user) {
             return redirect()->route('login');
         }
 
@@ -1172,11 +1174,11 @@ class VenueController extends Controller
             $isPrimaryOwner = $primaryOwner && $primaryOwner->id === $user->id;
         } catch (\Exception $e) {
             // Fallback to legacy check
-            $isPrimaryOwner = ($venue->user_id === $user->id) || 
+            $isPrimaryOwner = ($venue->user_id === $user->id) ||
                             ($venue->owner_id && $venue->owner_type === User::class && $venue->owner_id === $user->id);
         }
 
-        if (!$isPrimaryOwner && !$user->hasRole(['admin', 'superuser'])) {
+        if (! $isPrimaryOwner && ! $user->hasRole(['admin', 'superuser'])) {
             abort(403, 'Only the primary owner or admin can remove owners.');
         }
 
@@ -1201,7 +1203,7 @@ class VenueController extends Controller
         try {
             $venue->owners()->detach($userIdToRemove);
         } catch (\Exception $e) {
-            return back()->withErrors(['error' => 'Failed to remove owner: ' . $e->getMessage()]);
+            return back()->withErrors(['error' => 'Failed to remove owner: '.$e->getMessage()]);
         }
 
         return back()->with('success', 'Owner removed successfully.');
@@ -1213,8 +1215,8 @@ class VenueController extends Controller
     public function addOwner(Request $request, Venue $venue)
     {
         $user = Auth::user();
-        
-        if (!$user) {
+
+        if (! $user) {
             return redirect()->route('login');
         }
 
@@ -1229,11 +1231,11 @@ class VenueController extends Controller
             $isPrimaryOwner = $primaryOwner && $primaryOwner->id === $user->id;
         } catch (\Exception $e) {
             // Fallback to legacy check
-            $isPrimaryOwner = ($venue->user_id === $user->id) || 
+            $isPrimaryOwner = ($venue->user_id === $user->id) ||
                             ($venue->owner_id && $venue->owner_type === User::class && $venue->owner_id === $user->id);
         }
 
-        if (!$isPrimaryOwner && !$user->hasRole(['admin', 'superuser'])) {
+        if (! $isPrimaryOwner && ! $user->hasRole(['admin', 'superuser'])) {
             abort(403, 'Only the primary owner or admin can add owners.');
         }
 
@@ -1272,8 +1274,8 @@ class VenueController extends Controller
     public function updateOwnerRole(Request $request, Venue $venue)
     {
         $user = Auth::user();
-        
-        if (!$user) {
+
+        if (! $user) {
             return redirect()->route('login');
         }
 
@@ -1288,11 +1290,11 @@ class VenueController extends Controller
             $isPrimaryOwner = $primaryOwner && $primaryOwner->id === $user->id;
         } catch (\Exception $e) {
             // Fallback to legacy check
-            $isPrimaryOwner = ($venue->user_id === $user->id) || 
+            $isPrimaryOwner = ($venue->user_id === $user->id) ||
                             ($venue->owner_id && $venue->owner_type === User::class && $venue->owner_id === $user->id);
         }
 
-        if (!$isPrimaryOwner && !$user->hasRole(['admin', 'superuser'])) {
+        if (! $isPrimaryOwner && ! $user->hasRole(['admin', 'superuser'])) {
             abort(403, 'Only the primary owner or admin can update owner roles.');
         }
 
@@ -1314,7 +1316,7 @@ class VenueController extends Controller
                 'role' => $request->input('role'),
             ]);
         } catch (\Exception $e) {
-            return back()->withErrors(['error' => 'Failed to update owner role: ' . $e->getMessage()]);
+            return back()->withErrors(['error' => 'Failed to update owner role: '.$e->getMessage()]);
         }
 
         return back()->with('success', 'Owner role updated successfully.');
@@ -1348,7 +1350,7 @@ class VenueController extends Controller
         }
 
         foreach ($owners as $owner) {
-            if (!$owner || !$owner->email) {
+            if (! $owner || ! $owner->email) {
                 continue;
             }
 
@@ -1358,7 +1360,7 @@ class VenueController extends Controller
                     new \App\Mail\VenueOwnershipRequestMail($venue, $request, $requester)
                 );
             } catch (\Exception $e) {
-                Log::error("Failed to send venue ownership request email to {$owner->email}: " . $e->getMessage());
+                Log::error("Failed to send venue ownership request email to {$owner->email}: ".$e->getMessage());
             }
         }
     }

@@ -13,7 +13,8 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
 class Venue extends Model
 {
     use Claimable;
-protected $fillable = [
+
+    protected $fillable = [
         'name',
         'description',
         'city',
@@ -24,6 +25,7 @@ protected $fillable = [
         'address',
         'latitude',
         'longitude',
+        'google_place_id',
         'user_id',
         'owner_id',
         'owner_type',
@@ -169,18 +171,18 @@ protected $fillable = [
         } catch (\Throwable $e) {
             // Ignore and fall through to legacy ownership logic.
         }
-        
+
         // Fallback to legacy ownership check
         // Check direct user_id match (most common case)
         if ($this->user_id === $userId) {
             return true;
         }
-        
+
         // Check owner_id with User type
         if ($this->owner_id && $this->owner_type === User::class && $this->owner_id === $userId) {
             return true;
         }
-        
+
         // Check owner_id with Artist/Organiser type (check their user_id)
         if ($this->owner_id && $this->owner_type) {
             try {
@@ -199,7 +201,7 @@ protected $fillable = [
                 // Models might not exist, continue
             }
         }
-        
+
         return false;
     }
 

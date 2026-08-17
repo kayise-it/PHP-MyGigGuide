@@ -90,6 +90,67 @@ class MeClaimsApiTest extends TestCase
             ->assertJsonCount(0, 'claimable_pages');
     }
 
+    public function test_bulk_claim_many_venues_via_single_request(): void
+    {
+        $user = User::factory()->create([
+            'email' => 'venues@example.com',
+            'email_verified_at' => now(),
+        ]);
+        $user->addRole('user');
+
+        for ($i = 1; $i <= 5; $i++) {
+            Venue::query()->create([
+                'name' => "Venue $i",
+                'capacity' => 100,
+                'user_id' => null,
+                'owner_id' => null,
+                'contact_email' => 'venues@example.com',
+                'claim_status' => 'none',
+            ]);
+        }
+
+        Sanctum::actingAs($user);
+
+        $response = $this->postJson('/api/v1/me/claims/initiate');
+
+        $response->assertOk()
+            ->assertJsonCount(5, 'approved')
+            ->assertJsonCount(5, 'owned_pages')
+            ->assertJsonCount(0, 'claimable_pages');
+    }
+
+    public function test_bulk_claim_skips_extra_artists_without_422(): void
+    {
+        $user = User::factory()->create([
+            'email' => 'multi@gmail.com',
+            'email_verified_at' => now(),
+        ]);
+        $user->addRole('user');
+
+        Artist::query()->create([
+            'stage_name' => 'Band A',
+            'user_id' => null,
+            'contact_email' => 'multi@gmail.com',
+            'claim_status' => 'none',
+        ]);
+
+        Artist::query()->create([
+            'stage_name' => 'Band B',
+            'user_id' => null,
+            'contact_email' => 'multi@gmail.com',
+            'claim_status' => 'none',
+        ]);
+
+        Sanctum::actingAs($user);
+
+        $response = $this->postJson('/api/v1/me/claims/initiate');
+
+        $response->assertOk()
+            ->assertJsonCount(1, 'approved')
+            ->assertJsonCount(1, 'skipped')
+            ->assertJsonPath('skipped.0.reason', 'one_artist_per_account');
+    }
+
     public function test_unverified_user_gets_pending_not_approved(): void
     {
         $user = User::factory()->create([

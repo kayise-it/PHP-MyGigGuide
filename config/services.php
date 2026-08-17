@@ -53,4 +53,31 @@ return [
         'web_app_id' => env('FIREBASE_WEB_APP_ID', '1:929498924637:web:8d691f0f25d1cd9f72afb4'),
     ],
 
+    /*
+     * Evolution API — self-hosted WhatsApp Business API for admin claim notifications.
+     * Set EVOLUTION_API_URL, EVOLUTION_INSTANCE, EVOLUTION_API_KEY, and EVOLUTION_ADMIN_NUMBER
+     * in .env to activate. WhatsApp notification is silently skipped if any are blank.
+     *
+     * Evolution API send-text endpoint:
+     *   POST {url}/message/sendText/{instance}
+     *   Header: apikey: {api_key}
+     *   Body:   { "number": "27XXXXXXXXX", "text": "..." }
+     */
+    'evolution' => [
+        'url'          => env('EVOLUTION_API_URL', ''),
+        'instance'     => env('EVOLUTION_INSTANCE', ''),
+        'api_key'      => env('EVOLUTION_API_KEY', ''),
+        'admin_number' => env('EVOLUTION_ADMIN_NUMBER', ''),
+    ],
+
+    /*
+     * Event creation notifications — WhatsApp alert sent when any user crowd-sources a new event.
+     * Comma-separated user IDs in EVENT_NOTIFY_EXCLUDE_USER_IDS are never notified about
+     * (add Dave's own ID + the Quicket system user ID so their imports stay silent).
+     * Notification is also silently skipped when Evolution API vars are not set.
+     */
+    'event_notifications' => [
+        'exclude_user_ids' => array_filter(array_map('intval', explode(',', env('EVENT_NOTIFY_EXCLUDE_USER_IDS', '')))),
+    ],
+
 ];

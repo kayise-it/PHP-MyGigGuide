@@ -2,11 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\Api\V1\Concerns\ResolvesPostedEvents;
 use App\Models\Organiser;
 use Illuminate\Http\Request;
 
 class OrganiserController extends Controller
 {
+    use ResolvesPostedEvents;
+
     /**
      * Display a listing of the resource.
      */
@@ -40,11 +43,10 @@ class OrganiserController extends Controller
      */
     public function show(string $id)
     {
-        $organiser = Organiser::with(['user', 'events' => function ($query) {
-            $query->where('date', '>=', now())->orderBy('date');
-        }])->findOrFail($id);
+        $organiser = Organiser::with('user')->findOrFail($id);
+        $postedEvents = $this->postedEventsForOrganiser($organiser, 90);
 
-        return view('organisers.show', compact('organiser'));
+        return view('organisers.show', compact('organiser', 'postedEvents'));
     }
 
     /**

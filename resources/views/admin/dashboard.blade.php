@@ -84,6 +84,70 @@
                 </div>
             </div>
         </div>
+
+        <!-- User login activity -->
+        <div>
+            <h2 class="text-lg font-semibold text-gray-900 mb-4">User login activity</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <a href="{{ route('admin.users.index', ['login' => 'active_7d', 'sort' => 'last_login_at', 'direction' => 'desc']) }}"
+                   class="bg-white overflow-hidden shadow-sm rounded-xl border border-gray-200 hover:border-teal-300 transition-colors">
+                    <div class="p-6">
+                        <div class="flex items-center">
+                            <div class="flex-shrink-0">
+                                <div class="p-3 rounded-lg bg-teal-100">
+                                    <svg class="h-6 w-6 text-teal-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                </div>
+                            </div>
+                            <div class="ml-4">
+                                <p class="text-sm font-medium text-gray-500">Active last 7 days</p>
+                                <p class="text-2xl font-semibold text-gray-900">{{ number_format($stats['users_active_7d']) }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+
+                <a href="{{ route('admin.users.index', ['login' => 'active_30d', 'sort' => 'last_login_at', 'direction' => 'desc']) }}"
+                   class="bg-white overflow-hidden shadow-sm rounded-xl border border-gray-200 hover:border-indigo-300 transition-colors">
+                    <div class="p-6">
+                        <div class="flex items-center">
+                            <div class="flex-shrink-0">
+                                <div class="p-3 rounded-lg bg-indigo-100">
+                                    <svg class="h-6 w-6 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                    </svg>
+                                </div>
+                            </div>
+                            <div class="ml-4">
+                                <p class="text-sm font-medium text-gray-500">Active last 30 days</p>
+                                <p class="text-2xl font-semibold text-gray-900">{{ number_format($stats['users_active_30d']) }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+
+                <a href="{{ route('admin.users.index', ['login' => 'never', 'sort' => 'last_login_at', 'direction' => 'asc']) }}"
+                   class="bg-white overflow-hidden shadow-sm rounded-xl border border-gray-200 hover:border-orange-300 transition-colors">
+                    <div class="p-6">
+                        <div class="flex items-center">
+                            <div class="flex-shrink-0">
+                                <div class="p-3 rounded-lg bg-orange-100">
+                                    <svg class="h-6 w-6 text-orange-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
+                                    </svg>
+                                </div>
+                            </div>
+                            <div class="ml-4">
+                                <p class="text-sm font-medium text-gray-500">Never logged in</p>
+                                <p class="text-2xl font-semibold text-gray-900">{{ number_format($stats['users_never_logged_in']) }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            <p class="mt-2 text-sm text-gray-500">Based on <code class="text-xs bg-gray-100 px-1 rounded">last_login_at</code> (web, app, and API sign-in). Tap a card to filter Users.</p>
+        </div>
     @endif
 
     <!-- Charts and Tables Row -->

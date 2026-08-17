@@ -22,6 +22,7 @@ class DatabaseSeeder extends Seeder
             PaidFeaturesSeeder::class,
             FeatureProgramsSeeder::class,
             SampleDataSeeder::class,
+            SystemUserSeeder::class,
         ]);
 
         // Ensure there is at least one superuser for admin access

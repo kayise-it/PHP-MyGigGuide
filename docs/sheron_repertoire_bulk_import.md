@@ -1,0 +1,490 @@
+# Sheron — repertoire bulk import
+
+Extracted from [sheron-requests.glideos.app](https://sheron-requests.glideos.app/) on 28 Jul 2026.
+
+**451 songs** — paste into **Manage repertoire → Bulk paste** in the MGG app.
+
+## Format
+
+My Gig Guide bulk import expects:
+
+```
+Original artist - Song title
+```
+
+(Not "Song - Artist".)
+
+## Sheron originals (14)
+
+These are listed with artist **Sheron**. After import, tick **My original song** on each if you want them flagged as originals:
+
+- Bathing In Sunshine
+- Calling
+- Darling
+- Dirty
+- Glow
+- Goodbye My Love
+- Gurri
+- Hello It's Us
+- I Know
+- It Gets Better
+- Need You
+- Ordinary World
+- Voices
+- When I'm Gone
+
+## Full list
+
+```
+10cc - Dreadlock Holiday
+3 Doors Down - Kryptonite
+4 Non Blondes - What's Up?
+ABBA - Does Your Mother Know
+Adele - Hello
+Aerosmith - I Don't Want to Miss a Thing
+Aerosmith - Living On The Edge
+Afroman - Because I Got High
+Aha - Take On Me
+Alanis Morissette - Ironic
+Alanis Morissette - Uninvited
+Alanis Morissette - You Oughta Know
+Alannah Myles - Black Velvet
+Alice Cooper - Poison
+Alphaville - Forever Young
+American HiFi - Flavor Of The Weak
+Anastacia - Left Outside Alone
+Backstreet Boys - Incomplete
+Bad Company - Feel Like Makin' Love
+Ballyhoo - Man On The Moon
+Beastie Boys - Fight For Your Right
+Bee Gees - How Deep Is Your Love
+Ben E. King - Stand By Me
+Benson Boone - Beautiful Things
+Berlin - Take My Breath Away
+Better Than Ezra - Good
+Big Mountain - Baby I Love Your Way
+Bill Withers - Ain't No Sunshine
+Bill Withers - Lean On Me
+Billy Idol - White Wedding
+Billy Joel - Just The Way You Are
+Billy Joel - Piano Man
+Billy Joel - You May Be Right
+Billy Ocean - Loverboy
+Blake Shelton - Home
+Blink182 - All The Small Things
+Blink182 - Basket Case
+Blondie - Heart Of Glass
+Bob Marley - I Shot The Sheriff
+Bob Marley - No Woman, No Cry
+Bobby McFerrin - Don't Worry Be Happy
+Bon Jovi - Bed Of Roses
+Bon Jovi - It's My Life
+Bon Jovi - Livin' On A Prayer
+Bonnie Tyler - Total Eclipse Of The Heart
+Boston - More Than A Feeling
+Boyz II Men - End Of The Road
+Britney Spears - Baby One More Time
+Bruce Springsteen - Dancing In The Dark
+Bruce Springsteen - Fire
+Bruce Springsteen - Glory Days
+Bruce Springsteen - I'm On Fire
+Bruno Mars - Grenade
+Bruno Mars - Just The Way You Are
+Bruno Mars - Uptown Funk
+Bryan Adams - (Everything I Do) I Do It For You
+Bryan Adams - Cloud No. 9
+Bryan Adams - Heaven
+Bryan Adams - Somebody
+Bryan Adams - Summer Of '69
+Candy Dulfer & Dave Stewart - Lily Was Here
+Cat Stevens - Wild World
+CCR - Bad Moon Rising
+CCR - Cotton Fields
+CCR - Midnight Special
+Cheap Trick - I Want You To Want Me
+Chesney Hawkes - I Am The One And Only
+Chris de Burgh - The Lady In Red
+Chris Stapleton - Tennessee Whiskey
+Chuck Berry - Johnny B. Goode
+Coldplay - Yellow
+Collective Soul - December
+Collective Soul - Run
+Collective Soul - Where The River Flows
+Collective Soul - Why
+Counting Crows - Mr. Jones
+Creed - Higher
+Creed - My Sacrifice
+Creedence Clearwater Revival - Have You Ever Seen The Rain
+Creedence Clearwater Revival - Proud Mary
+Crowded House - Better Be Home Soon
+Crowded House - Don't Dream It's Over
+Crowded House - Take The Weather With You
+Culture Club - Karma Chameleon
+Cyndi Lauper - Girls Just Want to Have Fun
+Daft Punk - Get Lucky
+Daughtry - Home
+David Bowie - China Girl
+David Guetta ft. Usher - Without You
+Dead Or Alive - You Spin Me Round (Like a Record)
+Deep Blue Something - Breakfast At Tiffany's
+Deep Purple - Smoke On The Water
+Def Leppard - Hysteria
+Def Leppard - Pour Some Sugar On Me
+Del Shannon - My Little Runaway
+Depeche Mode - I Just Can't Get Enough
+Dire Straits - Brothers In Arms
+Dire Straits - Money For Nothing
+Dire Straits - So Far Away
+Dire Straits - Sultans Of Swing
+Dire Straits - Walk Of Life
+Disturbed - Shout 2000
+Don Henley - Boys Of Summer
+Duran Duran - Ordinary World
+Eagle Eye Cherry - Save Tonight
+Ed Sheeran - Bad Habits
+Ed Sheeran - Photograph
+Ed Sheeran - Thinking Out Loud
+Eddy Grant - Electric Avenue
+Eddy Grant - Gimme Hope Jo'anna
+Elton John - I Guess That's Why They Call It The Blues
+Elton John - Your Song
+Elton John & George Michael - Don't Let The Sun Go Down On Me
+Elvis Presley - Blue Suede Shoes
+Elvis Presley - Can't Help Falling In Love
+Elvis Presley - Fever
+Elvis Presley - Fools Rush In
+Elvis Presley - Suspicious Minds
+Erasure - Respect
+Eric Carmen - Hungry Eyes
+Eric Clapton - Change The World
+Eric Clapton - Layla (Unplugged)
+Eric Clapton - Tears In Heaven
+Eric Clapton - Wonderful Tonight
+Eurythmics - Here Comes The Rain Again
+Evanescence - My Immortal
+EVoid - Shadows
+Fine Young Cannibals - She Drives Me Crazy
+Five for Fighting - Superman (It's Not Easy)
+Fleetwood Mac - Go Your Own Way
+Foo Fighters - Times Like These
+Fool's Garden - Lemon Tree
+Foreigner - I Wanna Know What Love Is
+Fountains of Wayne - Stacy's Mom
+Frank Sinatra - Fly Me To The Moon
+Frank Sinatra - My Way
+Free - All Right Now
+Freshlyground - Doo Be Doo
+Gary Moore - Parisienne Walkways
+Gary Moore - Still Got The Blues
+Gary Moore - The Loner
+Gary Moore - Walking By Myself
+George Ezra - Budapest
+George Ezra - Shotgun
+George Gershwin - Summertime
+George Michael - Careless Whisper
+George Michael - Faith
+George Thorogood & The Destroyers - Bad To The Bone
+Gerhard Steyn - Baby Tjoklits
+Gerry Rafferty - Baker Street
+Golden Earring - Radar Love
+Goo Goo Dolls - Iris
+Gotye - Somebody That I Used To Know
+Green Day - Boulevard Of Broken Dreams
+Green Day - Wake Me Up When September Ends
+Guns N' Roses - Knockin' On Heaven's Door
+Guns N' Roses - Sweet Child O' Mine
+Heart - Alone
+Hot Chocolate - You Sexy Thing
+Incubus - Drive
+INXS - Tear Us Apart
+Irene Cara - Flashdance... What A Feeling
+J.J. Cale - Cocaine
+James - Laid
+James Blunt - You're Beautiful
+James Brown - This Is A Man's World
+Jason Mraz - I'm Yours
+Jerry Lee Lewis - Great Balls Of Fire
+Jet - Are You Gonna Be My Girl
+Jimi Hendrix - Foxy Lady
+Jimi Hendrix - Little Wing
+Jimmy Eat World - The Middle
+Joan Jett - I Love Rock 'n' Roll
+Joan Osborne - One Of Us
+Joe Cocker - Unchain My Heart
+Joe Cocker - You Can Leave Your Hat On
+John Denver - Country Roads
+John Legend - All Of Me
+John Lennon - Imagine
+John Mayer - Your Body Is A Wonderland
+John Mellencamp - Hurt So Good
+Johnny Cash - Folsom Prison Blues
+Johnny Cash - Ring Of Fire
+Johnny Clegg - Spirit Of the Great Heart
+Josh Turner - Your Man
+Joshua Kadison - Jessie
+Journey - Don't Stop Believin'
+Journey - Separate Ways (Worlds Apart)
+Juice Newton - Queen Of Hearts
+Just Jinjer - Stand In Your Way
+Just Jinjer - What He Means
+Justin Bieber - Sorry
+Katrina & The Waves - Walking On Sunshine
+Katy Perry - I Kissed A Girl
+Keith Urban - Somebody Like You
+Kenny Loggins - Footloose
+Kenny Rogers - The Gambler
+Kenny Rogers & Dolly Parton - Islands In The Stream
+Kid Rock / The Four Tops - Sugar Pie Honey Bunch
+Kim Carnes - Bette Davis Eyes
+Kings of Leon - Sex On Fire
+Kings of Leon - Use Somebody
+Kool & The Gang - Celebration
+Kool & The Gang - Fresh
+Lady Gaga - Remember Us This Way
+Lauren Daigle - You Say
+Led Zeppelin - Stairway To Heaven
+Lenny Kravitz - Fly Away
+Lenny Kravitz - It Ain't Over 'til It's Over
+Leonard Cohen - Hallelujah
+Lewis Capaldi - Someone You Loved
+Lifehouse - Hanging By A Moment
+Linkin Park - In The End
+Lionel Richie - All Night Long
+Lionel Richie - Easy
+Lionel Richie - Hello
+Lipps Inc. - Funkytown
+Liquido - Narcotic
+Lira - Feel Good
+Lit - My Own Worst Enemy
+Live - Dolphins Cry
+Live - I Alone
+Live - Lightning Crashes
+Live - Selling The Drama
+Lonestar - Amazed
+Louis Armstrong - What A Wonderful World
+Lynyrd Skynyrd - Sweet Home Alabama
+Madness - It Must Be Love
+Madness - Our House
+Madness - Our House
+Marc Cohn - Walking In Memphis
+Marilyn Manson - Sweet Dreams (Are Made of This)
+Maroon 5 - Drive By
+Marvin Gaye - Let's Get It On
+Matchbox20 - Bent
+Matchbox20 - Bright Lights
+Matchbox20 - Push
+Matchbox20 - Unwell
+Mean Mr. Mustard - Stranger In My Head
+Men At Work - Down Under
+Men At Work - Who Can It Be Now?
+Metallica - Enter Sandman
+Metallica - Nothing Else Matters
+Metallica - The Unforgiven
+Michael Bolton - When A Man Loves A Woman
+Michael Jackson - Beat It
+Michael Jackson - Billie Jean
+Michael Jackson - Human Nature
+Michael Jackson - Thriller
+Michael Jackson - You Are Not Alone
+Michael Learns To Rock - Paint My Love
+Michael Learns To Rock - Someday
+Michael Sembello - She's A Maniac
+Midnight Oil - Beds Are Burning
+Mike & The Mechanics - Over My Shoulder
+Miley Cyrus - Flowers
+Miley Cyrus - See You Again
+Miley Cyrus - Wrecking Ball
+Milky Chance - Stolen Dance
+Mr. Big - To Be With You
+Mumford & Sons - I Will Wait
+Natalie Imbruglia - Torn
+Neil Diamond - Forever In Blue Jeans
+Neil Diamond - I Am... I Said
+Neil Diamond - Sweet Caroline
+Neil Diamond / Urge Overkill - Girl, You'll Be a Woman Soon
+Nickelback - Gotta Be Somebody
+Nik Kershaw - Wouldn't It Be Good
+Nirvana - Come As You Are
+Nirvana - Lithium
+Nirvana - Smells Like Teen Spirit
+No Doubt - Hella Good
+Norman Greenbaum - Spirit In The Sky
+Oasis - Don't Look Back In Anger
+OMI - Cheerleader
+Paul Simon - Call Me Al
+Pearl Jam - Better Man
+Pearl Jam - Last Kiss
+Peter Gabriel - Sledgehammer
+Pharrell Williams - Happy
+Phil Collins - Against All Odds
+Phil Collins - Another Day In Paradise
+Phil Collins - In The Air Tonight
+Phillip Phillips - Gone, Gone, Gone
+Pink - Like A Pill
+Pink - Try
+Pink Floyd - Comfortably Numb
+Pink Floyd - High Hopes
+Pink Floyd - The Wall
+Pink Floyd - Wish You Were Here
+PJ Powers - Jabulani
+Post Malone - Fallin' In Love
+Prime Circle - Hello Cruel World
+Prime Circle - She Always Gets What She Wants
+Prince - Kiss
+Prince - Purple Rain
+Queen - Another One Bites The Dust
+Queen - Crazy Little Thing Called Love
+Queen - Don't Stop Me Now
+Queen - I Want To Break Free
+Queen - Who Wants To Live Forever
+R.E.M. - Losing My Religion
+Radiohead - Creep
+Radiohead - High And Dry
+Rag'n'Bone Man - Human
+Ray Parker Jr. - Ghostbusters
+Red Hot Chili Peppers - Under The Bridge
+Richard Marx - Right Here Waiting
+Rick Astley - Never Gonna Give You Up
+Rihanna - Diamonds
+Ritchie Valens - La Bamba
+Robbie Williams - Angels
+Robbie Williams - Feel
+Rocky Horror Picture Show - Sweet Transvestite
+Rocky Horror Picture Show - Time Warp
+Rod Stewart - Do Ya Think I'm Sexy
+Rod Stewart - Forever Young
+Rodriguez - Sugar Man
+Roxette - It Must Have Been Love
+Roxette - Listen To Your Heart
+Roxette - She's Got The Look
+Roy Orbison - Pretty Woman
+Sade - Smooth Operator
+Sam Smith - Stay With Me
+Santana - Black Magic Woman
+Santana - Europa (Earth's Cry Heaven's Smile)
+Santana - Maria Maria
+Santana ft. Rob Thomas - Smooth
+Seether - Broken
+Shakira - Waka Waka (This Time for Africa)
+Sheron - Bathing In Sunshine
+Sheron - Calling
+Sheron - Darling
+Sheron - Dirty
+Sheron - Glow
+Sheron - Goodbye My Love
+Sheron - Gurri
+Sheron - Hello It's Us
+Sheron - I Know
+Sheron - It Gets Better
+Sheron - Need You
+Sheron - Ordinary World
+Sheron - Voices
+Sheron - When I'm Gone
+Sheryl Crow - If It Makes You Happy
+Simon & Garfunkel - Mrs. Robinson
+Simon & Garfunkel - The Boxer
+Simon & Garfunkel - The Sound Of Silence
+Simple Minds - Don't You (Forget About Me)
+Simply Red - Stars
+Sinéad O'Connor - Nothing Compares 2 U
+Skunk Anansie - Hedonism
+Smash Mouth - All Star
+Smashing Pumpkins - Today
+Smokie - Alice
+Snow Patrol - Chasing Cars
+Soft Cell - Tainted Love
+Springbok Nude Girls - Blue Eyes
+Status Quo - Rockin' All Over The World
+Status Quo - Whatever You Want
+Stealers Wheel - Stuck In The Middle With You
+Steve Perry - Oh Sherrie
+Stevie Wonder - I Just Called To Say I Love You
+Sting - Englishman In New York
+Sting - Fields Of Gold
+Survivor - Eye Of The Tiger
+Suzanne Vega - Luka
+Swedish House Mafia ft. John Martin - Don't You Worry Child
+Tal Bachman - She's So High
+Tasmin Archer - Sleeping Satellite
+Tears For Fears - Change
+Tears For Fears - Everybody Wants To Rule The World
+Teddy Swims - Lose Control
+The Animals - The House Of The Rising Sun
+The Beatles - Come Together
+The Beatles - Hard Day's Night
+The Beatles - Hey Jude
+The Beatles - Let It Be
+The Beatles - Obladi Oblada
+The Buggles - Video Killed The Radio Star
+The Calling - Wherever You Will Go
+The Cars - Drive
+The Clash - Should I Stay Or Should I Go
+The Commitments - Mustang Sally
+The Cranberries - Dreams
+The Cranberries - Zombie
+The Doobie Brothers - Long Train Runnin'
+The Doors - Light My Fire
+The Drifters - Under The Boardwalk
+The Dubliners / Metallica - Whiskey In The Jar
+The Eagles - Hotel California
+The Eagles - Take It Easy
+The Knack - My Sharona
+The Lumineers - Ho Hey
+The Mamas & The Papas - California Dreamin'
+The Monkees - I'm A Believer
+The Moody Blues - Nights In White Satin
+The Outfield - Your Love
+The Parlotones - Push Me To The Floor
+The Platters - Only You
+The Police - Every Breath You Take
+The Police - Roxanne
+The Proclaimers - 500 Miles
+The Rasmus - In The Shadows
+The Rembrands - I'll Be There For You
+The Righteous Brothers - Unchained Melody
+The Rolling Stones - Paint It Black
+The Rolling Stones - Satisfaction
+The Scorpions - Still Loving You
+The Script - Hall Of Fame
+The Shadows - Apache
+The Stones - Start Me Up
+The Swinging Blue Jeans - The Hippy Hippy Shake
+The Temptations - Lady Soul
+The Temptations - My Girl
+The Weeknd - I Can't Feel My Face
+The Weeknd - Save Your Tears
+The White Stripes - Seven Nation Army
+Theuns Jordaan - Soos Bloed
+Timbaland - Apologise
+Tina Turner - Simply The Best
+Tom Petty - Free Fallin'
+Tones and I - Dance Monkey
+Toploader - Dancing In The Moonlight
+Toto - Africa
+Toto - Hold The Line
+Tracy Chapman - Fast Car
+Tracy Chapman - Give Me One Reason
+Tracy Chapman - Talking Bout A Revolution
+Tracy Chapman / Boyzone - Sorry (Baby Can I Hold You)
+Train - Drops Of Jupiter
+U2 - Pride (In the Name of Love)
+U2 - Sunday Bloody Sunday
+U2 - The Streets Have No Name
+U2 - With Or Without You
+UB40 - Kingston Town
+UB40 - Red Red Wine
+Van Halen - Jump
+Van Morrison - Brown Eyed Girl
+Vertical Horizon - You're A God
+Village People - Y.M.C.A.
+Violent Femmes - American Music
+Violent Femmes - Blister In The Sun
+Walk the Moon - Shut Up And Dance
+Weather Girls - It's Raining Men
+Wheatus - Teenage Dirtbag
+Whitney Houston - I Will Always Love You
+Wild Cherry - Play That Funky Music
+Yazoo - Don't Go
+ZZ Top - La Grange
+ZZ Top - Rough Boy
+```

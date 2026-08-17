@@ -25,6 +25,9 @@
                 <a href="{{ route('events.index') }}" class="{{ $siteBrand->navLinkClass(request()->routeIs('events.*')) }}">Events</a>
                 <a href="{{ route('artists.index') }}" class="{{ $siteBrand->navLinkClass(request()->routeIs('artists.*')) }}">Artists</a>
                 <a href="{{ route('venues.index') }}" class="{{ $siteBrand->navLinkClass(request()->routeIs('venues.*')) }}">Venues</a>
+                @foreach($siteBrand->partnerEngagementNavLinks() as $partnerLink)
+                    <a href="{{ route($partnerLink['route']) }}" class="{{ $siteBrand->navLinkClass(request()->routeIs($partnerLink['route'])) }}">{{ $partnerLink['label'] }}</a>
+                @endforeach
                 <a href="{{ url('/about') }}" class="{{ $siteBrand->navLinkClass(request()->is('about')) }}">About</a>
                 <a href="{{ route('contact.index') }}" class="{{ $siteBrand->navLinkClass(request()->routeIs('contact.*')) }}">Contact</a>
                 
@@ -181,6 +184,9 @@
             <a href="{{ route('artists.index') }}" class="{{ $siteBrand->mobileNavLinkClass(request()->routeIs('artists.*')) }}">Artists</a>
             <a href="{{ url('/about') }}" class="{{ $siteBrand->mobileNavLinkClass(request()->is('about')) }}">About</a>
             <a href="{{ route('venues.index') }}" class="{{ $siteBrand->mobileNavLinkClass(request()->routeIs('venues.*')) }}">Venues</a>
+            @foreach($siteBrand->partnerEngagementNavLinks() as $partnerLink)
+                <a href="{{ route($partnerLink['route']) }}" class="{{ $siteBrand->mobileNavLinkClass(request()->routeIs($partnerLink['route'])) }}">{{ $partnerLink['label'] }}</a>
+            @endforeach
             <a href="{{ route('organisers.index') }}" class="{{ $siteBrand->mobileNavLinkClass(request()->routeIs('organisers.*')) }}">Organisers</a>
             <a href="{{ route('contact.index') }}" class="{{ $siteBrand->mobileNavLinkClass(request()->routeIs('contact.*')) }}">Contact</a>
         </div>

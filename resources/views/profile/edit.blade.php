@@ -173,7 +173,6 @@
                                     id="real_name"
                                     name="real_name"
                                     value="{{ old('real_name', $profile->real_name ?? '') }}"
-                                    required
                                     class="block w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent @error('real_name') border-red-300 @enderror"
                                 />
                                 @error('real_name')
@@ -199,17 +198,17 @@
                             </div>
 
                             <div>
-                                <label for="contact_phone" class="block text-sm font-medium text-gray-700 mb-2">
+                                <label for="phone_number" class="block text-sm font-medium text-gray-700 mb-2">
                                     Contact Phone
                                 </label>
                                 <input
                                     type="text"
-                                    id="contact_phone"
-                                    name="contact_phone"
-                                    value="{{ old('contact_phone', $profile->contact_phone ?? '') }}"
-                                    class="block w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent @error('contact_phone') border-red-300 @enderror"
+                                    id="phone_number"
+                                    name="phone_number"
+                                    value="{{ old('phone_number', $profile->phone_number ?? '') }}"
+                                    class="block w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent @error('phone_number') border-red-300 @enderror"
                                 />
-                                @error('contact_phone')
+                                @error('phone_number')
                                     <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                                 @enderror
                             </div>
@@ -231,19 +230,80 @@
                             </div>
 
                             <div>
-                                <label for="website" class="block text-sm font-medium text-gray-700 mb-2">
-                                    Website
+                                <label for="instagram" class="block text-sm font-medium text-gray-700 mb-2">
+                                    Instagram URL
                                 </label>
                                 <input
                                     type="url"
-                                    id="website"
-                                    name="website"
-                                    value="{{ old('website', $profile->website ?? '') }}"
-                                    class="block w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent @error('website') border-red-300 @enderror"
+                                    id="instagram"
+                                    name="instagram"
+                                    value="{{ old('instagram', $profile->instagram ?? '') }}"
+                                    placeholder="https://instagram.com/..."
+                                    class="block w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent @error('instagram') border-red-300 @enderror"
                                 />
-                                @error('website')
+                                @error('instagram')
                                     <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                                 @enderror
+                            </div>
+
+                            <div>
+                                <label for="facebook" class="block text-sm font-medium text-gray-700 mb-2">
+                                    Facebook URL
+                                </label>
+                                <input
+                                    type="url"
+                                    id="facebook"
+                                    name="facebook"
+                                    value="{{ old('facebook', $profile->facebook ?? '') }}"
+                                    placeholder="https://facebook.com/..."
+                                    class="block w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent @error('facebook') border-red-300 @enderror"
+                                />
+                                @error('facebook')
+                                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                @enderror
+                            </div>
+
+                            <div>
+                                <label for="twitter" class="block text-sm font-medium text-gray-700 mb-2">
+                                    X / Twitter URL
+                                </label>
+                                <input
+                                    type="url"
+                                    id="twitter"
+                                    name="twitter"
+                                    value="{{ old('twitter', $profile->twitter ?? '') }}"
+                                    placeholder="https://x.com/..."
+                                    class="block w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent @error('twitter') border-red-300 @enderror"
+                                />
+                                @error('twitter')
+                                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                @enderror
+                            </div>
+
+                            <div class="md:col-span-2">
+                                <label for="artist_profile_picture" class="block text-sm font-medium text-gray-700 mb-2">
+                                    Artist page photo
+                                </label>
+                                @php
+                                    $artistPhoto = null;
+                                    if ($profile?->profile_picture && !str_contains($profile->profile_picture, '/tmp/php')) {
+                                        $artistPhoto = Storage::url($profile->profile_picture);
+                                    }
+                                @endphp
+                                @if($artistPhoto)
+                                    <img src="{{ $artistPhoto }}" alt="Artist page photo" class="h-24 w-24 rounded-lg object-cover border border-gray-200 mb-3">
+                                @endif
+                                <input
+                                    type="file"
+                                    id="artist_profile_picture"
+                                    name="artist_profile_picture"
+                                    accept="image/*"
+                                    class="block w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent @error('artist_profile_picture') border-red-300 @enderror"
+                                />
+                                @error('artist_profile_picture')
+                                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                @enderror
+                                <p class="mt-1 text-sm text-gray-500">Shown on your public artist page (not your account avatar above).</p>
                             </div>
 
                             <div class="md:col-span-2">
@@ -281,17 +341,17 @@
                             </div>
 
                             <div>
-                                <label for="contact_phone" class="block text-sm font-medium text-gray-700 mb-2">
+                                <label for="organiser_phone_number" class="block text-sm font-medium text-gray-700 mb-2">
                                     Contact Phone
                                 </label>
                                 <input
                                     type="text"
-                                    id="contact_phone"
-                                    name="contact_phone"
-                                    value="{{ old('contact_phone', $profile->contact_phone ?? '') }}"
-                                    class="block w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent @error('contact_phone') border-red-300 @enderror"
+                                    id="organiser_phone_number"
+                                    name="phone_number"
+                                    value="{{ old('phone_number', $profile->phone_number ?? '') }}"
+                                    class="block w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent @error('phone_number') border-red-300 @enderror"
                                 />
-                                @error('contact_phone')
+                                @error('phone_number')
                                     <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                                 @enderror
                             </div>

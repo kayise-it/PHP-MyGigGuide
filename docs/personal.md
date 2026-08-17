@@ -4,7 +4,7 @@
 
 Last updated: **23 May 2026**
 
-**Resume:** [SESSION_HANDOFF.md](./SESSION_HANDOFF.md) § “After reboot — pick up here” (dark theme done; **identity walkthrough** next).
+**Resume:** [SESSION_HANDOFF.md](./SESSION_HANDOFF.md) § “After reboot — pick up here” (live stack + check-in done; **Play Store MGG** next).
 
 ---
 
@@ -159,4 +159,6 @@ cd ~/development/mygigguide_app && flutter run --flavor mygigguide --dart-define
 | [API_V1.md](./API_V1.md) | API contract |
 | [DEPLOY_VPS.md](./DEPLOY_VPS.md) | Extra deploy notes (only if Dave asks) |
 | [RSS_EVENT_DISCOVERY.md](./RSS_EVENT_DISCOVERY.md) | Feeds, FetchRSS, n8n plan |
+| [MAIL_ADMIN_DB_SETUP.md](./MAIL_ADMIN_DB_SETUP.md) | **Pinned** — fix `/admin/mail-accounts` (MariaDB `mailuser`) |
+| [VPS_CREDENTIALS.local.md](./VPS_CREDENTIALS.local.md) | **Local only** — VPS/mail/DB passwords (gitignored) |
 | `mygigguide_app/docs/MOBILE_NATIVE_DETAIL.md` | Mobile detail screens plan |

@@ -119,7 +119,7 @@
                 </div>
                 <div class="info-row">
                     <span class="info-label">Subject:</span>
-                    <span class="info-value">{{ $subject }}</span>
+                    <span class="info-value">{{ $contactSubject }}</span>
                 </div>
                 <div class="info-row">
                     <span class="info-label">Newsletter:</span>
@@ -137,7 +137,7 @@
 
             <div class="message-box">
                 <h3 style="margin: 0 0 15px 0; color: #92400e; font-size: 18px;">Message:</h3>
-                <div class="message-text">{{ $message }}</div>
+                <div class="message-text">{{ $contactMessage }}</div>
             </div>
 
             <p style="color: #6b7280; font-size: 14px; margin-top: 20px;">

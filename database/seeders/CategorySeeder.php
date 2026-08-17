@@ -20,6 +20,11 @@ class CategorySeeder extends Seeder
             ['name' => 'Comedy', 'slug' => 'comedy', 'sort_order' => 40],
             ['name' => 'Theatre', 'slug' => 'theatre', 'sort_order' => 50],
             ['name' => 'Open mic', 'slug' => 'open-mic', 'sort_order' => 60],
+            ['name' => 'Sports', 'slug' => 'sports', 'sort_order' => 70],
+            ['name' => 'Travel & outdoor', 'slug' => 'travel-outdoor', 'sort_order' => 80],
+            ['name' => 'Family Friendly', 'slug' => 'family-friendly', 'sort_order' => 85],
+            // Import source tag (also create on production via admin if missing)
+            ['name' => 'Quicket', 'slug' => 'quicket', 'sort_order' => 90],
         ];
 
         foreach ($rows as $row) {

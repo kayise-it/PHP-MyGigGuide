@@ -84,6 +84,59 @@ Optional (only if you changed web CSS/JS): `npm ci && npm run build`. Skip `conf
 
 ---
 
+## App event uploads — fix `413 Request Entity Too Large`
+
+**Symptom:** Posting from the mobile app fails with **413** (or raw nginx HTML). A **2 MB poster alone** can fail even though Laravel allows **10 MB per image**.
+
+**Cause:** **nginx** default `client_max_body_size` is often **1 MB** — it rejects the request **before** PHP/Laravel runs. This is **not** a 1 MB cap in the app code.
+
+**Fix on the VPS** (once — needs `sudo`):
+
+1. Edit the site config (path may vary):
+
+```bash
+sudo nano /etc/nginx/sites-enabled/mygigguide.co.za
+# or: /etc/nginx/sites-enabled/default
+# or: grep -r client_max_body_size /etc/nginx/
+```
+
+2. Inside the `server { … }` block for `www.mygigguide.co.za` (and `rogues.mygigguide.co.za` if separate), add or raise:
+
+```nginx
+client_max_body_size 128M;
+```
+
+3. Test and reload nginx:
+
+```bash
+sudo nginx -t
+sudo systemctl reload nginx
+```
+
+4. Raise PHP limits to match (if lower than nginx):
+
+```bash
+grep -E 'upload_max_filesize|post_max_size' /etc/php/*/fpm/php.ini
+```
+
+Suggested values in `php.ini` (FPM pool or main ini):
+
+```ini
+upload_max_filesize = 20M
+post_max_size = 120M
+```
+
+Then restart PHP-FPM:
+
+```bash
+sudo systemctl restart php8.3-fpm
+# adjust version if different: php -v
+```
+
+**What we allow in Laravel:** poster + each gallery photo up to **10 MB**; up to **10** gallery photos — so the server should accept **~120 MB** total POST size to be safe.
+
+---
+
 ## Enable `git pull` on the VPS (one-time)
 
 Goal: user `dave` can run `git pull origin main` without Thando each time.

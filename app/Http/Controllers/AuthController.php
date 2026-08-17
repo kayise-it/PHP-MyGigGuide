@@ -2,34 +2,31 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\User;
+use App\Helpers\NameNormalizer;
+use App\Mail\EmailVerificationMail;
 use App\Models\Artist;
 use App\Models\Event;
-use App\Models\Venue;
 use App\Models\Organiser;
-use App\Mail\EmailVerificationMail;
-use App\Mail\ArtistClaimWarningMail;
-use App\Mail\PendingClaimNoticeMail;
+use App\Models\User;
+use App\Rules\UniqueNormalizedName;
 use App\Services\AppWebSessionService;
 use App\Services\ClaimService;
 use App\Services\UserFirebaseLinkService;
 use App\Support\FirebaseWeb;
+use Carbon\Carbon;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
-use Carbon\Carbon;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
 use InvalidArgumentException;
-use RuntimeException;
 use Laravel\Socialite\Facades\Socialite;
-use App\Rules\UniqueNormalizedName;
-use App\Helpers\NameNormalizer;
+use RuntimeException;
 
 class AuthController extends Controller
 {
@@ -64,9 +61,9 @@ class AuthController extends Controller
 
         $input = trim($request->input('username'));
         $user = User::whereRaw('LOWER(username) = ?', [strtolower($input)])->first();
-$credentials = $user
-            ? ['username' => $user->username, 'password' => $request->password]
-            : $request->only('username', 'password');
+        $credentials = $user
+                    ? ['username' => $user->username, 'password' => $request->password]
+                    : $request->only('username', 'password');
         $remember = $request->boolean('remember');
 
         $attemptOk = Auth::attempt($credentials, $remember);
@@ -127,7 +124,7 @@ $credentials = $user
      */
     public function register(Request $request)
     {
-// If this is coming from auth modal, we have simplified fields
+        // If this is coming from auth modal, we have simplified fields
         if ($request->has('continue')) {
             $request->validate([
                 'name' => ['required', 'string', 'max:255', UniqueNormalizedName::forUser()],
@@ -157,19 +154,19 @@ $credentials = $user
             // Check for unclaimed entities with matching email (artists, venues, organisers)
             $claimResults = $this->claimService->initiateClaimsForUser($user);
             $unclaimedEntities = $this->claimService->findUnclaimedByEmail($request->email);
-            $unclaimedArtist = $unclaimedEntities->first(fn($e) => $e instanceof Artist);
-            $hasPendingEntities = !empty($claimResults['pending']);
+            $unclaimedArtist = $unclaimedEntities->first(fn ($e) => $e instanceof Artist);
+            $hasPendingEntities = ! empty($claimResults['pending']);
 
             if ($hasPendingEntities) {
                 $entityNames = collect($claimResults['pending'])->pluck('name')->join(', ');
                 $entityCount = count($claimResults['pending']);
                 $gracePeriodEnabled = config('artist_claims.enable_grace_period', false);
                 $gracePeriodHours = config('artist_claims.grace_period_hours', 48);
-                
-                $gracePeriodText = $gracePeriodEnabled 
-                    ? " Your claim(s) will be processed after " . Carbon::now()->addHours($gracePeriodHours)->diffForHumans() . "."
-                    : "";
-                
+
+                $gracePeriodText = $gracePeriodEnabled
+                    ? ' Your claim(s) will be processed after '.Carbon::now()->addHours($gracePeriodHours)->diffForHumans().'.'
+                    : '';
+
                 $successMessage = "Account created! We found {$entityCount} profile(s) ({$entityNames}) linked to your email. Please verify your email to claim your profile(s).{$gracePeriodText}";
             } else {
                 $user->addRole('user');
@@ -180,7 +177,7 @@ $credentials = $user
             $user->getOrCreateFolderSettings();
 
             session(['pending_verification_email' => $user->email]);
-            
+
             try {
                 Mail::to($user->email)->send(new EmailVerificationMail($user, $unclaimedArtist));
             } catch (\Throwable $e) {
@@ -213,8 +210,8 @@ $credentials = $user
         // Check for unclaimed entities with matching email (artists, venues, organisers)
         $claimResults = $this->claimService->initiateClaimsForUser($user);
         $unclaimedEntities = $this->claimService->findUnclaimedByEmail($request->email);
-        $unclaimedArtist = $unclaimedEntities->first(fn($e) => $e instanceof Artist);
-        $hasPendingEntities = !empty($claimResults['pending']);
+        $unclaimedArtist = $unclaimedEntities->first(fn ($e) => $e instanceof Artist);
+        $hasPendingEntities = ! empty($claimResults['pending']);
 
         if (! $hasPendingEntities) {
             $user->addRole('user');
@@ -224,7 +221,7 @@ $credentials = $user
         $user->getOrCreateFolderSettings();
 
         session(['pending_verification_email' => $user->email]);
-        
+
         try {
             Mail::to($user->email)->send(new EmailVerificationMail($user, $unclaimedArtist));
         } catch (\Throwable $e) {
@@ -240,10 +237,10 @@ $credentials = $user
             $entityCount = count($claimResults['pending']);
             $gracePeriodEnabled = config('artist_claims.enable_grace_period', false);
             $gracePeriodHours = config('artist_claims.grace_period_hours', 48);
-            
-            $gracePeriodText = $gracePeriodEnabled 
-                ? " Your claim(s) will be processed after " . Carbon::now()->addHours($gracePeriodHours)->diffForHumans() . "."
-                : "";
+
+            $gracePeriodText = $gracePeriodEnabled
+                ? ' Your claim(s) will be processed after '.Carbon::now()->addHours($gracePeriodHours)->diffForHumans().'.'
+                : '';
             $successMessage = "Account created! We found {$entityCount} profile(s) ({$entityNames}) linked to your email. Please verify your email to claim your profile(s).{$gracePeriodText}";
         } else {
             $successMessage = 'Account created successfully! You are signed in. One account works on the app and website.';
@@ -344,7 +341,7 @@ $credentials = $user
 
     private function recordWebLogin(User $user): void
     {
-        $user->forceFill(['last_login_at' => now()])->save();
+        $user->recordLogin();
     }
 
     /**
@@ -371,8 +368,8 @@ $credentials = $user
 
         if (empty($clientId) || empty($clientSecret)) {
             Log::error('Facebook OAuth: Missing credentials', [
-                'client_id_set' => !empty($clientId),
-                'client_secret_set' => !empty($clientSecret),
+                'client_id_set' => ! empty($clientId),
+                'client_secret_set' => ! empty($clientSecret),
             ]);
 
             return redirect()->route('login')
@@ -414,7 +411,7 @@ $credentials = $user
             $facebookUser = Socialite::driver('facebook')->user();
 
             // Check if Facebook returned an email
-            if (!$facebookUser->getEmail()) {
+            if (! $facebookUser->getEmail()) {
                 return redirect()->route('login')
                     ->with('error', 'Unable to retrieve email from Facebook. Please ensure your Facebook account has a verified email address.');
             }
@@ -425,7 +422,7 @@ $credentials = $user
                 ->first();
 
             // If user doesn't exist, check if email exists
-            if (!$user) {
+            if (! $user) {
                 $user = User::where('email', $facebookUser->getEmail())->first();
 
                 if ($user) {
@@ -442,7 +439,7 @@ $credentials = $user
 
                     // Ensure username is unique
                     while (User::where('username', $username)->exists()) {
-                        $username = $originalUsername . $counter;
+                        $username = $originalUsername.$counter;
                         $counter++;
                     }
 
@@ -466,12 +463,12 @@ $credentials = $user
 
                     // Check for unclaimed entities with matching email (artists, venues, organisers)
                     $claimResults = $this->claimService->initiateClaimsForUser($user);
-                    $hasPendingEntities = !empty($claimResults['pending']);
+                    $hasPendingEntities = ! empty($claimResults['pending']);
 
                     if ($hasPendingEntities) {
                         // Assign appropriate roles based on claimed entity types
                         $claimedTypes = collect($claimResults['pending'])->pluck('type')->unique();
-                        
+
                         if ($claimedTypes->contains('artist')) {
                             $user->addRole('artist');
                         }
@@ -481,9 +478,9 @@ $credentials = $user
                         if ($claimedTypes->contains('venue')) {
                             $user->addRole('venue_owner');
                         }
-                        
+
                         // Also assign the originally selected role if different
-                        if (!$user->hasRole($role)) {
+                        if (! $user->hasRole($role)) {
                             $user->addRole($role);
                         }
                     } else {
@@ -516,6 +513,7 @@ $credentials = $user
                 'message' => $e->getMessage(),
                 'trace' => $e->getTraceAsString(),
             ]);
+
             return redirect()->route('login')
                 ->with('error', 'Facebook authentication session expired. Please try again.');
         } catch (\Laravel\Socialite\Two\ProviderException $e) {
@@ -525,12 +523,13 @@ $credentials = $user
                 'response' => method_exists($e, 'getResponse') ? $e->getResponse() : null,
                 'trace' => $e->getTraceAsString(),
             ]);
+
             return redirect()->route('login')
                 ->with('error', 'Facebook authentication failed. Please check your Facebook app configuration.');
         } catch (\GuzzleHttp\Exception\ClientException $e) {
             $statusCode = $e->getResponse() ? $e->getResponse()->getStatusCode() : 'unknown';
             $responseBody = $e->getResponse() ? $e->getResponse()->getBody()->getContents() : 'no response';
-            
+
             Log::error('Facebook OAuth: HTTP client exception', [
                 'message' => $e->getMessage(),
                 'status_code' => $statusCode,
@@ -556,6 +555,7 @@ $credentials = $user
                 'trace' => $e->getTraceAsString(),
                 'exception_class' => get_class($e),
             ]);
+
             return redirect()->route('login')
                 ->with('error', 'An unexpected error occurred during Facebook authentication. Please try again.');
         }
@@ -564,11 +564,10 @@ $credentials = $user
     /**
      * Handle Facebook data deletion callback.
      * This endpoint is called by Facebook when a user requests data deletion.
-     * 
+     *
      * Facebook sends a POST request with a signed_request parameter.
      * The signed_request contains the user's Facebook ID that needs to be deleted.
-     * 
-     * @param Request $request
+     *
      * @return \Illuminate\Http\JsonResponse
      */
     public function handleFacebookDataDeletion(Request $request)
@@ -585,11 +584,12 @@ $credentials = $user
 
             // Facebook sends data in signed_request format
             $signedRequest = $request->input('signed_request');
-            
-            if (!$signedRequest) {
+
+            if (! $signedRequest) {
                 Log::warning('Facebook data deletion: No signed_request received', [
                     'request_data' => $request->all(),
                 ]);
+
                 return response()->json([
                     'url' => route('facebook.data-deletion'),
                     'confirmation_code' => null,
@@ -601,6 +601,7 @@ $credentials = $user
             $parts = explode('.', $signedRequest, 2);
             if (count($parts) !== 2) {
                 Log::warning('Facebook data deletion: Invalid signed_request format');
+
                 return response()->json([
                     'url' => route('facebook.data-deletion'),
                     'confirmation_code' => null,
@@ -615,12 +616,13 @@ $credentials = $user
             if ($appSecret) {
                 $expectedSignature = base64_encode(hash_hmac('sha256', $payload, $appSecret, true));
                 $expectedSignature = strtr(rtrim($expectedSignature, '='), '+/', '-_');
-                
-                if (!hash_equals($signature, $expectedSignature)) {
+
+                if (! hash_equals($signature, $expectedSignature)) {
                     Log::warning('Facebook data deletion: Invalid signature', [
-                        'received_signature' => substr($signature, 0, 20) . '...',
-                        'expected_signature' => substr($expectedSignature, 0, 20) . '...',
+                        'received_signature' => substr($signature, 0, 20).'...',
+                        'expected_signature' => substr($expectedSignature, 0, 20).'...',
                     ]);
+
                     return response()->json([
                         'url' => route('facebook.data-deletion'),
                         'confirmation_code' => null,
@@ -633,11 +635,12 @@ $credentials = $user
             // Decode the payload
             $data = json_decode(base64_decode(strtr($payload, '-_', '+/')), true);
 
-            if (!$data || !isset($data['user_id'])) {
+            if (! $data || ! isset($data['user_id'])) {
                 Log::warning('Facebook data deletion: Invalid payload or missing user_id', [
                     'data' => $data,
                     'payload_decoded' => base64_decode(strtr($payload, '-_', '+/')),
                 ]);
+
                 return response()->json([
                     'url' => route('facebook.data-deletion'),
                     'confirmation_code' => null,
@@ -645,9 +648,9 @@ $credentials = $user
             }
 
             $facebookUserId = $data['user_id'];
-            
+
             // Generate a unique confirmation code
-            $confirmationCode = 'DEL_' . strtoupper(substr(md5($facebookUserId . config('app.key') . time()), 0, 10));
+            $confirmationCode = 'DEL_'.strtoupper(substr(md5($facebookUserId.config('app.key').time()), 0, 10));
 
             // Find user by Facebook provider ID
             $user = User::where('auth_provider', 'facebook')
@@ -668,7 +671,7 @@ $credentials = $user
                 // In production, you might want to queue this for better performance
                 try {
                     $this->deleteUserData($user);
-                    
+
                     Log::info('Facebook data deletion completed', [
                         'facebook_user_id' => $facebookUserId,
                         'user_id' => $user->id,
@@ -699,7 +702,7 @@ $credentials = $user
             ])->header('Content-Type', 'application/json');
 
         } catch (\Exception $e) {
-            Log::error('Facebook data deletion error: ' . $e->getMessage(), [
+            Log::error('Facebook data deletion error: '.$e->getMessage(), [
                 'trace' => $e->getTraceAsString(),
                 'request_data' => $request->all(),
             ]);
@@ -715,8 +718,7 @@ $credentials = $user
     /**
      * Delete user and all associated data.
      * This method contains the deletion logic similar to ProfileController.
-     * 
-     * @param User $user
+     *
      * @return void
      */
     private function deleteUserData(User $user)
@@ -725,7 +727,7 @@ $credentials = $user
         try {
             // Get all events owned by user
             $events = $user->events()->get();
-            
+
             // Get events owned by artist
             if ($user->artist) {
                 $artistEvents = Event::where('owner_type', Artist::class)
@@ -733,12 +735,12 @@ $credentials = $user
                     ->get();
                 $events = $events->merge($artistEvents);
             }
-            
+
             // Get events owned by organiser
             if ($user->organiser) {
                 $events = $events->merge($user->organiser->events()->get());
             }
-            
+
             $events = $events->unique('id');
 
             // Delete all events and their images
@@ -830,17 +832,11 @@ $credentials = $user
     /**
      * Ensure a name is unique by appending a suffix if necessary.
      * Used for social login where users can't control their display name.
-     *
-     * @param string $name
-     * @param string $table
-     * @param string $column
-     * @param int|null $excludeId
-     * @return string
      */
     private function ensureUniqueName(string $name, string $table, string $column, ?int $excludeId = null): string
     {
         $normalizedInput = NameNormalizer::normalize($name);
-        
+
         // Get all existing names from the table
         $query = DB::table($table)->select(['id', $column]);
         if ($excludeId !== null) {
@@ -857,18 +853,18 @@ $credentials = $user
             }
         }
 
-        if (!$isDuplicate) {
+        if (! $isDuplicate) {
             return $name;
         }
 
         // Append a number suffix to make it unique
         $counter = 2;
         $baseName = $name;
-        
+
         while (true) {
             $candidateName = "{$baseName} ({$counter})";
             $normalizedCandidate = NameNormalizer::normalize($candidateName);
-            
+
             $found = false;
             foreach ($existingRecords as $record) {
                 if (NameNormalizer::normalize($record->{$column}) === $normalizedCandidate) {
@@ -876,11 +872,11 @@ $credentials = $user
                     break;
                 }
             }
-            
-            if (!$found) {
+
+            if (! $found) {
                 return $candidateName;
             }
-            
+
             $counter++;
         }
     }

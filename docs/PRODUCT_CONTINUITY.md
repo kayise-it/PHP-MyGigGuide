@@ -2,9 +2,11 @@
 
 Short-lived **memory for humans and agents**: what exists, how it fits together, and what is still open. Update when major pieces move.
 
-**Last updated:** 23 May 2026
+**Last updated:** 7 Jun 2026
 
 **Resume after reboot:** [SESSION_HANDOFF.md](./SESSION_HANDOFF.md) · **Dave’s preferences:** [personal.md](./personal.md) · Cursor rule: `.cursor/rules/dave-context.mdc`
+
+**Architecture diagrams (Jun 2026):** [Client-facing](./architecture-client.png) · [Technical / Kayise](./architecture-technical.png) · [AI usage — build, product & future](./ai-usage-infographic.png) · [AI features — client](./ai-usage-client.png) — horizontal flow; WhatsApp, Flutter (MGG + Rogues), website → Laravel SSOT. *(Technical AI infographic omits WhatsApp speech-to-text via Grok — see WhatsApp row below.)*
 
 ---
 
@@ -14,7 +16,7 @@ Short-lived **memory for humans and agents**: what exists, how it fits together,
 |--------|------|--------|
 | **Website (Laravel)** | Public MVP: listings, event/artist/venue detail, admin. | **API v1** on same app (`/api/v1/...`). Session auth for web; **Sanctum** bearer for programmatic clients. **Home** hero: **split gig calendar + map**; embedded map JSON now includes **`poster_url`** + **`images`** (gallery) so clients can show thumbnails. **`/map`** is public (guests). |
 | **Mobile app (Flutter)** | `mygigguide_app` — separate repo. | **My Gig Guide** (`--flavor mygigguide`): **dark theme (May 2026)** — black scaffold, indigo `#6366F1`, flat cards `#12121A`, **black coverflow**, rounded **logo glow** (`header_logo_glow.png`). Tabs: **Home**, **Events**, **Browse**, **Add**, **Saved**, **Settings**. Browse sort: All, Gigs Near Me, **Top rated**, **Most events**. **Ratings** on detail (compact). **Rogues** (`--flavor rogues`): noir + **cyan**; dark bottom nav; **Radio** tab; Add under Settings. Home: coverflow + map + genre chips; Events tab = diary; WhatsApp share; Saved = Sanctum favorites. Native API detail screens. See **SESSION_HANDOFF** for glow → favicon/app icon (pinned). |
-| **WhatsApp** | Lite touch: queries, voice, light flows. | **Evolution** → **n8n** → **miggs-bridge** (Python on VPS) → Groq / live site scraping. Not a second source of truth for core DB data. |
+| **WhatsApp** | Lite touch: queries, voice, light flows. | **Evolution** → **n8n** → **miggs-bridge** (Python on VPS) → Groq / live site scraping. **Voice notes:** speech-to-text via **Grok (xAI)** in the WhatsApp path (Dave — note for future docs/infographic). Not a second source of truth for core DB data. |
 
 ### Add event poster (mobile)
 
@@ -60,7 +62,7 @@ API reference: **[API_V1.md](./API_V1.md)**.
 - **RSS / n8n** — event discovery via n8n (+ optional RSSHub on VPS). Most gigs from **FB groups**; **FetchRSS** 5-feed pilot OK to start. **n8n issue on backlog** (WhatsApp + RSS workflows) — discuss with Dave when ready. See **[RSS_EVENT_DISCOVERY.md](./RSS_EVENT_DISCOVERY.md)**.
 - **Repeat / multi-day events** — **when required:** (1) weekly repeat e.g. Karaoke Thursdays — Laravel + web + API, not app-only; (2) multi-day festivals via `end_date`; (3) full iCal/RRULE — **unlikely**. Tracked in **SESSION_HANDOFF.md** § Repeat / multi-day events.
 - **Hermes** — local experimentation; not a product dependency.
-- **White-label** — **Rogues subdomain live:** https://rogues.mygigguide.co.za. **Web Phase A (May 2026):** hostname → `SiteBrand` (Rogues logo, dark nav, cyan accents, favicon, footer “Powered by My Gig Guide”); **same event data** as www until content silo. Mobile Rogues uses `SITE_URL` / `brand_config.dart`. FM tenants TBD.
+- **White-label** — **Rogues subdomain live:** https://rogues.mygigguide.co.za. **Web Phase A (May 2026):** hostname → `SiteBrand` (Rogues logo, dark nav, cyan accents, favicon, footer “Powered by My Gig Guide”); **same event data** as www until content silo. Mobile Rogues uses `SITE_URL` / `brand_config.dart`. **919 FM web:** planned — see **[WEB_APP_ALIGNMENT.md](./WEB_APP_ALIGNMENT.md)**. FM tenants TBD in app stores.
 - **Mobile push** — OneSignal wired in app; per-brand keys and notification centre UI **later** (Rogues / FM tenants).
 - **Nav** — optional merge of **Artists + Venues** into one **Browse** tab (segment toggle) to reduce bottom-bar count after **Saved** added.
 - **App stores** — daily dev on **`mygigguide`** flavor; **Rogues** rebuilt at major milestones; Rogues may still be first store listing (paying client). Tracked in **SESSION_HANDOFF.md** § App store release.
