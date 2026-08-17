@@ -1,8 +1,17 @@
 # Fix truncated station_radio_tab_screen.dart
 
-Your file was cut off at ~941 lines. The full file is ~1470 lines.
+Your file was cut off at ~941 lines. The full file is ~1151 lines.
 
-## Files in this folder
+**Note:** Flutter files belong in **your** repo (`CambodiaDave/mygigguide_app`), not the Kayise Laravel repo. The Kayise `raw.githubusercontent.com` URL returns 404 unless you have org access.
+
+## Quick fix on your laptop (no Kayise download)
+
+From `~/development/mygigguide_app`, save `patch_station_radio.py` (see below or copy from this chat), then:
+
+```bash
+python3 patch_station_radio.py
+./scripts/build_apk.sh mix938 --label=nowplaying-v4
+```
 
 | File | Copy to |
 |------|---------|
