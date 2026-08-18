@@ -95,6 +95,8 @@ Use your actual vanilla flavor check (`!BrandConfig.isRogues` etc.) if you don't
 - [ ] Home shows **On Air** strip with **Mix 93.8** card
 - [ ] Tap card → detail with play, now playing, WhatsApp **066 417 8469**
 - [ ] Poll loads (create one: `php artisan poll:create mix938 "Question?" "A" "B"`)
+- [ ] VOW FM card on On Air strip (if catalog copied)
+- [ ] VOW poll loads (`php artisan poll:create vowfm "Question?" "A" "B"`)
 - [ ] Facebook / Instagram open
 
 **Checklist (mix938 flavor):**
@@ -108,9 +110,12 @@ Use your actual vanilla flavor check (`!BrandConfig.isRogues` etc.) if you don't
 
 ```bash
 php artisan poll:create mix938 "What's your favourite time to listen?" "Morning" "Drive time" "Evening"
+php artisan poll:create vowfm "Which show do you never miss?" "Breakfast" "Drive" "Late night"
 ```
 
-API: `GET https://www.mygigguide.co.za/api/v1/polls/mix938`
+API: `GET https://www.mygigguide.co.za/api/v1/polls/mix938` and `/polls/vowfm`
+
+See also: `docs/flutter/INSTALL_POLLS.md` for flavor radio tab in-app polls.
 
 ---
 

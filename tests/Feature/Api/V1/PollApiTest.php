@@ -10,6 +10,22 @@ class PollApiTest extends TestCase
 {
     use RefreshDatabase;
 
+    public function test_show_returns_active_poll_for_vowfm_context(): void
+    {
+        Poll::create([
+            'context' => 'vowfm',
+            'question' => 'Best show?',
+            'options' => ['Drive', 'Evening'],
+            'is_active' => true,
+        ]);
+
+        $response = $this->getJson('/api/v1/polls/vowfm');
+
+        $response->assertOk()
+            ->assertJsonPath('poll.context', 'vowfm')
+            ->assertJsonPath('poll.question', 'Best show?');
+    }
+
     public function test_show_returns_active_poll_for_context(): void
     {
         Poll::create([

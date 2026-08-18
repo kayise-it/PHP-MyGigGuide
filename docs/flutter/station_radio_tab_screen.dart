@@ -23,6 +23,7 @@ import 'rise_demo_poll_screen.dart';
 import 'rogues_demo_poll_screen.dart';
 import 'site_web_tab_screen.dart';
 import 'station_hosts_screen.dart';
+import 'station_in_app_poll_screen.dart';
 
 /// Station flavor hub — native live stream, site, hosts, WhatsApp, surveys, feedback.
 /// Used for Rogues on Radio and 919 FM (4th bottom tab replaces Add).
@@ -210,6 +211,12 @@ class _StationRadioTabScreenState extends ConsumerState<StationRadioTabScreen> {
   }
 
   Future<void> _openPoll(BuildContext context) async {
+    if (BrandConfig.stationPollContext.trim().isNotEmpty) {
+      await Navigator.of(context).push<void>(
+        MaterialPageRoute<void>(builder: (_) => const StationInAppPollScreen()),
+      );
+      return;
+    }
     final surveyUrl = BrandConfig.stationSurveyUrl.trim();
     if (surveyUrl.isNotEmpty) {
       if (BrandConfig.isFm919 && BrandConfig.isInAppHost(Uri.parse(surveyUrl))) {
@@ -423,11 +430,13 @@ class _StationRadioTabScreenState extends ConsumerState<StationRadioTabScreen> {
       _StationAction(
         icon: AppIconData.chartBar,
         label: 'Listener poll',
-        subtitle: BrandConfig.stationSurveyUrl.trim().isNotEmpty
-            ? 'Vote in the poll'
-            : (BrandConfig.isRogues || BrandConfig.isRiseFm
-                ? 'Tap to vote'
-                : 'Not configured yet'),
+        subtitle: BrandConfig.stationPollContext.trim().isNotEmpty
+            ? 'Vote in the app'
+            : BrandConfig.stationSurveyUrl.trim().isNotEmpty
+                ? 'Vote in the poll'
+                : (BrandConfig.isRogues || BrandConfig.isRiseFm
+                    ? 'Tap to vote'
+                    : 'Not configured yet'),
         onTap: (ctx) => _openPoll(ctx),
       ),
       _StationAction(

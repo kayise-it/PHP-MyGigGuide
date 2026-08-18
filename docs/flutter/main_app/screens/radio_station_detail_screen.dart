@@ -98,7 +98,10 @@ class _RadioStationDetailScreenState extends ConsumerState<RadioStationDetailScr
             onHosts: _openHosts,
           ),
           const SizedBox(height: 20),
-          StationPollSection(station: station),
+          StationPollSection(
+            pollContext: station.pollContext,
+            accentColor: station.accentColor,
+          ),
         ],
       ),
     );

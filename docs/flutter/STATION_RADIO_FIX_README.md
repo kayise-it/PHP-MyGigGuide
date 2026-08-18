@@ -16,8 +16,14 @@ python3 patch_station_radio.py
 | File | Copy to |
 |------|---------|
 | `station_radio_tab_screen.dart` | `lib/screens/station_radio_tab_screen.dart` |
+| `screens/station_in_app_poll_screen.dart` | `lib/screens/station_in_app_poll_screen.dart` |
+| `widgets/station_poll_section.dart` | `lib/widgets/station_poll_section.dart` |
+| `services/poll_api_service.dart` | `lib/services/poll_api_service.dart` |
+| `models/station_poll.dart` | `lib/models/station_poll.dart` |
 | `zeno_now_playing_service.dart` | `lib/services/zeno_now_playing_service.dart` |
 | `zeno_now_playing_banner.dart` | `lib/widgets/zeno_now_playing_banner.dart` |
+
+See **`INSTALL_POLLS.md`** for `BrandConfig.stationPollContext` (Mix + VOW in-app polls).
 
 ## On your laptop
 

@@ -7,6 +7,7 @@ class RadioStationsCatalog {
   RadioStationsCatalog._();
 
   static const mix938Accent = Color(0xFF00E676);
+  static const vowFmAccent = Color(0xFF1E88E5);
 
   /// Studio / WhatsApp: 066 417 8469
   static const mix938StudioE164 = '27664178469';
@@ -39,9 +40,23 @@ class RadioStationsCatalog {
     supportsInAppHosts: false,
   );
 
+  static const vowfm = RadioStationEntry(
+    id: 'vowfm',
+    name: 'VOW FM',
+    tagline: 'Wits campus radio — 88.1 FM',
+    frequencyLabel: '88.1 FM',
+    streamUrl: 'https://streaming.iono.fm/s/101',
+    accentColor: vowFmAccent,
+    pollContext: 'vowfm',
+    websiteUrl: 'https://www.vowfm.co.za',
+    socialLinks: [],
+    supportsInAppHosts: false,
+  );
+
   /// Stations visible on the main app Home On Air strip (add more over time).
   static const List<RadioStationEntry> onAirStations = [
     mix938,
+    vowfm,
   ];
 
   static RadioStationEntry? byId(String id) {

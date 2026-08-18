@@ -23,7 +23,13 @@ static String get stationStudioPhoneE164 {
   // ...
 }
 
-// --- required for PollApiService (main app On Air polls) ---
+// --- required for PollApiService (main app On Air polls + flavor in-app polls) ---
+static String get stationPollContext {
+  if (isMix938) return 'mix938';
+  if (isVowFm) return 'vowfm';
+  return '';
+}
+
 static String get siteUrl {
   // Return your existing SITE_URL dart-define value, e.g.:
   // return const String.fromEnvironment('SITE_URL', defaultValue: 'https://www.mygigguide.co.za');
