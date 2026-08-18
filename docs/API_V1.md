@@ -16,6 +16,10 @@ All endpoints return **JSON**. No authentication required for these read-only ro
 | GET | `/api/v1/venues/{id}` | Single venue (+ `upcoming_events`, next 90 days) |
 | GET | `/api/v1/artists` | Paginated artists |
 | GET | `/api/v1/artists/{id}` | Single artist (+ genres, `upcoming_events`, next 90 days) |
+| GET | `/api/v1/polls/{context}` | Active listener poll for a station context (e.g. `mix938`) |
+| POST | `/api/v1/polls/{poll}/vote` | Vote once per device (`device_id`, `option_index`) |
+
+**Polls:** `{context}` matches admin poll context (`mix938`, `vowfm`, etc.). Returns `{ "poll": null }` when none active. See Flutter `StationPollSection` + `PollApiService`.
 
 **Artists / venues list** (`GET /api/v1/artists`, `GET /api/v1/venues`): optional query **`sort`** — `name` (default), `rating`, `events`, `newest`. Rows include **`rating_summary`** (`average`, `count`) and **`events_count`**. Matches website browse sorts (website venues also has capacity — not in app MVP).
 
