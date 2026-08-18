@@ -30,6 +30,9 @@ class PollApiService {
   Future<StationPoll?> fetchPoll(String context) async {
     final uri = Uri.parse('$_apiV1Base/polls/$context');
     final response = await _client.get(uri).timeout(const Duration(seconds: 15));
+    if (response.statusCode == 404) {
+      return null;
+    }
     if (response.statusCode != 200) {
       throw PollApiException('Could not load poll (${response.statusCode})');
     }
@@ -62,6 +65,9 @@ class PollApiService {
         throw PollAlreadyVotedException(StationPoll.fromJson(pollJson));
       }
       throw PollApiException(body['message'] as String? ?? 'Already voted');
+    }
+    if (response.statusCode == 422) {
+      throw PollApiException(body['message'] as String? ?? 'Poll is closed');
     }
     if (response.statusCode != 200) {
       throw PollApiException(body['message'] as String? ?? 'Vote failed');

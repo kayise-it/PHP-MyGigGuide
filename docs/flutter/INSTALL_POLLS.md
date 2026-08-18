@@ -51,15 +51,20 @@ Flavors without `stationPollContext` keep the old behaviour (survey URL, Rogues/
 ## 3. Create polls on the VPS (one-time)
 
 ```bash
-cd ~/development/PHP-MyGigGuide   # or your app path on mel55-nix02
-
-php artisan migrate   # if polls tables not yet applied
-
-php artisan poll:create mix938 "What's your favourite time to listen?" "Morning" "Drive time" "Evening"
-php artisan poll:create vowfm "Which show do you never miss?" "Breakfast" "Drive" "Late night"
+cd /var/www/mygigguide
 ```
 
+**Interactive** (production uses this — no arguments on the command line):
+
+```bash
+php artisan poll:create
+```
+
+Follow the prompts: choose station (`mix938` or `vowfm`), question, options (blank line when done), close date.
+
 Or use **Admin → Polls** on www.mygigguide.co.za.
+
+**Do not run** plain `php artisan migrate --force` if you hit `venue_owners already exists` — polls are already on the server if VOW works.
 
 Verify:
 
