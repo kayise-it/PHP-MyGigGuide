@@ -42,6 +42,7 @@ class _StationPollSectionState extends State<StationPollSection> {
       if (!mounted) return;
       setState(() {
         _poll = poll;
+        _voted = poll?.userVoteIndex != null;
         _loading = false;
       });
     } catch (e) {

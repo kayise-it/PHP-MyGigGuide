@@ -14,7 +14,7 @@ class PollApiService {
   static const _deviceIdKey = 'mgg_poll_device_id';
 
   String get _apiV1Base {
-    final site = BrandConfig.siteUrl.trim().replaceAll(RegExp(r'/+$'), '');
+    final site = BrandConfig.pollApiSiteUrl.trim().replaceAll(RegExp(r'/+$'), '');
     return '$site/api/v1';
   }
 

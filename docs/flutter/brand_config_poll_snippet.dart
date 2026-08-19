@@ -1,16 +1,18 @@
 // Snippet — merge into lib/brand_config.dart for in-app listener polls.
 //
-// Poll API uses BrandConfig.siteUrl + /api/v1/polls/{context}
+// Polls are served from the MGG Laravel API — NOT the station website
+// (mix938.com / vowfm.co.za do not host /api/v1/polls).
 
-/// Laravel poll context for this flavor (empty = fall back to survey URL / demo).
+/// Laravel host for listener poll API (same for all flavors).
+static String get pollApiSiteUrl {
+  const override = String.fromEnvironment('POLL_API_SITE_URL', defaultValue: '');
+  if (override.isNotEmpty) return override;
+  return 'https://www.mygigguide.co.za';
+}
+
+/// Poll context sent to GET /api/v1/polls/{context}
 static String get stationPollContext {
   if (isMix938) return 'mix938';
   if (isVowFm) return 'vowfm';
   return '';
-}
-
-/// Site root for PollApiService — required when stationPollContext is set.
-static String get siteUrl {
-  // Return your existing SITE_URL dart-define value, e.g.:
-  // return const String.fromEnvironment('SITE_URL', defaultValue: 'https://www.mygigguide.co.za');
 }

@@ -33,18 +33,21 @@ Branch: `cursor/poll-vow-mix-858a` on the Laravel repo (or pull from `CambodiaDa
 Merge from `docs/flutter/brand_config_poll_snippet.dart`:
 
 ```dart
+/// Poll API host — always MGG, even for station flavors.
+static String get pollApiSiteUrl {
+  const override = String.fromEnvironment('POLL_API_SITE_URL', defaultValue: '');
+  if (override.isNotEmpty) return override;
+  return 'https://www.mygigguide.co.za';
+}
+
 static String get stationPollContext {
   if (isMix938) return 'mix938';
   if (isVowFm) return 'vowfm';
   return '';
 }
-
-static String get siteUrl {
-  // Your existing SITE_URL getter / dart-define
-}
 ```
 
-Flavors without `stationPollContext` keep the old behaviour (survey URL, Rogues/Rise demo screens).
+**Why this matters:** standalone Mix/VOW builds often set `SITE_URL` to the station website (`mix938.com`, etc.). Polls live on **`https://www.mygigguide.co.za/api/v1/polls/...`** — without `pollApiSiteUrl`, the flavor apps call the wrong host and show “Poll unavailable”.
 
 ---
 
@@ -84,8 +87,9 @@ curl -s "https://www.mygigguide.co.za/api/v1/polls/vowfm" | jq .
 
 **Checklist (each flavor):**
 
-- [ ] Radio tab → **Listener poll** → subtitle says **Vote in the app**
-- [ ] Poll question loads from API
+- [ ] Radio tab shows **Listener poll** block under the player (not only after tapping the grid tile)
+- [ ] Subtitle on poll tile says **Vote in the app**
+- [ ] Poll question loads from `mygigguide.co.za` API (not station website)
 - [ ] Tap an option → vote recorded, results show
 - [ ] Second vote on same device → already voted (409 handled)
 

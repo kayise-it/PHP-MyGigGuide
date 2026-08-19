@@ -19,6 +19,7 @@ import '../services/rogues_radio_player.dart';
 import '../widgets/app_icon.dart';
 import '../widgets/brand_logo_header.dart';
 import '../widgets/zeno_now_playing_banner.dart';
+import '../widgets/station_poll_section.dart';
 import 'rise_demo_poll_screen.dart';
 import 'rogues_demo_poll_screen.dart';
 import 'site_web_tab_screen.dart';
@@ -526,6 +527,13 @@ class _StationRadioTabScreenState extends ConsumerState<StationRadioTabScreen> {
                       onChanged: _onHot1027QualityChanged,
                     ),
                     const SizedBox(height: 8),
+                  ],
+                  if (BrandConfig.stationPollContext.trim().isNotEmpty) ...[
+                    const SizedBox(height: 8),
+                    StationPollSection(
+                      pollContext: BrandConfig.stationPollContext,
+                      accentColor: accent,
+                    ),
                   ],
                   GridView.builder(
                     shrinkWrap: true,

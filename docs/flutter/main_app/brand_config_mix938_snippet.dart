@@ -24,13 +24,15 @@ static String get stationStudioPhoneE164 {
 }
 
 // --- required for PollApiService (main app On Air polls + flavor in-app polls) ---
+/// Poll API always hits MGG Laravel — not mix938.com / vowfm.co.za.
+static String get pollApiSiteUrl {
+  const override = String.fromEnvironment('POLL_API_SITE_URL', defaultValue: '');
+  if (override.isNotEmpty) return override;
+  return 'https://www.mygigguide.co.za';
+}
+
 static String get stationPollContext {
   if (isMix938) return 'mix938';
   if (isVowFm) return 'vowfm';
   return '';
-}
-
-static String get siteUrl {
-  // Return your existing SITE_URL dart-define value, e.g.:
-  // return const String.fromEnvironment('SITE_URL', defaultValue: 'https://www.mygigguide.co.za');
 }
