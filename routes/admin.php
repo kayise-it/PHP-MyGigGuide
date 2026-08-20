@@ -4,6 +4,7 @@ use App\Http\Controllers\Admin\ArtistManagementController;
 use App\Http\Controllers\Admin\ArtistClaimDisputeController;
 use App\Http\Controllers\Admin\AuthController;
 use App\Http\Controllers\Admin\CategoryManagementController;
+use App\Http\Controllers\Admin\ContentReportController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\EventManagementController;
 use App\Http\Controllers\Admin\GenreManagementController;
@@ -111,6 +112,11 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::post('artist-disputes/{artist}/reject', [ArtistClaimDisputeController::class, 'reject'])->name('artist-disputes.reject');
         Route::post('artist-disputes/{artist}/clear-dispute', [ArtistClaimDisputeController::class, 'clearDispute'])->name('artist-disputes.clear-dispute');
 
+        Route::get('content-reports', [ContentReportController::class, 'index'])->name('content-reports.index');
+        Route::get('content-reports/{contentReport}', [ContentReportController::class, 'show'])->name('content-reports.show');
+        Route::post('content-reports/{contentReport}/resolve', [ContentReportController::class, 'resolve'])->name('content-reports.resolve');
+        Route::post('content-reports/{contentReport}/dismiss', [ContentReportController::class, 'dismiss'])->name('content-reports.dismiss');
+
         // Organiser Management
         Route::resource('organisers', OrganiserManagementController::class);
         Route::patch('organisers/{organiser}/toggle-status', [OrganiserManagementController::class, 'toggleStatus'])->name('organisers.toggle-status');
@@ -123,9 +129,9 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::resource('categories', CategoryManagementController::class);
         Route::patch('categories/{category}/toggle-status', [CategoryManagementController::class, 'toggleStatus'])->name('categories.toggle-status');
 
-        // Polls (station contexts incl. mix938)
-        Route::patch('polls/{poll}/close', [PollAdminController::class, 'close'])->name('polls.close');
-        Route::resource('polls', PollAdminController::class)->only(['index', 'create', 'store', 'show', 'edit', 'update', 'destroy']);
+        // Station polls (incl. results page)
+        Route::resource('polls', PollAdminController::class);
+        Route::post('polls/{poll}/close', [PollAdminController::class, 'close'])->name('polls.close');
 
         // Paid Features CRUD
         Route::resource('paid-features', PaidFeatureController::class)->parameters([

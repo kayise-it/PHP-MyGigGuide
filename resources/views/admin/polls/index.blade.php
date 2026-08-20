@@ -121,7 +121,6 @@
                                                 <form method="POST" action="{{ route('admin.polls.close', $poll) }}"
                                                       onsubmit="return confirm('Close this poll now?')">
                                                     @csrf
-                                                    @method('PATCH')
                                                     <button type="submit" class="text-amber-400 hover:text-amber-300 font-medium text-sm">Close</button>
                                                 </form>
                                             @endif
