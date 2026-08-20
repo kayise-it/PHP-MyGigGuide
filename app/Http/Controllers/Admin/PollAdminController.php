@@ -10,76 +10,115 @@ use Illuminate\View\View;
 
 class PollAdminController extends Controller
 {
-    /** Station / app contexts shown in admin dropdown. */
-    public const CONTEXTS = [
-        'mygigguide' => 'My Gig Guide (vanilla)',
-        'rogues' => 'Rogues on Radio',
-        'fm919' => '919 FM',
-        'hot1027' => 'HOT 1027',
-        'vowfm' => 'VOW FM',
-        'risefm' => 'Rise FM',
-        'mix938' => 'Mix 93.8',
-        'burghradio' => 'Burgh Radio',
+    private const CONTEXTS = ['vowfm', 'risefm', 'hot1027', 'fm919', 'mix938'];
+
+    /** @var array<string, string> */
+    public const CONTEXT_LABELS = [
+        'vowfm'   => 'VOW 88.1',
+        'risefm'  => 'RISE fm',
+        'hot1027' => 'HOT 102.7',
+        'fm919'   => '91.9 FM',
+        'mix938'  => 'Mix 93.8',
     ];
 
-    public function index(Request $request): View
+    public function index(): View
     {
-        $query = Poll::query()->latest('id');
-
-        if ($request->filled('context')) {
-            $query->where('context', $request->string('context'));
-        }
-
-        if ($request->filled('search')) {
-            $search = $request->string('search');
-            $query->where('question', 'like', "%{$search}%");
-        }
-
-        $polls = $query->paginate(20)->withQueryString();
+        $polls = Poll::query()
+            ->withCount('votes')
+            ->latest()
+            ->get()
+            ->groupBy('context');
 
         return view('admin.polls.index', [
             'polls' => $polls,
-            'contexts' => self::CONTEXTS,
+            'contextLabels' => self::CONTEXT_LABELS,
         ]);
     }
 
     public function create(): View
     {
-        return view('admin.polls.create', [
-            'contexts' => self::CONTEXTS,
-        ]);
+        $contexts = self::CONTEXTS;
+        $defaultClosesAt = now()->addDays(7)->format('Y-m-d');
+
+        return view('admin.polls.create', compact('contexts', 'defaultClosesAt'));
     }
 
     public function store(Request $request): RedirectResponse
     {
         $validated = $this->validatePoll($request);
 
-        Poll::create($validated);
+        Poll::create([
+            'context'   => $validated['context'],
+            'question'  => $validated['question'],
+            'options'   => $this->parseOptions($request->input('options_raw')),
+            'active'    => $request->boolean('active'),
+            'closes_at' => $validated['closes_at'] ?? null,
+        ]);
 
         return redirect()
             ->route('admin.polls.index')
-            ->with('success', 'Poll created.');
+            ->with('success', 'Poll created successfully.');
     }
 
     public function edit(Poll $poll): View
     {
+        $contexts = self::CONTEXTS;
+        $optionsText = implode("\n", $poll->options ?? []);
+        $totalVotes = $poll->votes()->count();
+
         return view('admin.polls.edit', [
             'poll' => $poll,
-            'contexts' => self::CONTEXTS,
+            'contexts' => $contexts,
+            'optionsText' => $optionsText,
+            'totalVotes' => $totalVotes,
+            'contextLabels' => self::CONTEXT_LABELS,
+        ]);
+    }
+
+    public function show(Poll $poll): View
+    {
+        $poll->loadCount('votes');
+
+        return view('admin.polls.show', [
+            'poll' => $poll,
+            'totalVotes' => $poll->votes_count,
+            'contextLabels' => self::CONTEXT_LABELS,
+            'autoRefresh' => request()->boolean('live'),
         ]);
     }
 
     public function update(Request $request, Poll $poll): RedirectResponse
     {
-        $poll->update($this->validatePoll($request));
+        $validated = $this->validatePoll($request);
+
+        $poll->update([
+            'context'   => $validated['context'],
+            'question'  => $validated['question'],
+            'options'   => $this->parseOptions($request->input('options_raw')),
+            'active'    => $request->boolean('active'),
+            'closes_at' => $validated['closes_at'] ?? null,
+        ]);
 
         return redirect()
             ->route('admin.polls.index')
-            ->with('success', 'Poll updated.');
+            ->with('success', 'Poll updated successfully.');
+    }
+
+    public function close(Poll $poll): RedirectResponse
+    {
+        $poll->update([
+            'active'    => false,
+            'closes_at' => now(),
+        ]);
+
+        return redirect()
+            ->route('admin.polls.index')
+            ->with('success', 'Poll closed.');
     }
 
     public function destroy(Poll $poll): RedirectResponse
     {
+        $poll->votes()->delete();
         $poll->delete();
 
         return redirect()
@@ -87,40 +126,32 @@ class PollAdminController extends Controller
             ->with('success', 'Poll deleted.');
     }
 
-    public function close(Poll $poll): RedirectResponse
-    {
-        $poll->update([
-            'is_active' => false,
-            'closes_at' => now(),
-        ]);
-
-        return redirect()
-            ->back()
-            ->with('success', 'Poll closed.');
-    }
-
-    /** @return array<string, mixed> */
     private function validatePoll(Request $request): array
     {
-        $validated = $request->validate([
-            'context' => 'required|string|max:64',
-            'question' => 'required|string|max:500',
-            'options' => 'required|array|min:2|max:10',
-            'options.*' => 'required|string|max:255',
-            'is_active' => 'sometimes|boolean',
-            'closes_at' => 'nullable|date',
-        ]);
+        $rules = [
+            'context'    => ['required', 'in:' . implode(',', self::CONTEXTS)],
+            'question'   => ['required', 'string', 'max:500'],
+            'options_raw' => ['required', 'string'],
+            'closes_at'  => ['nullable', 'date', 'after:today'],
+            'active'     => ['boolean'],
+        ];
 
-        $validated['is_active'] = $request->boolean('is_active');
-        $validated['options'] = array_values(array_filter(
-            array_map('trim', $validated['options']),
-            fn (string $option) => $option !== ''
-        ));
+        $validated = $request->validate($rules);
 
-        if (count($validated['options']) < 2) {
-            abort(422, 'At least two options are required.');
+        $options = $this->parseOptions($request->input('options_raw'));
+        if (count($options) < 2) {
+            back()->withErrors(['options_raw' => 'Please enter at least 2 options (one per line).'])->throwResponse();
         }
 
         return $validated;
+    }
+
+    private function parseOptions(string $raw): array
+    {
+        return array_values(
+            array_filter(
+                array_map('trim', explode("\n", $raw))
+            )
+        );
     }
 }

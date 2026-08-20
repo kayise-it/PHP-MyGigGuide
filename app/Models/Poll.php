@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
@@ -11,46 +12,71 @@ class Poll extends Model
         'context',
         'question',
         'options',
-        'is_active',
+        'active',
         'closes_at',
     ];
 
-    protected function casts(): array
-    {
-        return [
-            'options' => 'array',
-            'is_active' => 'boolean',
-            'closes_at' => 'datetime',
-        ];
-    }
+    protected $casts = [
+        'options'   => 'array',
+        'active'    => 'boolean',
+        'closes_at' => 'datetime',
+    ];
 
     public function votes(): HasMany
     {
         return $this->hasMany(PollVote::class);
     }
 
-    public function isOpen(): bool
+    /** Active poll for a given context (not expired). */
+    public function scopeActiveForContext(Builder $query, string $context): void
     {
-        if (! $this->is_active) {
-            return false;
-        }
-
-        if ($this->closes_at !== null && $this->closes_at->isPast()) {
-            return false;
-        }
-
-        return true;
+        $query->where('context', $context)
+              ->where('active', true)
+              ->where(function (Builder $q) {
+                  $q->whereNull('closes_at')
+                    ->orWhere('closes_at', '>', now());
+              });
     }
 
-    /** @return array<int, int> option_index => vote count */
-    public function voteCounts(): array
+    /** Total votes cast across all options. */
+    public function totalVotes(): int
     {
-        $counts = array_fill(0, count($this->options ?? []), 0);
+        return $this->votes()->count();
+    }
 
-        foreach ($this->votes()->selectRaw('option_index, count(*) as total')->groupBy('option_index')->get() as $row) {
-            $counts[(int) $row->option_index] = (int) $row->total;
+    public function isOpen(): bool
+    {
+        if (! $this->active) {
+            return false;
         }
 
-        return $counts;
+        return $this->closes_at === null || $this->closes_at->isFuture();
+    }
+
+    /**
+     * Returns per-option summary: label, vote count, percentage.
+     *
+     * @return array<int, array{label: string, votes: int, percent: float}>
+     */
+    public function resultsArray(): array
+    {
+        $total = $this->totalVotes();
+        $counts = $this->votes()
+            ->selectRaw('option_index, COUNT(*) as cnt')
+            ->groupBy('option_index')
+            ->pluck('cnt', 'option_index')
+            ->all();
+
+        $results = [];
+        foreach ($this->options as $index => $label) {
+            $votes = (int) ($counts[$index] ?? 0);
+            $results[] = [
+                'label'   => $label,
+                'votes'   => $votes,
+                'percent' => $total > 0 ? round($votes / $total * 100, 1) : 0.0,
+            ];
+        }
+
+        return $results;
     }
 }

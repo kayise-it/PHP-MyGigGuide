@@ -125,7 +125,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
         // Polls (station contexts incl. mix938)
         Route::patch('polls/{poll}/close', [PollAdminController::class, 'close'])->name('polls.close');
-        Route::resource('polls', PollAdminController::class)->except(['show']);
+        Route::resource('polls', PollAdminController::class)->only(['index', 'create', 'store', 'show', 'edit', 'update', 'destroy']);
 
         // Paid Features CRUD
         Route::resource('paid-features', PaidFeatureController::class)->parameters([
