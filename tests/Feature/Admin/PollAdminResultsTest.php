@@ -13,8 +13,10 @@ class PollAdminResultsTest extends TestCase
 
     public function test_admin_can_view_poll_results_page(): void
     {
+        $this->seed(\Database\Seeders\LaratrustSeeder::class);
+
         $admin = User::factory()->create();
-        $admin->assignRole('admin');
+        $admin->syncRoles(['admin']);
 
         $poll = Poll::create([
             'context' => 'mix938',
@@ -29,5 +31,29 @@ class PollAdminResultsTest extends TestCase
             ->assertSee('Favourite song?')
             ->assertSee('Track A')
             ->assertSee('Results');
+    }
+
+    public function test_admin_can_close_poll_via_patch(): void
+    {
+        $this->seed(\Database\Seeders\LaratrustSeeder::class);
+
+        $admin = User::factory()->create();
+        $admin->syncRoles(['admin']);
+
+        $poll = Poll::create([
+            'context' => 'vowfm',
+            'question' => 'Close me?',
+            'options' => ['Yes', 'No'],
+            'active' => true,
+        ]);
+
+        $this->actingAs($admin)
+            ->patch(route('admin.polls.close', $poll))
+            ->assertRedirect(route('admin.polls.index'))
+            ->assertSessionHas('success');
+
+        $poll->refresh();
+        $this->assertFalse($poll->active);
+        $this->assertNotNull($poll->closes_at);
     }
 }

@@ -131,7 +131,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
         // Station polls (incl. results page)
         Route::resource('polls', PollAdminController::class);
-        Route::post('polls/{poll}/close', [PollAdminController::class, 'close'])->name('polls.close');
+        Route::match(['post', 'patch'], 'polls/{poll}/close', [PollAdminController::class, 'close'])->name('polls.close');
 
         // Paid Features CRUD
         Route::resource('paid-features', PaidFeatureController::class)->parameters([
