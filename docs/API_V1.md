@@ -99,6 +99,7 @@ Artist / venue **`show`** also include ownership fields when a bearer token is s
 | `instagram` | url | Optional |
 | `facebook` | url | Optional |
 | `twitter` | url | Optional |
+| `tiktok` | url | Optional |
 | `profile_picture` | file | Optional image (jpeg/png/gif/webp, max 10MB) |
 | `youtube_videos[]` | url[] | Optional — replaces all videos (max 5). Send `[]` to clear. |
 
@@ -143,6 +144,7 @@ Same contract as **Update artist videos** — `youtube_videos[]` replaces all li
 | `description` | string | |
 | `price` | number | |
 | `ticket_url` | url | |
+| `tiktok` | url | Event TikTok profile or video link |
 | `capacity` | integer | |
 | `category` | string | Legacy single category label |
 | `categories[]` | integer[] | Category IDs (`GET /api/v1/categories`) |

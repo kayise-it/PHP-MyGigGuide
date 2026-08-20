@@ -159,6 +159,25 @@ class ArtistUpdateApiTest extends TestCase
         ]);
     }
 
+    public function test_owner_can_update_artist_tiktok_link(): void
+    {
+        $owner = $this->makeVerifiedUser();
+        $owner->syncRoles(['user']);
+        $artist = $this->makeOfficialArtist($owner);
+
+        Sanctum::actingAs($owner);
+
+        $this->patchJson("/api/v1/artists/{$artist->id}", [
+            'tiktok' => 'https://www.tiktok.com/@testartist',
+        ])->assertOk()
+            ->assertJsonPath('data.tiktok', 'https://www.tiktok.com/@testartist');
+
+        $this->assertDatabaseHas('artists', [
+            'id' => $artist->id,
+            'tiktok' => 'https://www.tiktok.com/@testartist',
+        ]);
+    }
+
     public function test_stranger_cannot_update_artist_profile(): void
     {
         $owner = $this->makeVerifiedUser();

@@ -139,6 +139,16 @@
                     @enderror
                 </div>
 
+                <div>
+                    <label for="tiktok" class="block text-sm font-medium text-gray-700 mb-2">TikTok</label>
+                    <input type="url" id="tiktok" name="tiktok" value="{{ old('tiktok', $entity->tiktok) }}"
+                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent @error('tiktok') border-red-500 @enderror"
+                           placeholder="https://www.tiktok.com/@artist">
+                    @error('tiktok')
+                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                    @enderror
+                </div>
+
                 <!-- Current Profile Picture -->
                 @if($entity->profile_picture)
                 <div class="md:col-span-2">

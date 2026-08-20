@@ -183,6 +183,15 @@
                 </div>
             </div>
 
+            <x-social-profile-links
+                :instagram="$artist->instagram"
+                :facebook="$artist->facebook"
+                :twitter="$artist->twitter"
+                :tiktok="$artist->tiktok"
+                class="{{ $siteBrand->detailPanelClass() }}"
+                heading-class="{{ $siteBrand->detailSubheadingClass() }}"
+            />
+
             <!-- Rating Form -->
             <x-rating-form :model="$artist" type="artist" />
 

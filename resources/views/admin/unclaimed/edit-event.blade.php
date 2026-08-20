@@ -99,6 +99,17 @@
                     @enderror
                 </div>
 
+                <!-- TikTok -->
+                <div class="md:col-span-2">
+                    <label for="tiktok" class="block text-sm font-medium text-gray-700 mb-2">TikTok</label>
+                    <input type="url" id="tiktok" name="tiktok" value="{{ old('tiktok', $entity->tiktok) }}"
+                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent @error('tiktok') border-red-500 @enderror"
+                           placeholder="https://www.tiktok.com/@event">
+                    @error('tiktok')
+                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                    @enderror
+                </div>
+
                 <!-- Description -->
                 <div class="md:col-span-2">
                     <label for="description" class="block text-sm font-medium text-gray-700 mb-2">Description</label>

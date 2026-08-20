@@ -24,6 +24,7 @@ class Artist extends Model
         'instagram',
         'facebook',
         'twitter',
+        'tiktok',
         'profile_picture',
         'gallery',
         'settings',
