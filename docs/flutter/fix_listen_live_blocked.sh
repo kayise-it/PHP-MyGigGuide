@@ -25,7 +25,11 @@ else
 fi
 echo
 
-echo "--- Step 2: Run Python patch ---"
+echo "--- Step 2: Run targeted fix (detail + radio tab) ---"
+python3 "$HOME/development/PHP-MyGigGuide/docs/flutter/fix_listen_live_now.py" "$APP_DIR" || true
+echo
+
+echo "--- Step 2b: Run full Python patch ---"
 python3 "$HOME/development/PHP-MyGigGuide/docs/flutter/patch_onair_inapp_stream.py" || true
 echo
 
