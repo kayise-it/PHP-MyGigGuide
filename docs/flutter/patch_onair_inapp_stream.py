@@ -22,6 +22,35 @@ else:
 
 DETAIL_SCREEN = os.path.join(APP_DIR, 'lib/screens/radio_station_detail_screen.dart')
 CATALOG       = os.path.join(APP_DIR, 'lib/data/radio_stations_catalog.dart')
+RADIO_PLAYER  = os.path.join(APP_DIR, 'lib/services/rogues_radio_player.dart')
+
+# In-app first; if playback fails, open iono/Zeno in browser (works on all flavors).
+LISTEN_LIVE_ON_PRESSED = """                    onPressed: () async {
+                      final streamUrl = station.streamUrl.trim();
+                      final webUrl = (station.webPlayerUrl ?? station.streamUrl).trim();
+
+                      if (streamUrl.isNotEmpty) {
+                        try {
+                          await ref.read(roguesRadioPlayerProvider).setStreamUrl(streamUrl);
+                          await ref.read(roguesRadioPlayerProvider).toggle();
+                          if (!context.mounted) return;
+                          final state = ref.read(roguesRadioPlayerProvider).uiState;
+                          if (state != RoguesRadioUiState.error) return;
+                        } catch (_) {
+                          // Fall through to browser player.
+                        }
+                      }
+
+                      if (webUrl.isNotEmpty) {
+                        _open(context, webUrl);
+                        return;
+                      }
+
+                      if (!context.mounted) return;
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Stream URL not configured.')),
+                      );
+                    },"""
 
 def backup(path):
     bak = path + '.bak'
@@ -113,7 +142,7 @@ def patch_detail_screen():
                     \),
                   \),'''
 
-    NEW_BUTTON = '''                  // Listen Live — direct in-app stream (streamUrl).
+    NEW_BUTTON = '''                  // Listen Live — in-app stream, browser fallback if needed.
                   FilledButton.icon(
                     style: FilledButton.styleFrom(
                       backgroundColor: accent,
@@ -122,31 +151,30 @@ def patch_detail_screen():
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                     ),
                     onPressed: () async {
-                      if (!RoguesRadioPlayer.isSupported) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('Live stream is not available on this device.'),
-                          ),
-                        );
+                      final streamUrl = station.streamUrl.trim();
+                      final webUrl = (station.webPlayerUrl ?? station.streamUrl).trim();
+
+                      if (streamUrl.isNotEmpty) {
+                        try {
+                          await ref.read(roguesRadioPlayerProvider).setStreamUrl(streamUrl);
+                          await ref.read(roguesRadioPlayerProvider).toggle();
+                          if (!context.mounted) return;
+                          final state = ref.read(roguesRadioPlayerProvider).uiState;
+                          if (state != RoguesRadioUiState.error) return;
+                        } catch (_) {
+                          // Fall through to browser player.
+                        }
+                      }
+
+                      if (webUrl.isNotEmpty) {
+                        _open(context, webUrl);
                         return;
                       }
-                      final url = station.streamUrl.trim();
-                      if (url.isEmpty) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Stream URL not configured.')),
-                        );
-                        return;
-                      }
-                      await ref.read(roguesRadioPlayerProvider).setStreamUrl(url);
-                      await ref.read(roguesRadioPlayerProvider).toggle();
+
                       if (!context.mounted) return;
-                      final state = ref.read(roguesRadioPlayerProvider).uiState;
-                      if (state == RoguesRadioUiState.error) {
-                        final msg = ref.read(roguesRadioPlayerProvider).errorMessage;
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text(msg ?? 'Could not play live stream.')),
-                        );
-                      }
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Stream URL not configured.')),
+                      );
                     },
                     icon: const Icon(Icons.play_circle_filled_rounded),
                     label: const Text(
@@ -164,35 +192,7 @@ def patch_detail_screen():
             "                      _open(context, url);\n"
             "                    },"
         )
-        NEW_SIMPLE = (
-            "                    onPressed: () async {\n"
-            "                      if (!RoguesRadioPlayer.isSupported) {\n"
-            "                        ScaffoldMessenger.of(context).showSnackBar(\n"
-            "                          const SnackBar(\n"
-            "                            content: Text('Live stream is not available on this device.'),\n"
-            "                          ),\n"
-            "                        );\n"
-            "                        return;\n"
-            "                      }\n"
-            "                      final url = station.streamUrl.trim();\n"
-            "                      if (url.isEmpty) {\n"
-            "                        ScaffoldMessenger.of(context).showSnackBar(\n"
-            "                          const SnackBar(content: Text('Stream URL not configured.')),\n"
-            "                        );\n"
-            "                        return;\n"
-            "                      }\n"
-            "                      await ref.read(roguesRadioPlayerProvider).setStreamUrl(url);\n"
-            "                      await ref.read(roguesRadioPlayerProvider).toggle();\n"
-            "                      if (!context.mounted) return;\n"
-            "                      final state = ref.read(roguesRadioPlayerProvider).uiState;\n"
-            "                      if (state == RoguesRadioUiState.error) {\n"
-            "                        final msg = ref.read(roguesRadioPlayerProvider).errorMessage;\n"
-            "                        ScaffoldMessenger.of(context).showSnackBar(\n"
-            "                          SnackBar(content: Text(msg ?? 'Could not play live stream.')),\n"
-            "                        );\n"
-            "                      }\n"
-            "                    },"
-        )
+        NEW_SIMPLE = LISTEN_LIVE_ON_PRESSED
         if OLD_SIMPLE in src:
             new_src = src.replace(OLD_SIMPLE, NEW_SIMPLE, 1)
             print('  Replaced Listen Live button (simple match).')
@@ -219,6 +219,80 @@ def patch_detail_screen():
         print('  ✓ Saved.')
     else:
         print('  No changes needed (already patched?).')
+
+
+def patch_v1_is_supported_block():
+    """Replace v1 patch that blocked main-app flavor via RoguesRadioPlayer.isSupported."""
+    print(f'\n[1b] Fixing v1 isSupported block in {DETAIL_SCREEN}')
+    if not os.path.isfile(DETAIL_SCREEN):
+        return
+
+    src = read(DETAIL_SCREEN)
+    if 'Live stream is not available on this device' not in src:
+        print('  No v1 isSupported block found.')
+        return
+
+    # Replace the whole onPressed async block that starts with isSupported check.
+    pattern = re.compile(
+        r"onPressed: \(\) async \{\s*"
+        r"if \(!RoguesRadioPlayer\.isSupported\) \{.*?\}\s*"
+        r"return;\s*\}\s*"
+        r"final url = station\.streamUrl\.trim\(\);.*?"
+        r"\},",
+        re.DOTALL,
+    )
+    new_src, count = pattern.subn(LISTEN_LIVE_ON_PRESSED, src, count=1)
+    if count:
+        backup(DETAIL_SCREEN)
+        write(DETAIL_SCREEN, new_src)
+        print('  ✓ Removed isSupported gate; added browser fallback.')
+        return
+
+    print('  ⚠  Found error message but could not auto-replace — edit manually.')
+
+
+def patch_radio_player():
+    """Allow in-app playback on Android/iOS even when flavor has no Radio tab."""
+    print(f'\n[3] Patching {RADIO_PLAYER}')
+    if not os.path.isfile(RADIO_PLAYER):
+        print('  File not found — skip (On Air may still work via browser fallback).')
+        return
+
+    src = read(RADIO_PLAYER)
+    if 'static bool get isSupported' not in src:
+        print('  No isSupported getter — skip.')
+        return
+
+    # Replace entire isSupported getter body with mobile-friendly check.
+    new_getter = """static bool get isSupported {
+    if (kIsWeb) return false;
+    return defaultTargetPlatform == TargetPlatform.android ||
+        defaultTargetPlatform == TargetPlatform.iOS;
+  }"""
+
+    new_src, count = re.subn(
+        r'static bool get isSupported \{.*?\}',
+        new_getter,
+        src,
+        count=1,
+        flags=re.DOTALL,
+    )
+    if count == 0:
+        print('  ⚠  Could not patch isSupported — check lib/services/rogues_radio_player.dart manually.')
+        return
+
+    if 'foundation.dart' not in new_src and 'defaultTargetPlatform' in new_getter:
+        if "import 'package:flutter/foundation.dart';" not in new_src:
+            first_import_end = new_src.index('\n', new_src.index('import ')) + 1
+            new_src = (
+                new_src[:first_import_end]
+                + "import 'package:flutter/foundation.dart';\n"
+                + new_src[first_import_end:]
+            )
+
+    backup(RADIO_PLAYER)
+    write(RADIO_PLAYER, new_src)
+    print('  ✓ isSupported now true on Android/iOS (not web).')
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -276,14 +350,15 @@ print('=== MGG On Air in-app stream patch ===')
 print(f'App dir: {APP_DIR}')
 
 patch_detail_screen()
+patch_v1_is_supported_block()
 patch_catalog()
+patch_radio_player()
 
 print('\n=== Done. Next steps: ===')
 print('  1. flutter analyze lib/screens/radio_station_detail_screen.dart')
-print('     (Fix any import path issues if errors appear)')
+print('     lib/services/rogues_radio_player.dart')
 print('  2. flutter run --flavor mygigguide \\')
 print('       --dart-define=BRAND=mygigguide \\')
 print('       --dart-define=SITE_URL=https://www.mygigguide.co.za')
-print('  3. On Air → VOW → Listen Live  →  audio in app (no browser)')
-print('  4. On Air → VOW → Open in iono →  browser (expected)')
-print('  5. ./scripts/build_apk.sh mygigguide --label=onair-inapp-stream-v1')
+print('  3. On Air → VOW or Mix → Listen Live → in-app audio OR browser fallback')
+print('  4. ./scripts/build_apk.sh mygigguide --label=onair-inapp-stream-v2')
