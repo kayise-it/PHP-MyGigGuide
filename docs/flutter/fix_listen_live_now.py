@@ -18,29 +18,46 @@ DETAIL = os.path.join(APP_DIR, "lib/screens/radio_station_detail_screen.dart")
 RADIO_TAB = os.path.join(APP_DIR, "lib/screens/station_radio_tab_screen.dart")
 PLAYER = os.path.join(APP_DIR, "lib/services/rogues_radio_player.dart")
 
+# Browser-first for main MGG On Air (no foreground-service on mygigguide flavor).
+BROWSER_ON_PRESSED = """                    onPressed: () {
+                      final url = (station.webPlayerUrl ?? station.streamUrl).trim();
+                      if (url.isEmpty) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('Stream URL not configured.')),
+                        );
+                        return;
+                      }
+                      _open(context, url);
+                    },"""
+
+# In-app first; if playback fails, open iono/Zeno in browser (station flavors only).
 LISTEN_LIVE_ON_PRESSED = """                    onPressed: () async {
                       final streamUrl = station.streamUrl.trim();
                       final webUrl = (station.webPlayerUrl ?? station.streamUrl).trim();
 
+                      var playedInApp = false;
                       if (streamUrl.isNotEmpty) {
                         try {
                           await ref.read(roguesRadioPlayerProvider).setStreamUrl(streamUrl);
                           await ref.read(roguesRadioPlayerProvider).toggle();
-                          if (!context.mounted) return;
-                          final state = ref.read(roguesRadioPlayerProvider).uiState;
-                          if (state != RoguesRadioUiState.error) return;
+                          if (context.mounted) {
+                            final state = ref.read(roguesRadioPlayerProvider).uiState;
+                            playedInApp = state == RoguesRadioUiState.playing ||
+                                state == RoguesRadioUiState.loading;
+                          }
                         } catch (_) {}
                       }
 
-                      if (webUrl.isNotEmpty) {
+                      if (!playedInApp && webUrl.isNotEmpty) {
                         _open(context, webUrl);
                         return;
                       }
 
-                      if (!context.mounted) return;
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Stream URL not configured.')),
-                      );
+                      if (!playedInApp && context.mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('Stream URL not configured.')),
+                        );
+                      }
                     },"""
 
 IS_SUPPORTED_SNACK_RE = re.compile(
