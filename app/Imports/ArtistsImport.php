@@ -41,6 +41,7 @@ class ArtistsImport implements ToCollection, WithHeadingRow
                 'instagram' => trim((string) $this->getCell($row, 'instagram', '')),
                 'facebook' => trim((string) $this->getCell($row, 'facebook', '')),
                 'twitter' => trim((string) $this->getCell($row, 'twitter', '')),
+                'tiktok' => trim((string) $this->getCell($row, 'tiktok', '')),
                 'user_id' => $this->getCell($row, 'user_id'),
                 'profile_picture' => trim((string) $this->getCell($row, 'profile_picture', '')),
                 'gallery_json' => trim((string) $this->getCell($row, 'gallery_json', '')),
@@ -107,6 +108,7 @@ class ArtistsImport implements ToCollection, WithHeadingRow
                 'instagram' => $rowData['instagram'] ?: null,
                 'facebook' => $rowData['facebook'] ?: null,
                 'twitter' => $rowData['twitter'] ?: null,
+                'tiktok' => $rowData['tiktok'] ?: null,
                 'user_id' => $rowData['user_id'],
             ], fn ($v) => $v !== '');
 

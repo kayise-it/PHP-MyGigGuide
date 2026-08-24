@@ -143,6 +143,7 @@ class ArtistManagementController extends Controller
             'instagram' => 'nullable|url',
             'facebook' => 'nullable|url',
             'twitter' => 'nullable|url',
+            'tiktok' => 'nullable|url',
             'snapscan_code' => 'nullable|string|max:255',
             'profile_picture' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:10240',
             'user_id' => 'nullable|exists:users,id',
@@ -227,6 +228,7 @@ class ArtistManagementController extends Controller
             'instagram' => $request->input('instagram'),
             'facebook' => $request->input('facebook'),
             'twitter' => $request->input('twitter'),
+            'tiktok' => $request->input('tiktok'),
             'snapscan_code' => $snapscanCode,
             'user_id' => $request->input('user_id', null), // Use null as default if empty
         ];

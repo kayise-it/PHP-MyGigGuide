@@ -83,6 +83,16 @@
                             </p>
                         </div>
                         <div>
+                            <label class="text-sm font-medium text-gray-500">TikTok</label>
+                            <p class="text-gray-900">
+                                @if($artist->tiktok)
+                                    <a href="{{ $artist->tiktok }}" target="_blank" class="text-purple-600 hover:text-purple-700">{{ $artist->tiktok }}</a>
+                                @else
+                                    Not provided
+                                @endif
+                            </p>
+                        </div>
+                        <div>
                             <label class="text-sm font-medium text-gray-500">Live tips (SnapScan)</label>
                             <p class="text-gray-900">
                                 @if($artist->snapscan_code)
