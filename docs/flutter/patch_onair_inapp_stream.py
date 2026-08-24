@@ -228,27 +228,88 @@ def patch_v1_is_supported_block():
         return
 
     src = read(DETAIL_SCREEN)
-    if 'Live stream is not available on this device' not in src:
-        print('  No v1 isSupported block found.')
+    if 'Live stream is not available on this device' not in src and 'RoguesRadioPlayer.isSupported' not in src:
+        print('  No isSupported gate in detail screen.')
         return
 
-    # Replace the whole onPressed async block that starts with isSupported check.
-    pattern = re.compile(
-        r"onPressed: \(\) async \{\s*"
-        r"if \(!RoguesRadioPlayer\.isSupported\) \{.*?\}\s*"
-        r"return;\s*\}\s*"
-        r"final url = station\.streamUrl\.trim\(\);.*?"
-        r"\},",
+    changed = False
+    new_src = src
+
+    # Aggressive: drop the whole if (!RoguesRadioPlayer.isSupported) { ... return; } block.
+    blocked = re.compile(
+        r"if\s*\(!RoguesRadioPlayer\.isSupported\)\s*\{[^{}]*(?:\{[^{}]*\}[^{}]*)*\}\s*return;\s*\}",
         re.DOTALL,
     )
-    new_src, count = pattern.subn(LISTEN_LIVE_ON_PRESSED, src, count=1)
-    if count:
+    new_src, n = blocked.subn('', new_src, count=1)
+    if n:
+        print('  Removed isSupported if-block.')
+        changed = True
+
+    # If the v1 onPressed is still there, replace entire onPressed async block.
+    if 'RoguesRadioPlayer.isSupported' in new_src or 'not available on this device' in new_src:
+        pattern = re.compile(
+            r"onPressed:\s*\(\)\s*async\s*\{.*?\n\s*\},",
+            re.DOTALL,
+        )
+        for m in pattern.finditer(new_src):
+            block = m.group(0)
+            if 'Listen Live' in new_src[max(0, m.start()-400):m.start()] or 'isSupported' in block or 'not available on this device' in block:
+                new_src = new_src[:m.start()] + LISTEN_LIVE_ON_PRESSED + new_src[m.end():]
+                print('  Replaced full onPressed handler.')
+                changed = True
+                break
+
+    if changed:
         backup(DETAIL_SCREEN)
         write(DETAIL_SCREEN, new_src)
-        print('  ✓ Removed isSupported gate; added browser fallback.')
+        print('  ✓ Detail screen saved.')
+    elif 'not available on this device' in src:
+        print('  ⚠  Could not auto-fix detail screen — run fix_listen_live_blocked.sh')
+
+
+def patch_all_dart_sources():
+    """Remove blocked message / isSupported early-return from any other dart file."""
+    lib_dir = os.path.join(APP_DIR, 'lib')
+    if not os.path.isdir(lib_dir):
         return
 
-    print('  ⚠  Found error message but could not auto-replace — edit manually.')
+    skip = {
+        os.path.basename(DETAIL_SCREEN),
+        os.path.basename(RADIO_PLAYER),
+    }
+    fixed = []
+    for root, _, files in os.walk(lib_dir):
+        for name in files:
+            if not name.endswith('.dart'):
+                continue
+            if name in skip:
+                continue
+            path = os.path.join(root, name)
+            src = read(path)
+            if 'not available on this device' not in src and 'RoguesRadioPlayer.isSupported' not in src:
+                continue
+            new_src = src.replace(
+                "Live stream is not available on this device.",
+                "Could not start live stream.",
+            )
+            new_src = re.sub(
+                r"if\s*\(!RoguesRadioPlayer\.isSupported\)\s*\{[^{}]*(?:\{[^{}]*\}[^{}]*)*\}\s*return;\s*\}",
+                '',
+                new_src,
+                flags=re.DOTALL,
+            )
+            new_src = new_src.replace('if (!RoguesRadioPlayer.isSupported) return;', '')
+            if new_src != src:
+                backup(path)
+                write(path, new_src)
+                fixed.append(path)
+
+    if fixed:
+        print(f'\n[4] Patched additional files:')
+        for p in fixed:
+            print(f'  - {p}')
+    else:
+        print('\n[4] No other dart files needed patching.')
 
 
 def patch_radio_player():
@@ -353,6 +414,7 @@ patch_detail_screen()
 patch_v1_is_supported_block()
 patch_catalog()
 patch_radio_player()
+patch_all_dart_sources()
 
 print('\n=== Done. Next steps: ===')
 print('  1. flutter analyze lib/screens/radio_station_detail_screen.dart')
