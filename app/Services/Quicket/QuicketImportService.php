@@ -1004,14 +1004,34 @@ class QuicketImportService
         $name = (string) $mapped['venue_name'];
         $lat = $mapped['latitude'];
         $lng = $mapped['longitude'];
+        $address = (string) ($mapped['venue_address'] ?? '');
 
         if (is_float($lat) && is_float($lng)) {
+            $byPlaceId = $this->findByGooglePlaceId($name, $lat, $lng);
+            if ($byPlaceId !== null) {
+                $this->ensureVenuePhoto($byPlaceId, $name, $lat, $lng);
+
+                return ['venue' => $byPlaceId->fresh(), 'created' => false, 'match_method' => 'google_place_id'];
+            }
+
             $nearby = $this->findNearbyByName($name, $lat, $lng);
             if ($nearby !== null) {
                 $this->ensureVenuePhoto($nearby, $name, $lat, $lng);
 
                 return ['venue' => $nearby->fresh(), 'created' => false, 'match_method' => 'proximity'];
             }
+        }
+
+        $byNameAddress = $this->findByNameAndAddress($name, $address);
+        if ($byNameAddress !== null) {
+            $this->ensureVenuePhoto(
+                $byNameAddress,
+                $name,
+                is_float($lat) ? $lat : null,
+                is_float($lng) ? $lng : null
+            );
+
+            return ['venue' => $byNameAddress->fresh(), 'created' => false, 'match_method' => 'name_address'];
         }
 
         $byNameCity = $this->findByNameAndCity($name, (string) $mapped['city']);
@@ -1137,14 +1157,70 @@ class QuicketImportService
         return null;
     }
 
-    private function findByNameAndCity(string $name, string $city): ?Venue
+    private function findByGooglePlaceId(string $name, float $lat, float $lng): ?Venue
     {
-        $query = Venue::query()->orderBy('id');
-        if ($city !== '') {
-            $query->where('city', 'like', '%'.$city.'%');
+        try {
+            $found = $this->googlePlaces->findPlaceNear($name, $lat, $lng);
+        } catch (\Throwable) {
+            return null;
         }
 
-        foreach ($query->limit(100)->get() as $venue) {
+        if ($found === null) {
+            return null;
+        }
+
+        $placeId = trim((string) ($found['place_id'] ?? ''));
+        if ($placeId === '') {
+            return null;
+        }
+
+        return Venue::query()->where('google_place_id', $placeId)->first();
+    }
+
+    private function findByNameAndAddress(string $name, string $address): ?Venue
+    {
+        $address = trim($address);
+        if ($address === '') {
+            return null;
+        }
+
+        $normalizedAddress = Str::lower($address);
+
+        foreach (Venue::query()->orderBy('id')->whereNotNull('address')->limit(500)->get() as $venue) {
+            if (! $this->namesLikelySame($name, (string) $venue->name)) {
+                continue;
+            }
+
+            if (Str::lower(trim((string) $venue->address)) === $normalizedAddress) {
+                return $venue;
+            }
+        }
+
+        return null;
+    }
+
+    private function findByNameAndCity(string $name, string $city): ?Venue
+    {
+        if ($city !== '') {
+            foreach (Venue::query()
+                ->orderBy('id')
+                ->where('city', 'like', '%'.$city.'%')
+                ->limit(100)
+                ->get() as $venue) {
+                if ($this->namesLikelySame($name, (string) $venue->name)) {
+                    return $venue;
+                }
+            }
+        }
+
+        // Legacy CSV rows often have no city — still match on normalized name.
+        foreach (Venue::query()
+            ->orderBy('id')
+            ->where(function ($query) {
+                $query->whereNull('city')->orWhere('city', '');
+            })
+            ->limit(200)
+            ->get() as $venue) {
             if ($this->namesLikelySame($name, (string) $venue->name)) {
                 return $venue;
             }
