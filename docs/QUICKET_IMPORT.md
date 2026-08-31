@@ -135,3 +135,25 @@ php artisan quicket:backfill-categories --quicket-category=64 --apply
 - Tune nightly `--max-pages` if listings move slowly
 - Travel (`6`) and Other (`64`) still manual-only; add staggered cron for `64` only after seeds look sane
 - Venue main_picture via Google Places (on create + `quicket:backfill-venue-photos`)
+
+## Duplicate venues (merge + prevention)
+
+Quicket imports can create duplicate venue rows when legacy CSV rows lack `city` or sit just outside the 400m proximity window.
+
+**One-time cleanup:**
+
+```bash
+# Preview merges (keeper = most events; copies missing city/coords/photo)
+php artisan venues:merge-duplicates --dry-run
+
+# Apply auto merges (skips ambiguous groups flagged REVIEW)
+php artisan venues:merge-duplicates --apply
+
+# Include review-flagged groups after manual check
+php artisan venues:merge-duplicates --apply --include-review
+
+# Single group
+php artisan venues:merge-duplicates --dry-run --group=groundthevenue
+```
+
+**Import matching (Jul 2026):** `resolveVenue` now also matches on `google_place_id`, normalized name + address, and legacy rows with empty `city`.
