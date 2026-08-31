@@ -463,18 +463,17 @@ class _StationRadioTabScreenState extends ConsumerState<StationRadioTabScreen> {
           subtitle: 'Song or shout-out',
           onTap: (ctx) => _openRequest(ctx),
         ),
-      _StationAction(
-        icon: AppIconData.chartBar,
-        label: 'Listener poll',
-        subtitle: BrandConfig.stationPollContext.trim().isNotEmpty
-            ? 'Vote in the app'
-            : BrandConfig.stationSurveyUrl.trim().isNotEmpty
-                ? 'Vote in the poll'
-                : (BrandConfig.isRogues || BrandConfig.isRiseFm
-                    ? 'Tap to vote'
-                    : 'Not configured yet'),
-        onTap: (ctx) => _openPoll(ctx),
-      ),
+      if (BrandConfig.stationPollContext.trim().isEmpty)
+        _StationAction(
+          icon: AppIconData.chartBar,
+          label: 'Listener poll',
+          subtitle: BrandConfig.stationSurveyUrl.trim().isNotEmpty
+              ? 'Vote in the poll'
+              : (BrandConfig.isRogues || BrandConfig.isRiseFm
+                  ? 'Tap to vote'
+                  : 'Not configured yet'),
+          onTap: (ctx) => _openPoll(ctx),
+        ),
       _StationAction(
         icon: AppIconData.trophy,
         label: 'Quiz & competitions',

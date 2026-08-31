@@ -98,7 +98,7 @@ adb install -r build/app/outputs/flutter-apk/*hot1027*.apk
 
 | Feature | Where |
 |---------|--------|
-| **Listener poll** | Radio tab — full question, tap-to-vote, results bars (same as VOW) |
+| **Listener poll** | Radio tab — full question, tap-to-vote, results bars (no duplicate chip) |
 | **On air now** | Under the live player — current show name from station API |
 | **Today’s schedule** | Scroll below action chips — time slots for today |
 | **Hosts & shows** | Action chip → presenter list with photos and times |
