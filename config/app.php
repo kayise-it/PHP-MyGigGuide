@@ -123,4 +123,15 @@ return [
         'store' => env('APP_MAINTENANCE_STORE', 'database'),
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Android app (Google Play)
+    |--------------------------------------------------------------------------
+    */
+
+    'android_play_store_url' => env(
+        'ANDROID_PLAY_STORE_URL',
+        'https://play.google.com/store/apps/details?id=za.co.mygigguide.mygigguide_app'
+    ),
+
 ];
