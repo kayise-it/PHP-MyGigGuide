@@ -53,6 +53,9 @@
                     <li><a href="{{ route('artists.index') }}" class="text-gray-400 hover:text-white transition-colors duration-200">Discover Artists</a></li>
                     <li><a href="{{ route('venues.index') }}" class="text-gray-400 hover:text-white transition-colors duration-200">Find Venues</a></li>
                     <li><a href="{{ route('organisers.index') }}" class="text-gray-400 hover:text-white transition-colors duration-200">Event Organisers</a></li>
+                    @if($playStoreUrl = $siteBrand->androidPlayStoreUrl())
+                    <li><a href="{{ $playStoreUrl }}" class="text-gray-400 hover:text-white transition-colors duration-200" target="_blank" rel="noopener noreferrer">Android app (Google Play)</a></li>
+                    @endif
                 </ul>
             </div>
 

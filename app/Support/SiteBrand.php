@@ -868,4 +868,16 @@ final class SiteBrand
 
         return 'My Gig Guide';
     }
+
+    /** Google Play listing for the My Gig Guide Android app (vanilla site only). */
+    public function androidPlayStoreUrl(): ?string
+    {
+        if ($this->isPartnerTenant()) {
+            return null;
+        }
+
+        $url = config('app.android_play_store_url');
+
+        return is_string($url) && $url !== '' ? $url : null;
+    }
 }

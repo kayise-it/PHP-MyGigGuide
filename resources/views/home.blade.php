@@ -124,6 +124,11 @@
         <a href="{{ route('events.index') }}" class="btn-primary px-8 py-3 rounded-2xl font-semibold">
           Browse all events
         </a>
+        @if($playStoreUrl = $siteBrand->androidPlayStoreUrl())
+        <a href="{{ $playStoreUrl }}" class="btn-outline px-8 py-3 rounded-2xl font-semibold inline-flex items-center justify-center gap-2" target="_blank" rel="noopener noreferrer">
+          Get the Android app
+        </a>
+        @endif
         @guest
         <a href="{{ route('login') }}" class="btn-outline px-8 py-3 rounded-2xl font-semibold">
           Sign in
