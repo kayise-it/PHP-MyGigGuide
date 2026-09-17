@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Services\ApiUserRegistrationService;
 use App\Services\UserFirebaseLinkService;
+use App\Support\ClientAccess;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -27,6 +28,9 @@ class AuthController extends Controller
             'username' => ['required', 'string'],
             'password' => ['required', 'string'],
             'device_name' => ['nullable', 'string', 'max:100'],
+            'brand' => ['nullable', 'string', 'max:32'],
+            'client' => ['nullable', 'string', 'max:32'],
+            'platform' => ['nullable', 'string', 'max:16'],
         ]);
 
         $user = \App\Models\User::whereRaw('LOWER(username) = ?', [strtolower(trim($validated['username']))])->first();
@@ -44,9 +48,7 @@ class AuthController extends Controller
         }
 
         $this->registration->ensureMemberCanCreateEvents($user);
-        $user->recordLogin();
-
-        $token = $user->createToken($validated['device_name'] ?? 'mobile-app')->plainTextToken;
+        $token = $this->issueToken($user, $request, $validated);
 
         return response()->json([
             'token_type' => 'Bearer',
@@ -63,6 +65,9 @@ class AuthController extends Controller
         $validated = $request->validate([
             'id_token' => ['required', 'string'],
             'device_name' => ['nullable', 'string', 'max:100'],
+            'brand' => ['nullable', 'string', 'max:32'],
+            'client' => ['nullable', 'string', 'max:32'],
+            'platform' => ['nullable', 'string', 'max:16'],
         ]);
 
         try {
@@ -87,8 +92,7 @@ class AuthController extends Controller
             ], 403);
         }
 
-        $user->recordLogin();
-        $token = $user->createToken($validated['device_name'] ?? 'mobile-app')->plainTextToken;
+        $token = $this->issueToken($user, $request, $validated);
 
         return response()->json([
             'token_type' => 'Bearer',
@@ -108,6 +112,9 @@ class AuthController extends Controller
             'password' => ['required', 'string', 'min:8'],
             'username' => ['nullable', 'string', 'max:255'],
             'device_name' => ['nullable', 'string', 'max:100'],
+            'brand' => ['nullable', 'string', 'max:32'],
+            'client' => ['nullable', 'string', 'max:32'],
+            'platform' => ['nullable', 'string', 'max:16'],
         ]);
 
         try {
@@ -125,8 +132,7 @@ class AuthController extends Controller
         }
 
         $user = $result['user'];
-        $user->recordLogin();
-        $token = $user->createToken($validated['device_name'] ?? 'mobile-app')->plainTextToken;
+        $token = $this->issueToken($user, $request, $validated);
 
         return response()->json([
             'token_type' => 'Bearer',
@@ -143,6 +149,21 @@ class AuthController extends Controller
         return response()->json([
             'message' => 'Logged out successfully.',
         ]);
+    }
+
+    /**
+     * @param  array<string, mixed>  $validated
+     */
+    private function issueToken(User $user, Request $request, array $validated): string
+    {
+        $access = ClientAccess::fromRequest($request);
+        $user->recordLogin($access['client'], $access['platform']);
+
+        $deviceName = $validated['device_name']
+            ?? ClientAccess::suggestedTokenName($access['client'], $access['platform'])
+            ?? 'mobile-app';
+
+        return $user->createToken($deviceName)->plainTextToken;
     }
 
     private function userPayload(User $user): array

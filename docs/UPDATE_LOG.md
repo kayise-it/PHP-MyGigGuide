@@ -15,6 +15,20 @@
 
 ---
 
+## 17 Sep 2026 — First-party access (flavor, platform, first seen, last access)
+
+| Area | What | Status |
+|------|------|--------|
+| **Laravel users** | `first_seen_at`, `last_access_at`, `first_client`, `first_platform`, `last_client`, `last_platform` | Coded — migrate with `--path=` |
+| **API** | Optional `brand` / `platform` (or `device_name` like `fm919-android-149`) on login/register; headers `X-Client-Brand` / `X-Client-Platform` on signed-in calls | Coded |
+| **Website** | Login records `platform=web` + hostname skin (919 vs My Gig Guide) | Coded |
+| **Admin** | User page shows first seen, last access, first/last skin and platform, token names | Coded |
+| **Not in this slice** | Flutter change, time-in-app, Mixpanel / GA / Firebase Analytics | Skipped on purpose |
+
+**VPS migrate (when Dave deploys):** `php artisan migrate --path=database/migrations/2026_09_17_100000_add_client_access_to_users_table.php --force` — do not run plain `migrate --force`.
+
+---
+
 ## 5 Aug 2026 — Claim notifications: admin email + WhatsApp (Evolution API)
 
 | Area | What | Status |

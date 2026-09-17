@@ -3,6 +3,7 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Support\ClientAccess;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -32,6 +33,12 @@ class User extends Authenticatable implements LaratrustUser
         'settings',
         'email_verified_at',
         'last_login_at',
+        'first_seen_at',
+        'last_access_at',
+        'first_client',
+        'first_platform',
+        'last_client',
+        'last_platform',
         'is_active',
     ];
 
@@ -55,6 +62,8 @@ class User extends Authenticatable implements LaratrustUser
         return [
             'email_verified_at' => 'datetime',
             'last_login_at' => 'datetime',
+            'first_seen_at' => 'datetime',
+            'last_access_at' => 'datetime',
             'password' => 'hashed',
             'settings' => 'array',
             'is_active' => 'boolean',
@@ -64,9 +73,61 @@ class User extends Authenticatable implements LaratrustUser
     /**
      * Record a successful sign-in (web session or API token issuance).
      */
-    public function recordLogin(): void
+    public function recordLogin(?string $client = null, ?string $platform = null): void
     {
-        $this->forceFill(['last_login_at' => now()])->save();
+        $this->recordAccess($client, $platform, forceLastAccess: true, extra: [
+            'last_login_at' => now(),
+        ]);
+    }
+
+    /**
+     * First seen (once) + last access. Client/platform stick on first write;
+     * last_* follow the latest known skin and platform.
+     *
+     * @param  array<string, mixed>  $extra
+     */
+    public function recordAccess(
+        ?string $client = null,
+        ?string $platform = null,
+        bool $forceLastAccess = false,
+        array $extra = [],
+    ): void {
+        $client = ClientAccess::normalizeClient($client);
+        $platform = ClientAccess::normalizePlatform($platform);
+        $now = now();
+        $updates = $extra;
+
+        if ($this->first_seen_at === null) {
+            $updates['first_seen_at'] = $now;
+        }
+        if ($client !== null && $this->first_client === null) {
+            $updates['first_client'] = $client;
+        }
+        if ($platform !== null && $this->first_platform === null) {
+            $updates['first_platform'] = $platform;
+        }
+
+        $touchLast = $forceLastAccess
+            || $this->last_access_at === null
+            || $this->last_access_at->lt($now->copy()->subMinutes(ClientAccess::TOUCH_AFTER_MINUTES))
+            || ($client !== null && $client !== $this->last_client)
+            || ($platform !== null && $platform !== $this->last_platform);
+
+        if ($touchLast) {
+            $updates['last_access_at'] = $now;
+            if ($client !== null) {
+                $updates['last_client'] = $client;
+            }
+            if ($platform !== null) {
+                $updates['last_platform'] = $platform;
+            }
+        }
+
+        if ($updates === []) {
+            return;
+        }
+
+        $this->forceFill($updates)->save();
     }
 
     /**

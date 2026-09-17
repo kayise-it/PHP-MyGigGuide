@@ -666,6 +666,8 @@ cd ~/development/mygigguide_app
 
 ## 📌 Pinned — App analytics & user insights (later)
 
+**Update (17 Sep 2026):** Laravel baby-step is coded (flavor, Android/iOS/web, first seen, last access on the user row; admin User page). **Do not** add Firebase Analytics, Mixpanel, or time-in-app. Flutter can send `brand` + `platform` on a later rebuild — **not** required for 919 going live or the first iOS binary.
+
 **Context (Jun 2026):** Dave is **only rolling out the vanilla `mygigguide` build** for now. Rogues / FM919 / HOT1027 analytics can wait until those flavors ship separately.
 
 **What you have today (no extra build):**

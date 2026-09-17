@@ -18,6 +18,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'capability' => \App\Http\Middleware\EnsureHasCapability::class,
             'api.permission' => \App\Http\Middleware\EnsureApiPermission::class,
             'auth.sanctum.optional' => \App\Http\Middleware\OptionalSanctumAuth::class,
+            'client.access' => \App\Http\Middleware\RecordClientAccess::class,
         ]);
 
         // Force HTTPS in production

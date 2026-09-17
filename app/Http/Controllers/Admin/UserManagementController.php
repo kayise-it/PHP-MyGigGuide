@@ -185,7 +185,7 @@ class UserManagementController extends Controller
 
     public function show(Request $request, User $user)
     {
-        $user->load(['roles', 'permissions', 'events', 'venues', 'ratings'])
+        $user->load(['roles', 'permissions', 'events', 'venues', 'ratings', 'tokens'])
             ->loadMax('tokens as last_api_used_at', 'last_used_at');
 
         if ($request->ajax()) {

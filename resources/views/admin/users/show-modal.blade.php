@@ -101,6 +101,13 @@
                     </dl>
                 </div>
             </div>
+
+            @include('admin.users._client-access', [
+                'headerClass' => 'px-4 py-3 border-b border-gray-200',
+                'headingClass' => 'text-sm font-semibold text-gray-900',
+                'bodyClass' => 'px-4 py-4',
+                'cardClass' => 'bg-white border border-gray-200 rounded-xl',
+            ])
         </div>
 
         <div class="space-y-4">

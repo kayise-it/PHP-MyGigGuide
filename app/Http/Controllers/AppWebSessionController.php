@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Services\AppWebSessionService;
+use App\Support\ClientAccess;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -33,7 +34,8 @@ class AppWebSessionController extends Controller
 
         Auth::login($user);
         $request->session()->regenerate();
-        $user->recordLogin();
+        $access = ClientAccess::forWeb($request);
+        $user->recordLogin($access['client'], $access['platform']);
 
         $redirect = $this->webSession->sanitizeRedirect($validated['redirect'] ?? null);
 
