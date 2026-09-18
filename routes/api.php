@@ -30,17 +30,17 @@ Route::prefix('v1')->group(function () {
 
     Route::get('events', [EventController::class, 'index']);
     Route::get('events/{event}', [EventController::class, 'show'])
-        ->middleware('auth.sanctum.optional')
+        ->middleware(['auth.sanctum.optional', 'client.access'])
         ->whereNumber('event');
 
     Route::get('venues/map', [VenueController::class, 'map']);
     Route::get('venues', [VenueController::class, 'index']);
     Route::get('venues/{venue}', [VenueController::class, 'show'])
-        ->middleware('auth.sanctum.optional');
+        ->middleware(['auth.sanctum.optional', 'client.access']);
 
     Route::get('artists', [ArtistController::class, 'index']);
     Route::get('artists/{artist}', [ArtistController::class, 'show'])
-        ->middleware('auth.sanctum.optional');
+        ->middleware(['auth.sanctum.optional', 'client.access']);
 
     Route::get('artists/{artist}/repertoire', [ArtistRepertoireController::class, 'index'])
         ->whereNumber('artist');
@@ -52,11 +52,11 @@ Route::prefix('v1')->group(function () {
         ->whereNumber('event');
 
     Route::get('events/{event}/board', [EventCheckInController::class, 'board'])
-        ->middleware('auth.sanctum.optional')
+        ->middleware(['auth.sanctum.optional', 'client.access'])
         ->whereNumber('event');
 
     Route::get('venues/{venue}/tonight', [EventCheckInController::class, 'tonightAtVenue'])
-        ->middleware('auth.sanctum.optional')
+        ->middleware(['auth.sanctum.optional', 'client.access'])
         ->whereNumber('venue');
 
     Route::get('live-sessions/{liveSession}', [LiveSessionController::class, 'show'])
@@ -74,7 +74,7 @@ Route::prefix('v1')->group(function () {
     Route::post('auth/register', [AuthController::class, 'register']);
     Route::post('auth/firebase', [AuthController::class, 'firebaseLogin']);
 
-    Route::middleware('auth:sanctum')->group(function () {
+    Route::middleware(['auth:sanctum', 'client.access'])->group(function () {
         Route::post('auth/logout', [AuthController::class, 'logout']);
 
         Route::get('me', [MeController::class, 'show']);

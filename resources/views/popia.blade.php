@@ -89,7 +89,7 @@
                             <li><strong>Location (optional):</strong> If you enable location permission, we use it for features such as “Gigs near me” and map distance. You can deny or revoke this in your device settings.</li>
                             <li><strong>Photos you choose:</strong> Poster and gallery images when you add an event, stored on our servers and shown on public event listings.</li>
                             <li><strong>Poster “Read image” (optional):</strong> If you tap Read image, the poster (and any description text you typed) is sent to our servers. We process it with automated tools (including a third-party AI service) to suggest event fields. Do not use this feature on images containing personal data you do not want processed.</li>
-                            <li><strong>Device / app data:</strong> App version, flavour (brand), and standard diagnostic data needed to run the app and API.</li>
+                            <li><strong>Device / app data:</strong> App version, flavour (brand), and standard diagnostic data needed to run the app and API. For signed-in accounts we also store which skin you used first and last (for example My Gig Guide or 919 FM), whether that was Android, iOS, or the website, and the first and last time we saw you signed in. This stays on our server. We do not use third-party analytics tools (Google Analytics, Mixpanel, Firebase Analytics) for this.</li>
                             <li><strong>Push notifications (when enabled):</strong> Device tokens via Google Firebase Cloud Messaging / related services.</li>
                         </ul>
                     </div>

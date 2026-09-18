@@ -12,6 +12,7 @@ use App\Rules\UniqueNormalizedName;
 use App\Services\AppWebSessionService;
 use App\Services\ClaimService;
 use App\Services\UserFirebaseLinkService;
+use App\Support\ClientAccess;
 use App\Support\FirebaseWeb;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -341,7 +342,8 @@ class AuthController extends Controller
 
     private function recordWebLogin(User $user): void
     {
-        $user->recordLogin();
+        $access = ClientAccess::forWeb();
+        $user->recordLogin($access['client'], $access['platform']);
     }
 
     /**

@@ -78,6 +78,22 @@ All endpoints return **JSON**. No authentication required for these read-only ro
 
 Event / artist / venue **`show`** responses include **`rating_summary`**: `{ average, count, user: { rating, review } | null }`. Send optional bearer token on GET to populate `user` for the signed-in account.
 
+### Client brand / platform (optional — first-party access)
+
+**Not required** for 919 FM going live or the first iOS submit. Laravel stores this on the user when the app (or website) sends it. No Mixpanel, Google Analytics, or time-in-app.
+
+On **`POST /api/v1/auth/login`**, **`register`**, and **`firebase`**, optional JSON:
+
+| Field | Example | Notes |
+|-------|---------|--------|
+| `brand` or `client` | `fm919` | Skin: `mygigguide`, `fm919`, `rogues`, `hot1027`, `risefm`, `vowfm`, `mixfm` |
+| `platform` | `android` | `android`, `ios`, or `web` |
+| `device_name` | `fm919-android-149` | Names the Sanctum token as today. If `brand` / `platform` are omitted, a name like `{brand}-{platform}-{build}` is parsed. |
+
+Later signed-in calls may send headers **`X-Client-Brand`** and **`X-Client-Platform`** (for example `GET /api/v1/me`). Unknown values are ignored (not an error). **First** skin and platform stay put; **last** skin, platform, and last access update (writes at most every 15 minutes unless the skin/platform changed). Guests are not tracked. Website login records `platform=web` and the hostname skin (`fm919` on `919fm.mygigguide.co.za`).
+
+Admin → Users → View shows first seen, last access, first/last skin and platform, and token names.
+
 Artist / venue **`show`** also include ownership fields when a bearer token is sent: **`ownership_status`** (`official` \| `unclaimed` \| `pending` \| `disputed`), **`user_claim_pending`** (bool), **`can_request_claim`** (bool — logged-in user may call manual claim). **`show`** also returns **`can_edit_videos`** and **`can_edit_profile`** when the bearer may `PATCH` that page.
 
 ### Update artist page (`PATCH /api/v1/artists/{id}`)

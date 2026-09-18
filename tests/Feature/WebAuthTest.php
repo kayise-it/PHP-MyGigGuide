@@ -12,6 +12,12 @@ class WebAuthTest extends TestCase
 {
     use RefreshDatabase;
 
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->seed(\Database\Seeders\LaratrustSeeder::class);
+    }
+
     public function test_web_register_logs_in_immediately_without_verified_email(): void
     {
         Mail::fake();
@@ -33,6 +39,10 @@ class WebAuthTest extends TestCase
 
         $response->assertRedirect(route('dashboard'));
         $this->assertAuthenticatedAs($user);
+        $this->assertSame('mygigguide', $user->first_client);
+        $this->assertSame('web', $user->first_platform);
+        $this->assertNotNull($user->first_seen_at);
+        $this->assertNotNull($user->last_access_at);
     }
 
     public function test_web_login_allows_first_password_login_for_unverified_user(): void
@@ -70,6 +80,27 @@ class WebAuthTest extends TestCase
 
         $response->assertRedirect(route('verification.notice'));
         $this->assertGuest();
+    }
+
+    public function test_web_login_on_fm919_host_records_919_web_client(): void
+    {
+        $user = User::factory()->create([
+            'username' => 'fm919_fan',
+            'email_verified_at' => now(),
+        ]);
+        $user->addRole('user');
+
+        $response = $this->post('https://919fm.mygigguide.co.za/login', [
+            'username' => 'fm919_fan',
+            'password' => 'password',
+        ]);
+
+        $response->assertRedirect(route('dashboard'));
+        $user->refresh();
+        $this->assertSame('fm919', $user->first_client);
+        $this->assertSame('web', $user->first_platform);
+        $this->assertSame('fm919', $user->last_client);
+        $this->assertNotNull($user->last_access_at);
     }
 
     public function test_firebase_web_login_establishes_session(): void

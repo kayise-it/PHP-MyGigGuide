@@ -93,6 +93,10 @@
                 </div>
             </div>
 
+            <div class="mt-6">
+                @include('admin.users._client-access')
+            </div>
+
             <!-- Roles & Permissions -->
             <div class="mt-6 bg-white shadow-sm rounded-xl border border-gray-200">
                 <div class="px-6 py-4 border-b border-gray-200">
