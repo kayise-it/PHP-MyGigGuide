@@ -680,6 +680,14 @@
                         </span>
                     </div>
 
+                    @if($event->tiktok)
+                    <x-social-profile-links
+                        :tiktok="$event->tiktok"
+                        class="{{ $siteBrand->detailPanelClass('p-4') }}"
+                        heading-class="text-lg font-semibold text-white mb-3"
+                    />
+                    @endif
+
                     <!-- Social Sharing -->
                     <div class="{{ $siteBrand->detailPanelClass() }}">
                         <h3 class="text-lg font-semibold text-white mb-4">Share this event</h3>

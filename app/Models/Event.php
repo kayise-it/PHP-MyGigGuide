@@ -22,6 +22,7 @@ class Event extends Model
         'time',
         'price',
         'ticket_url',
+        'tiktok',
         'poster',
         'poster_card',
         'gallery',

@@ -31,6 +31,7 @@ class ArtistResource extends JsonResource
             'instagram' => $this->instagram,
             'facebook' => $this->facebook,
             'twitter' => $this->twitter,
+            'tiktok' => $this->tiktok,
             'profile_picture_url' => self::publicStorageUrl($this->profile_picture),
             'gallery_urls' => self::publicStorageUrls(is_array($this->gallery) ? $this->gallery : []),
             'genres' => GenreResource::collection($this->whenLoaded('genres')),

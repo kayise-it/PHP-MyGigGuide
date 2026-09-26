@@ -195,6 +195,7 @@ class EventController extends Controller
             'time' => 'required|date_format:H:i',
             'price' => 'nullable|numeric|min:0',
             'ticket_url' => 'nullable|url',
+            'tiktok' => 'nullable|url',
             'poster' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:10240',
             'gallery' => 'nullable|array|max:10',
             'gallery.*' => 'image|mimes:jpeg,png,jpg,gif,webp|max:10240',

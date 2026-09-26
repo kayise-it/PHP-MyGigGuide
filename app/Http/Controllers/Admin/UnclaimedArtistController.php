@@ -55,6 +55,7 @@ class UnclaimedArtistController extends Controller
             'instagram' => 'nullable|url',
             'facebook' => 'nullable|url',
             'twitter' => 'nullable|url',
+            'tiktok' => 'nullable|url',
             'profile_picture' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:10240',
         ]);
 

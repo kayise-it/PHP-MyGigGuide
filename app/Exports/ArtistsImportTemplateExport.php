@@ -20,6 +20,7 @@ class ArtistsImportTemplateExport implements FromArray, WithHeadings
             'Instagram',
             'Facebook',
             'Twitter',
+            'TikTok',
             'User ID',
             'User Email',
             'User Name',
@@ -44,6 +45,7 @@ class ArtistsImportTemplateExport implements FromArray, WithHeadings
                 '',  // Instagram
                 '',  // Facebook
                 '',  // Twitter
+                '',  // TikTok
                 '',  // User ID (optional existing artist user)
                 '',  // User Email (ignored on import)
                 '',  // User Name (ignored on import)

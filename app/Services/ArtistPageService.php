@@ -69,6 +69,7 @@ class ArtistPageService
             'instagram' => filled($request->input('instagram')) ? $request->input('instagram') : null,
             'facebook' => filled($request->input('facebook')) ? $request->input('facebook') : null,
             'twitter' => filled($request->input('twitter')) ? $request->input('twitter') : null,
+            'tiktok' => filled($request->input('tiktok')) ? $request->input('tiktok') : null,
             'contact_email' => filled($request->input('contact_email')) ? $request->input('contact_email') : null,
         ]);
 
@@ -82,6 +83,7 @@ class ArtistPageService
             'instagram' => 'nullable|url|max:255',
             'facebook' => 'nullable|url|max:255',
             'twitter' => 'nullable|url|max:255',
+            'tiktok' => 'nullable|url|max:255',
             'snapscan_code' => 'nullable|string|max:255',
             'profile_picture' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:10240',
             'youtube_videos' => 'nullable|array|max:5',

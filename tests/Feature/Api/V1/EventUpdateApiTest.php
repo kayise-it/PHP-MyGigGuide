@@ -83,6 +83,29 @@ class EventUpdateApiTest extends TestCase
         ]);
     }
 
+    public function test_owner_can_set_event_tiktok_link(): void
+    {
+        $user = $this->makeVerifiedUser();
+        $user->syncRoles(['user']);
+        $event = $this->makeOwnedEvent($user);
+
+        Sanctum::actingAs($user);
+
+        $this->patchJson("/api/v1/events/{$event->id}", [
+            'name' => $event->name,
+            'date' => $event->date->toDateString(),
+            'time' => '20:00',
+            'venue_id' => $event->venue_id,
+            'tiktok' => 'https://www.tiktok.com/@gignight',
+        ])->assertOk()
+            ->assertJsonPath('data.tiktok', 'https://www.tiktok.com/@gignight');
+
+        $this->assertDatabaseHas('events', [
+            'id' => $event->id,
+            'tiktok' => 'https://www.tiktok.com/@gignight',
+        ]);
+    }
+
     public function test_owner_can_update_event_via_multipart_post_method_spoof(): void
     {
         $user = $this->makeVerifiedUser();

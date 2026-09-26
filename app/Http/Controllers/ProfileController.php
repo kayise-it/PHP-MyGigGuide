@@ -138,6 +138,7 @@ class ProfileController extends Controller
             'instagram' => 'nullable|url|max:255',
             'facebook' => 'nullable|url|max:255',
             'twitter' => 'nullable|url|max:255',
+            'tiktok' => 'nullable|url|max:255',
             'artist_profile_picture' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:10240',
         ]);
 
@@ -151,6 +152,7 @@ class ProfileController extends Controller
             'instagram' => $request->instagram,
             'facebook' => $request->facebook,
             'twitter' => $request->twitter,
+            'tiktok' => $request->tiktok,
         ];
 
         if ($request->hasFile('artist_profile_picture')) {

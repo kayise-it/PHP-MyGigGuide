@@ -27,6 +27,7 @@ class EventResource extends JsonResource
             'time' => $this->time ? $this->time->format('H:i:s') : null,
             'price' => $this->price,
             'ticket_url' => $this->ticket_url,
+            'tiktok' => $this->tiktok,
             'status' => $this->status,
             'legacy_category' => $this->category,
             'poster_url' => $this->resolvePosterUrl(),
