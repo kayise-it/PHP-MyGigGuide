@@ -123,6 +123,7 @@ class AuthController extends Controller
                 email: $validated['email'],
                 password: $validated['password'],
                 username: $validated['username'] ?? null,
+                signedUpVia: 'app',
             );
         } catch (ValidationException $e) {
             return response()->json([

@@ -10,6 +10,7 @@ use App\Models\Organiser;
 use App\Models\User;
 use App\Models\Venue;
 use App\Rules\UniqueNormalizedName;
+use App\Services\UserSignupNotificationService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -21,6 +22,10 @@ use Illuminate\Support\Str;
 
 class UserManagementController extends Controller
 {
+    public function __construct(
+        private readonly UserSignupNotificationService $signupNotifications,
+    ) {}
+
     /**
      * Search users for the user selector component
      */
@@ -178,6 +183,8 @@ class UserManagementController extends Controller
         if (method_exists($user, 'getOrCreateFolderSettings')) {
             $user->getOrCreateFolderSettings();
         }
+
+        $this->signupNotifications->notifyAdmin($user, 'admin');
 
         return redirect()->route('admin.users.index')
             ->with('success', 'User created successfully.');

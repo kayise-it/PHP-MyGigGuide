@@ -14,10 +14,14 @@ use Laratrust\Models\Role;
  */
 class ApiUserRegistrationService
 {
+    public function __construct(
+        private readonly UserSignupNotificationService $signupNotifications,
+    ) {}
+
     /**
      * @return array{user: User, username: string}
      */
-    public function register(string $name, string $email, string $password, ?string $username = null): array
+    public function register(string $name, string $email, string $password, ?string $username = null, string $signedUpVia = 'app'): array
     {
         $email = strtolower(trim($email));
         $name = trim($name);
@@ -43,6 +47,7 @@ class ApiUserRegistrationService
         $user->addRole('user');
         $this->ensureMemberCanCreateEvents($user);
         $user->getOrCreateFolderSettings();
+        $this->signupNotifications->notifyAdmin($user, $signedUpVia);
 
         return ['user' => $user, 'username' => $username];
     }

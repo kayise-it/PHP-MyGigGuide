@@ -63,6 +63,7 @@ class UserFirebaseLinkService
                 email: $claims['email'],
                 password: Str::random(40),
                 username: null,
+                signedUpVia: 'Google',
             );
             $user = $result['user'];
             $user->update(['firebase_uid' => $claims['uid']]);

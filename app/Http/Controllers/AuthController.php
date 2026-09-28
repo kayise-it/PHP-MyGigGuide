@@ -12,6 +12,7 @@ use App\Rules\UniqueNormalizedName;
 use App\Services\AppWebSessionService;
 use App\Services\ClaimService;
 use App\Services\UserFirebaseLinkService;
+use App\Services\UserSignupNotificationService;
 use App\Support\ClientAccess;
 use App\Support\FirebaseWeb;
 use Carbon\Carbon;
@@ -37,6 +38,7 @@ class AuthController extends Controller
         ClaimService $claimService,
         private readonly UserFirebaseLinkService $firebaseLink,
         private readonly AppWebSessionService $webSession,
+        private readonly UserSignupNotificationService $signupNotifications,
     ) {
         $this->claimService = $claimService;
     }
@@ -304,6 +306,11 @@ class AuthController extends Controller
 
     private function finishWebRegistration(Request $request, User $user, string $successMessage): RedirectResponse
     {
+        $this->signupNotifications->notifyAdmin(
+            $user,
+            $request->has('continue') ? 'website popup' : 'website',
+        );
+
         Auth::login($user);
         $request->session()->regenerate();
         $this->recordWebLogin($user);
@@ -492,6 +499,7 @@ class AuthController extends Controller
 
                     // Create user folder and settings
                     $user->getOrCreateFolderSettings();
+                    $this->signupNotifications->notifyAdmin($user, 'Facebook');
                 }
             }
 
